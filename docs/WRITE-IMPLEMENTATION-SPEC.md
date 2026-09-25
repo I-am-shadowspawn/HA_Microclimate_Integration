@@ -39,9 +39,7 @@ Capture `20260923T163151Z-3x_viumy` reports v20 changing from `00/00` to `09/02`
 
 ### Confirmed scheduled write
 
-Inspected the local folder:
-
-`/home/simon/Documents/Codex/2026-09-22/in-app-browser-context-source-ambient/work/20260923T222243Z-n2x2lwed`
+Inspected the locally supplied capture `20260923T222243Z-n2x2lwed`:
 
 - Target: v32; baseline value: plain string `7200`.
 - Sent value: `7200\u00007200\u0000Europe/London\u00000` in JSON notation.
@@ -171,4 +169,3 @@ Commands: `outputs/microclimate-test-matrix.sh` and `outputs/microclimate-test-m
 The product decisions above are sufficient to implement the requested iteration. Use the recorded defaults rather than reopening resolved questions. Continue independent phases if a runtime edge case exposes malformed data; reject only the affected operation with a clear error. Do not invent a new pin, endpoint, timezone or protocol meaning to make a test pass.
 
 If evidence contradicts a requested capability, record the exact blocker and finish unaffected work; do not silently mark the whole request complete with a missing field family. Otherwise proceed through packaging without asking for repeated coding permission. No automatic live-controller verification is included: release notes must distinguish mocked write acceptance from the two hardware-confirmed pin examples.
-

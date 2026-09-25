@@ -17,7 +17,12 @@ async def test_inventory(hass,model):
         rows=er.async_entries_for_config_entry(er.async_get(hass),entry.entry_id)
         expected={'Evo Connect':59,'Evo Connect 2':66,'Evo Connect 3':93}[model]
         assert len(rows)==expected
-        assert sum(hass.states.get(e.entity_id) is not None for e in rows)==expected
+        raw=[e for e in rows if '_raw_' in e.unique_id]
+        assert raw and all(e.disabled_by == er.RegistryEntryDisabler.INTEGRATION for e in raw)
+        assert sum(hass.states.get(e.entity_id) is not None for e in rows)==expected-len(raw)
+        schedule=[e for e in rows if e.unique_id.endswith('_schedule')]
+        assert len(schedule)==len(MODEL_CHANNEL_OPTIONS[model])
+        assert all(e.disabled_by is None and e.entity_category is None for e in schedule)
         assert not any('_schedule_period_' in e.unique_id or ('_write_' in e.unique_id and '_period_' in e.unique_id) for e in rows)
         assert not any(e.domain=='time' for e in rows)
         assert reader.call_count==1
@@ -32,7 +37,11 @@ from test_write_runtime import runtime
 
 async def test_anchor_only_permission_and_rename(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
+    registry=er.async_get(hass)
+    raw=[e for e in er.async_entries_for_config_entry(registry,c.entry.entry_id) if '_raw_' in e.unique_id]
+    assert raw and all(e.disabled_by == er.RegistryEntryDisabler.INTEGRATION for e in raw)
     anchor=next(f['entity_id'] for f in view['fields'] if f['index'])
+    assert registry.async_get(anchor).disabled_by is None
     user=Mock(id='schedule-user')
     user.permissions.check_entity.side_effect=lambda eid,policy:eid==anchor
     projection=snapshot(hass,c,'Yellow',device,user)
@@ -41,7 +50,6 @@ async def test_anchor_only_permission_and_rename(hass,runtime,hass_admin_user):
     assert not projection['observations']
     api=CardAPI(hass);job=await wait_job(hass,api,await api.save(msg,user))
     assert job['status']=='succeeded'
-    registry=er.async_get(hass)
     registry.async_update_entity(anchor,new_entity_id='sensor.renamed_schedule')
     user.permissions.check_entity.side_effect=lambda eid,policy:eid=='sensor.renamed_schedule'
     assert all(f['entity_id']=='sensor.renamed_schedule' for f in snapshot(hass,c,'Yellow',device,user)['fields'])

@@ -57,7 +57,7 @@ class MicroclimatePinCount(CoordinatorEntity, SensorEntity):
 
 
 class MicroclimateRawPin(CoordinatorEntity, SensorEntity):
-    """Raw observation, temporarily enabled by default; mapping and physical meaning are unverified."""
+    """Optional raw observation; mapping and physical meaning are unverified."""
     _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_entity_registry_enabled_default = DEFAULT_ENABLE_DIAGNOSTICS
@@ -186,7 +186,8 @@ class MicroclimateSchedule(CoordinatorEntity, SensorEntity):
         'periods', 'daily_points', 'day_night', 'seasons', 'duplicate_clock_times',
         'timing', 'control', 'ramp_time', 'periodic_interval', 'periodic_duration',
     })
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    # This enabled sensor anchors schedule-card read and control permissions.
+    _attr_entity_registry_enabled_default = True
 
     def __init__(self, coordinator, entry, channel):
         super().__init__(coordinator)
@@ -209,7 +210,6 @@ class MicroclimateWriteStatus(CoordinatorEntity, SensorEntity):
     _attr_has_entity_name = True
     _attr_name = 'Last configuration write'
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_entity_registry_enabled_default = DEFAULT_ENABLE_DIAGNOSTICS
 
     def __init__(self, coordinator, entry):
         super().__init__(coordinator)

@@ -188,7 +188,7 @@ CHANNELS = {
     channel: {key: groups[group][role] for key, (group, role) in CHANNEL_FIELD_PATHS.items()}
     for channel, groups in CHANNEL_PINS.items()
 }
-# Temporary defaults for the write-validation release.
+# Public defaults. Raw observations remain available when individually enabled.
 CONF_ENABLE_WRITES = 'enable_writes'
 DEFAULT_ENABLE_WRITES = True
-DEFAULT_ENABLE_DIAGNOSTICS = True
+DEFAULT_ENABLE_DIAGNOSTICS = False

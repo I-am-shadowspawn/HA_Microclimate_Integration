@@ -228,18 +228,21 @@ async def test_queued_disable_and_unload_cancel(hass,runtime):
     assert writer.await_count==1  # No replay on reload.
 
 
-async def test_integration_disabled_diagnostics_only(hass):
+async def test_diagnostic_registry_choices_survive_setup_and_reload(hass):
     entry=MockConfigEntry(domain=DOMAIN,data={'evo_device':'diagnostics','model':'Evo Connect','token':'fake'})
     entry.add_to_hass(hass);reg=er.async_get(hass)
-    for pin,disabler in [('v0',er.RegistryEntryDisabler.INTEGRATION),('v4',er.RegistryEntryDisabler.USER)]:
+    for pin,disabler in [('v0',er.RegistryEntryDisabler.INTEGRATION),('v4',er.RegistryEntryDisabler.USER),('v8',None)]:
         reg.async_get_or_create('sensor',DOMAIN,f'{entry.entry_id}_Yellow_raw_{pin}',config_entry=entry,
                                entity_category=EntityCategory.DIAGNOSTIC,disabled_by=disabler)
     with patch('custom_components.microclimate_integration.api_client.fetch_data',return_value=payload('Evo Connect')):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
-        for pin,disabled in [('v0',None),('v4',er.RegistryEntryDisabler.USER)]:
-            eid=reg.async_get_entity_id('sensor',DOMAIN,f'{entry.entry_id}_Yellow_raw_{pin}')
-            assert reg.async_get(eid).disabled_by==disabled
+        for _ in range(2):
+            for pin,disabled in [('v0',er.RegistryEntryDisabler.INTEGRATION),('v4',er.RegistryEntryDisabler.USER),('v8',None)]:
+                eid=reg.async_get_entity_id('sensor',DOMAIN,f'{entry.entry_id}_Yellow_raw_{pin}')
+                assert reg.async_get(eid).disabled_by==disabled
+            assert await hass.config_entries.async_reload(entry.entry_id)
+            await hass.async_block_till_done()
         await hass.config_entries.async_unload(entry.entry_id)
 
 

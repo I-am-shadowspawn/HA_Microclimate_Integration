@@ -1,19 +1,19 @@
-# Microclimate cards — 1.3.0
+# Microclimate cards — 1.3.1
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-The release includes **Microclimate channel** and **Microclimate controller** cards. Install the backend and its bundled card together. This release targets Home Assistant 2026.9.2/2026.9.3.
+The release includes **Microclimate channel** and **Microclimate controller** cards. Install the backend and its bundled card together. The minimum supported Home Assistant Core version is 2026.9.3.
 
 ## Clean reinstall required
 
-Follow [the clean-install runbook](CLEAN-INSTALL-1.3.0.md). Remove the old testing entries/devices, replace rather than overlay the integration directory, restart and recreate entries. Reselect devices in existing card configurations; device IDs change. Edit the existing JavaScript module resource to `/microclimate_integration/microclimate-cards.js?v=1.3.0`, then refresh the frontend. Preserve any custom colour configuration.
+For the 1.3.0 compact transition, follow [the clean-install runbook](CLEAN-INSTALL-1.3.0.md). If already on the compact candidate, install 1.3.1 and retain the entry and card configuration. Update the JavaScript module resource to `/microclimate_integration/microclimate-cards.js?v=1.3.1`, then refresh the frontend. Preserve any custom colour configuration.
 
-Individual time/setpoint entities no longer exist. Keep the channel's **Reported schedule periods** sensor enabled: the card requires READ access to show its schedule and CONTROL access to edit it. Other controls and root dates retain separate permissions. The sensor itself remains read-only; validated writes go through the card API.
+Individual time/setpoint entities no longer exist. Keep the channel's **Reported schedule periods** sensor enabled: the card requires READ access to show its schedule and CONTROL access to edit it. It is an ordinary enabled sensor rather than a diagnostic entity; raw-pin diagnostics can remain disabled. Other controls and root dates retain separate permissions. The sensor itself remains read-only; validated writes go through the card API.
 
 ## Install and add cards
 
 1. Back up your Home Assistant configuration. Extract the install ZIP into your HA configuration directory so it contains `custom_components/microclimate_integration/manifest.json` and `frontend/microclimate-cards.js` beneath the integration folder. Restart HA after replacing the integration.
-2. In dashboard settings → Resources (enable Advanced Mode in your user profile if necessary), add `/microclimate_integration/microclimate-cards.js?v=1.3.0`, type **JavaScript module**. Add it once. If upgrading a previous card resource, change its version query and reload the browser.
+2. In dashboard settings → Resources (enable Advanced Mode in your user profile if necessary), add `/microclimate_integration/microclimate-cards.js?v=1.3.1`, type **JavaScript module**. Add it once. If upgrading a previous card resource, change its version query and reload the browser.
 3. Edit a dashboard, Add card, choose **Microclimate channel**, then select the registered Yellow/Red/Blue channel device. Add one per channel you want displayed.
 4. Add **Microclimate controller** separately and select the root device to edit shared season dates.
 
@@ -74,7 +74,7 @@ Drafts are in-memory only. Page reload warns about unsaved changes and never sub
 
 - **Unknown**: missing/invalid data or an unset date; it is never filled with an invented zero.
 - **Edit absent/disabled**: check entity permissions, integration write option, unavailable/disabled controls, other active saves and matching backend/card versions.
-- **Version mismatch/custom element missing**: install the entire 1.3.0 integration, register the module resource, restart HA and reload the browser cache.
+- **Version mismatch/custom element missing**: install the entire 1.3.1 integration, register the module resource, restart HA and reload the browser cache.
 - **Time-template conflict**: affected slots have incompatible preserved metadata. Capture the observed encodings for investigation; do not discard timezone/opaque suffixes to force a write.
 - **Invalid date path**: no sequence of the requested single-pin updates preserves a valid calendar. No writes were dispatched.
 

@@ -1,12 +1,12 @@
-# Compact schedule cards — release 1.3.0
+# Compact schedule cards — candidate 1.3.1
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-This release adds channel schedule cards and a root-controller season-date card with explicit Save/Cancel. See [installation and card usage](docs/CARD-USAGE.md) and [card API](docs/CARD-API.md). **Clean reinstall required.** Individual schedule time/setpoint entities are removed; the cards use the aggregate schedule sensor as their permission scope. See [clean reinstall](docs/CLEAN-INSTALL-1.3.0.md).
+The compact series adds channel schedule cards and a root-controller season-date card with explicit Save/Cancel. See [installation and card usage](docs/CARD-USAGE.md) and [card API](docs/CARD-API.md). A clean reinstall was required for the 1.3.0 transition from the disposable prototype; upgrading an existing compact 1.3.0 entry to 1.3.1 preserves its identity. Individual schedule time/setpoint entities were removed; the cards use the aggregate schedule sensor as their permission scope. See [clean reinstall](docs/CLEAN-INSTALL-1.3.0.md) if still on the prototype.
 
 # Microclimate Integration for Home Assistant
 
-Local development candidate **1.3.0**. This custom integration reads Microclimate Evo Connect controller data and adds readback-confirmed configuration controls. **Writes and diagnostic entities are enabled by default for this iteration.** Existing climate/sensor observations stay read-only. See [write controls and usage](docs/WRITE-CONTROLS.md) for supported settings, constraints, errors and hardware-evidence limits.
+Local development candidate **1.3.1**. This custom integration reads Microclimate Evo Connect controller data and adds readback-confirmed configuration controls. Configuration writes remain enabled by default and can be disabled in entry options. Raw-pin diagnostic entities are disabled by default; the Reported schedule periods sensor remains enabled because the card uses it for permissions. Existing climate/sensor observations stay read-only. See [write controls and usage](docs/WRITE-CONTROLS.md) for supported settings, constraints, errors and hardware-evidence limits.
 
 ## Supported Home Assistant baseline
 
@@ -29,7 +29,7 @@ Each entry creates one root controller device and its channel devices. Supplied 
 - Reported schedule periods, with all eight slots retained in attributes. The count means reported slots, not active slots. Thermal setpoints are Celsius; fixed-output setpoints are percentages. Unexpected tokens, reported timezone and unrecognized fields are preserved without calculating the active schedule.
 - Mode-specific schedule attributes: Day Night exposes `day_night.day` and `.night` from the first two pairs; Multi exposes `daily_points` (eight time/setpoint entries); Seasonal exposes `seasons` (four day/night pairs plus root start dates). Original `periods` remain available in every mode. These are reported settings, not an active-schedule calculation. Blue Periodic retains unparsed interval/duration fields; no periodic meaning is assigned to Yellow/Red fields.
 - Root metadata: four season starts, previous-24-hour power, temperature-unit code, system date/time and system name, plus reported pin count. The 24-hour power unit remains unverified and unset. Dates retain the reported year format; no century or timestamp is invented.
-- Raw-pin diagnostics, temporarily enabled by default; explicitly user-disabled entities remain disabled.
+- Optional raw-pin diagnostics, disabled by default. Individual registry enable/disable choices survive reload.
 
 Missing/invalid readings are unknown; failed refreshes make entities unavailable. Native temperatures are Celsius even when the upstream text is mislabeled F. Home Assistant may convert those native values for display. The reported unit flag does not trigger an extra conversion.
 
@@ -97,15 +97,15 @@ Schedules are manually configured clock times. Automatic sunrise/sunset selectio
 
 The existing Reported schedule periods entity includes a readable `summary` attribute (maximum 255 characters) alongside the timing mode and reported slot count. Full `day_night`, `daily_points`, `seasons` and raw `periods` details remain available in the live entity attributes. IDs and polling are unchanged.
 
-Large structured schedule attributes are excluded from recorder history using HA's entity metadata; the compact summary, mode and count remain recordable. Consequently history cannot reconstruct every old raw schedule field. Use a deliberate diagnostic capture for a full snapshot. Raw-pin diagnostics are temporarily enabled by default in 1.1.0. No active-calendar projection is calculated. Live dashboard acceptance and long-running recorder growth remain the separate V-04/V-06 deployment checks.
+Large structured schedule attributes are excluded from recorder history using HA's entity metadata; the compact summary, mode and count remain recordable. Consequently history cannot reconstruct every old raw schedule field. HA's downloadable diagnostics provide a bounded structural summary without raw values; opt-in DEBUG capture is available when a full snapshot is needed. No active-calendar projection is calculated. Live dashboard acceptance and long-running recorder growth remain separate deployment checks.
 
-## Individual schedule entities (1.0.9)
+## Aggregate schedule entity
 
-Each channel now registers 16 enabled read-only sensors: eight start-time sensors and eight setpoint sensors. They appear under the channel device as ordinary sensors, not just nested diagnostic attributes. Names follow the current mode: Day/Night, Schedule point 1–8 (Multi), or Season 1–4 day/night. IDs follow the physical slots and do not change when modes change. Custom user-assigned names take precedence.
+Each channel has one enabled Reported schedule periods sensor with a summary and structured attributes. Its registry entity is the card's schedule permission anchor. Keep it enabled and grant READ access to view the schedule and CONTROL access to edit it.
 
-Day & Night uses four sensors (two pairs); the remaining pairs are unavailable. Multi and Seasonal use all 16. Constant and Periodic do not use these manual time/setpoint pairs, so their field sensors are unavailable. Missing values in an applicable mode are unknown. Setpoints display Celsius (or HA's configured temperature unit) for thermal control and percentages for fixed output. Separate write controls are added in 1.1.0; these sensors remain observations.
+Day & Night uses two pairs; Multi and Seasonal use up to eight. Constant and Periodic do not expose editable manual pairs. The card shows thermal setpoints in Celsius (or HA's configured temperature unit) and fixed output as percentages. The sensor remains read-only; validated writes use the card API.
 
-The existing Reported schedule periods diagnostic sensor, summary and structured attributes remain. Existing installations may retain old unavailable registry entries, so device totals alone are not proof of a mapping problem. This version adds 16 registered field sensors per channel; raw diagnostics also contribute to registry totals and now default to enabled.
+Raw-pin entities remain registered for optional troubleshooting but are disabled by default. Other diagnostics, including root metadata and Last configuration write, retain their own defaults.
 
 Root season starts remain separate metadata sensors. A raw 00/00 value reports unknown; a valid 09/02 reports 09/02. If a valid raw date nevertheless displays unknown, supply that entity's attributes for investigation.
 

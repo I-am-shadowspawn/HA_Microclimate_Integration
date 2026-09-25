@@ -1,3 +1,9 @@
+# 1.3.1 — support diagnostics and public defaults
+
+- Disable raw-pin diagnostic entities by default without changing registry choices on reload. Keep schedule sensors enabled as ordinary entities for card permissions; writes retain their enabled default.
+- Add bounded, redacted Home Assistant downloadable diagnostics with model/version, safe options, polling/write status and response shape. Raw values require the existing explicit DEBUG capture option.
+- Remove a workstation path from the development documentation and audit packaged public assets for credentials and personal paths.
+
 # Unreleased — distribution tooling
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).

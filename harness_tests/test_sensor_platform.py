@@ -10,7 +10,7 @@ from custom_components.microclimate_integration.identity import channel_identity
 
 
 @pytest.mark.parametrize('model,channels', [('Evo Connect',{'Yellow','Blue'}),('Evo Connect 2',{'Yellow','Blue'}),('Evo Connect 3',{'Yellow','Red','Blue'})])
-async def test_raw_candidates_default_enabled_and_shared_fetch(hass,model,channels):
+async def test_raw_candidates_default_disabled_and_shared_fetch(hass,model,channels):
     entry = MockConfigEntry(domain=DOMAIN,data={'evo_device':'test','token':'fake','model':model})
     entry.add_to_hass(hass)
     payload = {'v0':'25°F','v8':'27°F','v52':1,'v4':0,'token':'not-a-pin'}
@@ -22,8 +22,8 @@ async def test_raw_candidates_default_enabled_and_shared_fetch(hass,model,channe
         raw = [e for e in sensors if '_raw_' in e.unique_id]
         assert raw
         assert {e.unique_id.removeprefix(entry.entry_id+'_').split('_raw_')[0] for e in raw} == channels
-        assert all(e.disabled_by is None for e in raw)
-        assert all(hass.states.get(e.entity_id) is not None for e in raw)
+        assert all(e.disabled_by == er.RegistryEntryDisabler.INTEGRATION for e in raw)
+        assert all(hass.states.get(e.entity_id) is None for e in raw)
         count_id = registry.async_get_entity_id('sensor',DOMAIN,f'{entry.entry_id}_reported_pin_count')
         assert hass.states.get(count_id).state == '4'
         assert api.await_count == 1

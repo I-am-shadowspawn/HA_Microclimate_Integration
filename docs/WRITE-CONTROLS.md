@@ -1,8 +1,8 @@
-# Configuration writes — candidate 1.3.0
+# Configuration writes — candidate 1.3.1
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-This iteration adds editable controls alongside the existing observations. Writes and diagnostic entities are enabled by default. Full raw-response DEBUG logging remains off. The integration has not been deployed or used to write a live controller during implementation.
+This iteration adds editable controls alongside the existing observations. Writes remain enabled by default; raw-pin diagnostics default to disabled. Full raw-response DEBUG logging remains off. The automated validation uses mocked controller traffic and does not dispatch live writes.
 
 ## Where to find the controls
 
@@ -45,7 +45,9 @@ Polling and writes share one coordinator/session per entry. The I/O lock include
 
 ## Options and diagnostics
 
-Disable **Enable configuration writes** in this entry's options to block new and queued updates; already dispatched requests cannot be recalled. Observations remain available. Missing option values default to enabled for this development iteration. Only this integration's previously integration-disabled diagnostic entries are enabled automatically; user-disabled entries remain disabled. Increased raw diagnostics can increase recorder/history volume. Disable unwanted entities or configure recorder exclusions as needed. The named defaults in const.py allow a future release to change policy explicitly.
+Disable **Enable configuration writes** in this entry's options to block new and queued updates; already dispatched requests cannot be recalled. Observations remain available. Missing option values default to enabled. Raw-pin diagnostic entities are registered but disabled by default; enable only the pins needed for troubleshooting. User and integration registry choices remain unchanged on reload. The Reported schedule periods sensor stays enabled and is required for card schedule access. Other diagnostics retain their defaults. Enabling many raw pins can increase recorder/history volume.
+
+Home Assistant's **Download diagnostics** action on the integration entry produces a bounded summary of model/version, safe option flags, polling and write status, and response shape. It omits raw pin names/values, controller name, token, entry ID, URLs and exception messages. Review the file before posting it. For a full raw response, explicitly enable **Log full API responses** and DEBUG logging; those logs may contain controller names and readings and must be reviewed before sharing.
 
 Full response logging requires both the per-entry option and HA DEBUG logging. It covers read/baseline/readback JSON, not credential URLs. Tokens and credential fields are redacted, including URL-encoded occurrences; other names/readings remain visible. Accepted read bodies are bounded to 1 MiB, update acknowledgements to 64 KiB. Oversized responses are rejected, not partially normalized or logged. Both endpoints refuse redirects and use HA's normal TLS session.
 

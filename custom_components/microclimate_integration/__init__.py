@@ -4,12 +4,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .coordinator import MicroclimateCoordinator
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity import EntityCategory
 from .identity import controller_device_info
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, DEFAULT_ENABLE_DIAGNOSTICS
+from .const import DOMAIN
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 PLATFORMS = ["climate", "sensor", "select", "number", "text"]
@@ -33,12 +31,6 @@ async def async_setup_entry(hass, entry):
         await coordinator.async_config_entry_first_refresh()
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
         dr.async_get(hass).async_get_or_create(config_entry_id=entry.entry_id, **controller_device_info(entry))
-        if DEFAULT_ENABLE_DIAGNOSTICS:
-            registry = er.async_get(hass)
-            for registered in er.async_entries_for_config_entry(registry, entry.entry_id):
-                if (registered.platform == DOMAIN and registered.entity_category == EntityCategory.DIAGNOSTIC
-                        and registered.disabled_by == er.RegistryEntryDisabler.INTEGRATION):
-                    registry.async_update_entity(registered.entity_id, disabled_by=None)
         forwarding = True
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         entry.async_on_unload(entry.add_update_listener(_options_updated))

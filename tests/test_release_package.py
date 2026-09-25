@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 import unittest
 import zipfile
 from pathlib import Path
@@ -36,6 +37,14 @@ class ReleasePackageTests(unittest.TestCase):
                         or "evo-captures/" in name
                         for name in names
                     )
+                    for name in names:
+                        if name.endswith((".md", ".json", ".txt")):
+                            text = bundle.read(name).decode("utf-8")
+                            assert not re.search(r"/(?:home/[^/]+|srv/dev)/", text), name
+                            if name.startswith("fixtures/"):
+                                assert not re.search(
+                                    r'"(?:token|api_key|password|authorization)"\s*:', text, re.I
+                                ), name
                     component = "custom_components/microclimate_integration/"
                     assert component + "brand/icon.png" in names
                     assert component + "LICENSE" in names

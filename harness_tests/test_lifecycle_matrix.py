@@ -81,7 +81,7 @@ async def test_sensor_entities_registered_by_real_setup(hass,model_entry,synthet
         sensors = hass.states.async_all('sensor')
         assert await hass.config_entries.async_unload(model_entry.entry_id)
         await hass.async_block_till_done()
-        assert len(sensors) == 46
+        assert len(sensors) == 26  # 20 registered raw-pin diagnostics are disabled.
         count_id = er.async_get(hass).async_get_entity_id('sensor',DOMAIN,f'{model_entry.entry_id}_reported_pin_count')
         assert next(s for s in sensors if s.entity_id==count_id).state == str(len(synthetic_payload))
 
@@ -94,7 +94,7 @@ async def test_sensor_platform_loads_through_ha(hass,model_entry,synthetic_paylo
         sensors = hass.states.async_all('sensor')
         assert await hass.config_entries.async_unload(model_entry.entry_id)
         await hass.async_block_till_done()
-        assert len(sensors) == 46
+        assert len(sensors) == 26  # Reload preserves the raw-pin default.
         count_id = er.async_get(hass).async_get_entity_id('sensor',DOMAIN,f'{model_entry.entry_id}_reported_pin_count')
         assert next(s for s in sensors if s.entity_id==count_id).state == str(len(synthetic_payload))
 
