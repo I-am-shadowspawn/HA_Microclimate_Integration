@@ -1,0 +1,32 @@
+name: Bug report
+description: Report an integration or card problem (never include tokens).
+body:
+  - type: markdown
+    attributes:
+      value: "Unofficial independent project, not affiliated with or supported by Microclimate. Security issues belong in private vulnerability reporting. Remove tokens, credential URLs and personal data."
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and device
+      description: Integration/card version, HA Core version, controller model and firmware.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction and behaviour
+      description: Steps, expected result, actual result; state whether observed on hardware or in tests.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Review logs and screenshots manually before posting. Never attach a raw token file or full backup.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy review
+      options:
+        - label: I have removed credentials and personal information from this report and its attachments.
+          required: true

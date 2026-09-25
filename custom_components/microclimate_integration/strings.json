@@ -1,0 +1,109 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Microclimate controller",
+        "data": {
+          "evo_device": "Controller name",
+          "token": "API token",
+          "model": "Model"
+        }
+      },
+      "reconfigure": {
+        "title": "Update this controller",
+        "description": "Rename this controller or replace its API token. Use a replacement token for the same controller to preserve its Home Assistant entities.",
+        "data": {
+          "evo_device": "Controller name",
+          "token": "Replacement or current API token"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Replace Microclimate API token",
+        "description": "Enter the replacement token for this same controller. Existing entities and customizations will be preserved.",
+        "data": {
+          "token": "Replacement API token"
+        }
+      }
+    },
+    "error": {
+      "required": "Enter the controller name and API token.",
+      "invalid_model": "Select a supported model.",
+      "invalid_auth": "The API token was rejected. Check the token and try again.",
+      "cannot_connect": "Unable to validate the controller connection. Try again later.",
+      "already_configured": "This API token is already used by another controller entry."
+    },
+    "abort": {
+      "already_configured": "This API token is already configured.",
+      "reconfigure_successful": "Controller configuration updated.",
+      "reauth_successful": "Authentication updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Microclimate controls and diagnostics",
+        "description": "Configuration controls are editable by default. Disable writes here to keep observations only. Full response logging remains separately off by default; enable it with Home Assistant DEBUG logging for troubleshooting. Credentials are redacted but controller names and readings remain visible.",
+        "data": {
+          "log_raw_response": "Log full API responses",
+          "enable_writes": "Enable configuration writes (on by default for this release)"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "writes_disabled": {
+      "message": "Configuration writes are disabled in integration options."
+    },
+    "unsupported_capability": {
+      "message": "This setting is unavailable for this channel, timing mode or response."
+    },
+    "stale_context": {
+      "message": "The controller mode or encoding changed. Refresh the setting and try again."
+    },
+    "invalid_number": {
+      "message": "Enter a finite number between 0 and 100 inclusive."
+    },
+    "invalid_date": {
+      "message": "Enter a valid DD/MM date. Leap day and unset dates are not accepted."
+    },
+    "invalid_time": {
+      "message": "Enter a manual time from 00:00:00 to 23:59:59 without fractional seconds or a timezone."
+    },
+    "invalid_option": {
+      "message": "Select one of the supported configuration options."
+    },
+    "unsupported_encoding": {
+      "message": "No consistent supported controller time encoding is available for this field."
+    },
+    "rejected": {
+      "message": "The server rejected the update. The observed configuration is retained."
+    },
+    "rate_limited": {
+      "message": "The server rate limited the update. Check the observed value before trying again."
+    },
+    "mismatch": {
+      "message": "The requested setting was not confirmed by API readback. The observed value is displayed."
+    },
+    "uncertain": {
+      "message": "The update outcome is uncertain. Check the controller and observed value before trying again."
+    },
+    "invalid_auth": {
+      "message": "The controller token was rejected. Reauthenticate the integration."
+    },
+    "read_failed": {
+      "message": "A fresh baseline could not be obtained. No update was sent."
+    },
+    "invalid_season_order": {
+      "message": "Season starts must be distinct and follow season 1\u20134 through one yearly cycle. Only one December/January crossing is allowed."
+    },
+    "season_dates_unavailable": {
+      "message": "Cannot validate season order: another season date is missing or invalid. Correct it on the controller and refresh first. Explicit 00/00 dates are treated as unset."
+    },
+    "invalid_ramp": {
+      "message": "Enter a whole number of minutes between 0 and 240 inclusive."
+    },
+    "control_denied": {
+      "message": "Schedule control permission is unavailable or was revoked. No further update was sent."
+    }
+  }
+}

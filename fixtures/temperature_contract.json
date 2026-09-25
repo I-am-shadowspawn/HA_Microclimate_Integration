@@ -1,0 +1,16 @@
+{
+  "provenance": {
+    "endpoint": "https://microclimate.blynk.cc/external/api/getAll",
+    "authority": "Maintainer confirmation in this review",
+    "scope": "Defined integration mappings verified against controller display; firmware version unspecified",
+    "capture_kind": "Reconstructed sanitized regression examples, not downloaded hardware captures",
+    "rule": "Temperature numbers are Celsius even when the upstream suffix or v25 flag says F. HA display-unit conversion still applies normally."
+  },
+  "examples": [
+    {"raw": "25°F", "v25": "F", "expected_celsius": 25.0},
+    {"raw": "25°C", "v25": "C", "expected_celsius": 25.0},
+    {"raw": "25", "v25": "F", "expected_celsius": 25.0},
+    {"raw": "-5°F", "v25": "F", "expected_celsius": -5.0},
+    {"raw": "32°F", "v25": "F", "expected_celsius": 32.0}
+  ]
+}

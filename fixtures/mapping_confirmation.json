@@ -1,0 +1,26 @@
+{
+  "source": "Maintainer confirmation in this task, 2026-09-22",
+  "mapping": "Existing defined mapping verified against controller display",
+  "temperature_unit": "Celsius numeric value, even when labeled F",
+  "output_unit": {
+    "Yellow v4": "%",
+    "Blue v6": "%"
+  },
+  "alarm_fields": "Existing lower/upper alarm point mappings are temperature thresholds, not invented alarm-state codes",
+  "firmware": "not supplied",
+  "captures": [
+    "captured_evo_connect.json",
+    "captured_controller_2.json"
+  ],
+  "red_output": "Maintainer supplied current_power v5 in updated CHANNELS; uses shared output-percentage contract",
+  "red_mapping": "Updated const.py supplied by maintainer: control v82, timing v83, output type v84, alarms v79/v80, ramp v78",
+  "blue_revision": {
+    "ramp_time": "v108",
+    "lower_alarm": "v109",
+    "upper_alarm": "v110",
+    "output_type": "v114"
+  },
+  "ramp_time_unit": "minutes; maintainer confirmed",
+  "fixed_schedule_setpoint_unit": "percent; maintainer confirmed",
+  "previous_24hr_power_unit": "not confirmed"
+}

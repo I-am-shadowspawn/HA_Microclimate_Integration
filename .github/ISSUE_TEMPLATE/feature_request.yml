@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest a change to this unofficial independent integration.
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Problem and proposed behaviour
+      description: Explain the user need and the controller models/channels involved. Do not include credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Controller evidence and alternatives
+      description: For new pin meanings or writes, describe what has been verified and what remains uncertain.

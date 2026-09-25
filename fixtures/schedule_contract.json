@@ -1,0 +1,335 @@
+{
+  "source": "fixtures/captures_20260923.json",
+  "capture_runs": 12,
+  "capture_samples": 48,
+  "evidence_scope": "Observed codes are distinct from operator-labelled mode confirmation; shared model capabilities also have maintainer confirmation in the conversation.",
+  "mode_coverage": [
+    {
+      "model": "Evo Connect",
+      "channel": "Yellow",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Yellow",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T154221Z-kwxxrllz",
+        "20260923T154234Z-1u_yj_mu"
+      ],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Yellow",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Yellow",
+      "code": 3,
+      "mode": "Seasonal",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T154221Z-kwxxrllz",
+        "20260923T154234Z-1u_yj_mu"
+      ],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "code": 3,
+      "mode": "Periodic",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "code": 4,
+      "mode": "Seasonal",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Yellow",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [
+        "20260923T154258Z-naxlheci",
+        "20260923T160504Z-w0x9t9hf",
+        "20260923T161425Z-h68vr6tv"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T160504Z-w0x9t9hf",
+        "20260923T161425Z-h68vr6tv"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Yellow",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T161243Z-0t5chryz",
+        "20260923T161619Z-bxa27uzc"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161243Z-0t5chryz",
+        "20260923T161619Z-bxa27uzc"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Yellow",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [
+        "20260923T161340Z-9ybnn1ih"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161340Z-9ybnn1ih"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Yellow",
+      "code": 3,
+      "mode": "Seasonal",
+      "observed_run_ids": [
+        "20260923T155359Z-o8nx14qu",
+        "20260923T160254Z-6cextzcs"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T160254Z-6cextzcs"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [
+        "20260923T161425Z-h68vr6tv"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161425Z-h68vr6tv"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T161619Z-bxa27uzc"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161619Z-bxa27uzc"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [
+        "20260923T161340Z-9ybnn1ih"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161340Z-9ybnn1ih"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "code": 3,
+      "mode": "Periodic",
+      "observed_run_ids": [
+        "20260923T154258Z-naxlheci",
+        "20260923T155359Z-o8nx14qu",
+        "20260923T160254Z-6cextzcs",
+        "20260923T160504Z-w0x9t9hf"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T160254Z-6cextzcs",
+        "20260923T160504Z-w0x9t9hf"
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "code": 4,
+      "mode": "Seasonal",
+      "observed_run_ids": [
+        "20260923T161243Z-0t5chryz"
+      ],
+      "operator_labelled_run_ids": [
+        "20260923T161243Z-0t5chryz"
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T154209Z-0oobijyl",
+        "20260923T154246Z-in_re18s"
+      ],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "code": 3,
+      "mode": "Seasonal",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Red",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Red",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T154209Z-0oobijyl",
+        "20260923T154246Z-in_re18s"
+      ],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Red",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Red",
+      "code": 3,
+      "mode": "Seasonal",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Blue",
+      "code": 0,
+      "mode": "Constant",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Blue",
+      "code": 1,
+      "mode": "Day Night",
+      "observed_run_ids": [
+        "20260923T154209Z-0oobijyl",
+        "20260923T154246Z-in_re18s"
+      ],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Blue",
+      "code": 2,
+      "mode": "Multi",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Blue",
+      "code": 3,
+      "mode": "Periodic",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Blue",
+      "code": 4,
+      "mode": "Seasonal",
+      "observed_run_ids": [],
+      "operator_labelled_run_ids": []
+    }
+  ],
+  "maintainer_confirmations": {
+    "day_night": "First two pairs are Day and Night on all channels.",
+    "multi": "Eight time/setpoint pairs specify daily setpoint-change times. No explicit per-point enable control; 00:00:00 plus zero setpoint is inferred unused.",
+    "seasonal": "Four consecutive day/night pairs; root v20-v23 are Season 1-4 start dates.",
+    "ramp": "Yellow v48, Red v78 in minutes; Blue has no ramp.",
+    "temperature": "Upstream numbers are Celsius even if labelled F.",
+    "fixed_output_schedule": "Setpoints are percentages.",
+    "manual_clock_schedules": "All schedules manually timed; no automatic sunrise/sunset functionality."
+  },
+  "unverified": [
+    "Periodic interval/duration units, phase and zero semantics",
+    "Physical duplicate-time precedence and midnight carry-over",
+    "Season date sentinel/rollover selection",
+    "Definitive unused-slot encoding beyond the maintainer default-pair inference",
+    "Independent complete mode sweeps on Evo I and Evo III",
+    "Writes and schedule persistence across mode changes",
+    "Unknown extra encoded fields retain their raw values; no solar capability inferred."
+  ]
+}

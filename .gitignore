@@ -1,0 +1,17 @@
+.venv/
+.matrix/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.coverage*
+results/
+dist/
+node_modules/
+test-results/
+playwright-report/
+.env
+.env.*
+*token*.txt
+*.log
+evo-captures/
+source-baseline.json

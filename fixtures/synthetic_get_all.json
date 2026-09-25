@@ -1,0 +1,29 @@
+{
+  "provenance": {
+    "kind": "synthetic",
+    "endpoint": "https://microclimate.blynk.cc/external/api/getAll",
+    "firmware": "not verified",
+    "temperature_contract": "Maintainer confirmed Celsius numbers may be labeled F. 25\u00b0F must remain 25\u00b0C.",
+    "pin_contract": "Maintainer confirmed the defined mappings against the controller display; values here remain synthetic, not independent hardware evidence."
+  },
+  "payload": {
+    "v0": "25\u00b0F",
+    "v8": "27\u00b0F",
+    "v16": "Yellow",
+    "v52": "1",
+    "v4": "0",
+    "v1": "24\u00b0C",
+    "v9": "26\u00b0C",
+    "v17": "Red",
+    "v111": 1,
+    "v2": "23\u00b0F",
+    "v10": "22\u00b0F",
+    "v18": "Blue",
+    "v112": "2",
+    "v6": 50,
+    "v82": "1",
+    "v83": "1",
+    "v84": "0",
+    "v5": "30"
+  }
+}
