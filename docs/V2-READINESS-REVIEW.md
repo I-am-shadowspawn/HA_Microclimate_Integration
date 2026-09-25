@@ -4,7 +4,7 @@
 
 ## Publication follow-up — 25 September 2026
 
-V2-01 local preparation is now complete. V2-02 metadata, original draft icon and local hassfest validation are complete; actual HACS validation awaits authorized upload. This review below records the earlier baseline. See [publication preparation](V2-PUBLICATION-PREPARATION.md) and the active [TODO](../TODO.md) for current status.
+V2-01 and V2-02 are complete. The source is uploaded and both public HACS and hassfest checks passed; V2-07 HACS install/update and release remain separate. This review below records the earlier baseline. See [publication preparation](V2-PUBLICATION-PREPARATION.md) and the active [TODO](../TODO.md) for current status.
 
 Reviewed 25 September 2026 against workspace 1.3.0. Recommendation: retain the architecture and prepare a focused public-release cycle, not another wholesale rewrite. V1.3 is a strong functional baseline but is not yet a complete public/HACS distribution.
 
