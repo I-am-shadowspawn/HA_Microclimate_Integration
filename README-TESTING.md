@@ -4,6 +4,8 @@
 
 The test harness runs Home Assistant in process with mocked HTTP. It needs no running HA server or controller token. The supported minimum is **Home Assistant Core 2026.9.3**. The 2026.9.2 lockfile is retained as historical evidence, not a supported CI target.
 
+The shared Python/TypeScript [validation contract](docs/VALIDATION-CONTRACT.md) records observation/edit boundaries and the fixture-driven parity tests.
+
 ## Reproduce the CI checks
 
 Use Python **3.14.x**, [uv](https://docs.astral.sh/uv/) 0.6.1, Node.js **24.21.0** and npm. GitHub CI pins Python 3.14.7 and installs the locked HA 2026.9.3 environment. uv uses its normal cache unless you set `UV_CACHE_DIR` yourself.

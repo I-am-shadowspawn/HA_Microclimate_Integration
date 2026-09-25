@@ -1,3 +1,9 @@
+# 1.4.1 — shared validation contracts
+
+- Exercise backend and card validation against the same reviewed fixture vectors, with separate permissive observation and strict edit expectations.
+- Share compatible numeric, time and schedule-shape constraints within each implementation; preserve entity IDs, native units, profile applicability and opaque time suffixes.
+- Reject unset season-date edits and malformed Day/Night or Seasonal point counts in the card before Save, matching backend validation.
+
 # 1.4.0 — entry-bound climate cleanup
 
 - Use the config entry and channel for the climate device identity, removing the obsolete name-based base identity.

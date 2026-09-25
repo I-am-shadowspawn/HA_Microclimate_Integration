@@ -1,4 +1,5 @@
 import { newId } from "./id";
+import { boundedNumber, validSeconds, validPointCount } from "./constraints";
 import { pointError } from "./draft";
 import type { Draft, Point } from "./types";
 
@@ -48,25 +49,14 @@ export function importPreset(d: Draft, value: unknown): Draft {
     throw new Error("Preset mode and native units must match this channel.");
   if (!Array.isArray(preset.points))
     throw new Error("Invalid schedule points.");
-  const required = d.mode === "Day Night" ? 2 : d.mode === "Seasonal" ? 8 : null;
-  if (
-    preset.points.length < 2 ||
-    preset.points.length > 8 ||
-    (required !== null && preset.points.length !== required)
-  )
+  if (!validPointCount(d.mode, preset.points.length))
     throw new Error("Incorrect number of schedule points.");
   const points: Point[] = preset.points.map((p) => {
     if (
       !p ||
       typeof p !== "object" ||
       Object.keys(p).sort().join(",") !== "seconds,target_native" ||
-      !Number.isInteger(p.seconds) ||
-      p.seconds < 0 ||
-      p.seconds >= 86400 ||
-      typeof p.target_native !== "number" ||
-      !Number.isFinite(p.target_native) ||
-      p.target_native < 0 ||
-      p.target_native > 100
+      !validSeconds(p.seconds) || !boundedNumber(p.target_native)
     )
       throw new Error("Invalid schedule point.");
     return {

@@ -1,7 +1,8 @@
 """Bounded alarm thresholds and supported ramp durations."""
 from homeassistant.components.number import NumberEntity, NumberMode, NumberDeviceClass
 from homeassistant.const import UnitOfTemperature, UnitOfTime, PERCENTAGE
-from .write_contract import observed_numeric, WriteValidationError, MAX_RAMP_MINUTES
+from .write_contract import observed_numeric, WriteValidationError
+from .constraints import numeric_maximum
 from .write_entity import WriteEntity, setup_controls
 
 
@@ -15,7 +16,7 @@ class MicroclimateNumber(WriteEntity, NumberEntity):
 
     @property
     def native_max_value(self):
-        return MAX_RAMP_MINUTES if self.field.kind == 'ramp' else 100
+        return numeric_maximum(self.field.kind)
 
     @property
     def native_step(self):

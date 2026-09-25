@@ -1,0 +1,1012 @@
+{
+  "schema": 1,
+  "provenance": "Synthetic contract vectors; no controller identifiers, credentials or captures.",
+  "numbers": [
+    {
+      "value": null,
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": true,
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": -1,
+      "observation_temperature": -1,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": 0,
+      "observation_temperature": 0,
+      "observation_ramp": 0,
+      "observation_percentage": 0,
+      "numeric_write": true,
+      "ramp_write": true,
+      "draft_number": true,
+      "draft_ramp": true
+    },
+    {
+      "value": 0.1,
+      "observation_temperature": 0.1,
+      "observation_ramp": 0.1,
+      "observation_percentage": 0.1,
+      "numeric_write": true,
+      "ramp_write": false,
+      "draft_number": true,
+      "draft_ramp": false
+    },
+    {
+      "value": 100,
+      "observation_temperature": 100,
+      "observation_ramp": 100,
+      "observation_percentage": 100,
+      "numeric_write": true,
+      "ramp_write": true,
+      "draft_number": true,
+      "draft_ramp": true
+    },
+    {
+      "value": 100.1,
+      "observation_temperature": 100.1,
+      "observation_ramp": 100.1,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": 240,
+      "observation_temperature": 240,
+      "observation_ramp": 240,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": true,
+      "draft_number": false,
+      "draft_ramp": true
+    },
+    {
+      "value": 241,
+      "observation_temperature": 241,
+      "observation_ramp": 241,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": "25",
+      "observation_temperature": 25,
+      "observation_ramp": 25,
+      "observation_percentage": 25,
+      "numeric_write": true,
+      "ramp_write": true,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": "25°F",
+      "observation_temperature": 25,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": "-5°C",
+      "observation_temperature": -5,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": "",
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": "nan",
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": {
+        "special": "nan"
+      },
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": {
+        "special": "infinity"
+      },
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": {
+        "special": "negative_infinity"
+      },
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": [],
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    },
+    {
+      "value": {},
+      "observation_temperature": null,
+      "observation_ramp": null,
+      "observation_percentage": null,
+      "numeric_write": false,
+      "ramp_write": false,
+      "draft_number": false,
+      "draft_ramp": false
+    }
+  ],
+  "dates": [
+    {
+      "value": "01/01",
+      "edit_valid": true,
+      "observation": "calendar_fields"
+    },
+    {
+      "value": "31/12",
+      "edit_valid": true,
+      "observation": "calendar_fields"
+    },
+    {
+      "value": "28/02",
+      "edit_valid": true,
+      "observation": "calendar_fields"
+    },
+    {
+      "value": "29/02",
+      "edit_valid": false,
+      "observation": "calendar_fields"
+    },
+    {
+      "value": "29/02/24",
+      "edit_valid": false,
+      "observation": "calendar_fields"
+    },
+    {
+      "value": "29/02/25",
+      "edit_valid": false,
+      "observation": "invalid_date"
+    },
+    {
+      "value": "29/02/00",
+      "edit_valid": false,
+      "observation": "reported_unparsed"
+    },
+    {
+      "value": "00/00",
+      "edit_valid": false,
+      "observation": "zero_date"
+    },
+    {
+      "value": "31/04",
+      "edit_valid": false,
+      "observation": "invalid_date"
+    },
+    {
+      "value": "01/13",
+      "edit_valid": false,
+      "observation": "invalid_date"
+    },
+    {
+      "value": "1/01",
+      "edit_valid": false,
+      "observation": "reported_unparsed"
+    },
+    {
+      "value": null,
+      "edit_valid": false,
+      "observation": "missing_or_invalid"
+    },
+    {
+      "value": "01/01\n",
+      "observation": "missing_or_invalid",
+      "edit_valid": false
+    }
+  ],
+  "seconds": [
+    {
+      "value": 0,
+      "valid": true
+    },
+    {
+      "value": 1,
+      "valid": true
+    },
+    {
+      "value": 86399,
+      "valid": true
+    },
+    {
+      "value": 86400,
+      "valid": false
+    },
+    {
+      "value": -1,
+      "valid": false
+    },
+    {
+      "value": 0.5,
+      "valid": false
+    },
+    {
+      "value": "3600",
+      "valid": false
+    },
+    {
+      "value": null,
+      "valid": false
+    },
+    {
+      "value": true,
+      "valid": false
+    },
+    {
+      "value": {
+        "special": "nan"
+      },
+      "valid": false
+    },
+    {
+      "value": {
+        "special": "infinity"
+      },
+      "valid": false
+    }
+  ],
+  "annual_cycles": [
+    {
+      "dates": [
+        "09/10",
+        "01/01",
+        "01/06",
+        "01/07"
+      ],
+      "valid": true
+    },
+    {
+      "dates": [
+        "01/01",
+        "02/12",
+        "01/04",
+        "01/11"
+      ],
+      "valid": false
+    },
+    {
+      "dates": [
+        "01/05",
+        "01/09",
+        "01/01",
+        "01/03"
+      ],
+      "valid": true
+    },
+    {
+      "dates": [
+        "20/02",
+        "01/02",
+        "30/06",
+        "20/06"
+      ],
+      "valid": false
+    },
+    {
+      "dates": [
+        "01/01",
+        "01/01",
+        "01/06",
+        "01/09"
+      ],
+      "valid": false
+    },
+    {
+      "dates": [
+        "01/01",
+        "00/00",
+        "00/00",
+        "00/00"
+      ],
+      "valid": true
+    },
+    {
+      "dates": [
+        "01/01",
+        null,
+        "00/00",
+        "00/00"
+      ],
+      "valid": false
+    },
+    {
+      "dates": [
+        "29/02",
+        "01/04",
+        "01/06",
+        "01/08"
+      ],
+      "valid": false
+    }
+  ],
+  "enums": [
+    {
+      "model": "Evo Connect 3",
+      "key": "Yellow_control_pin",
+      "options": [
+        "fixed",
+        "heating",
+        "cooling"
+      ],
+      "raw": "1.0",
+      "observed": "heating",
+      "edits": [
+        [
+          "heating",
+          true
+        ],
+        [
+          "1",
+          false
+        ],
+        [
+          1,
+          false
+        ],
+        [
+          null,
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect",
+      "key": "Blue_control_pin",
+      "options": [
+        "fixed"
+      ],
+      "raw": 1,
+      "observed": null,
+      "edits": [
+        [
+          "fixed",
+          true
+        ],
+        [
+          "heating",
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Yellow_timing_type",
+      "options": [
+        "Constant",
+        "Day Night",
+        "Multi",
+        "Seasonal"
+      ],
+      "raw": 3,
+      "observed": "Seasonal",
+      "edits": [
+        [
+          "Seasonal",
+          true
+        ],
+        [
+          "Periodic",
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Red_timing_type",
+      "options": [
+        "Constant",
+        "Day Night",
+        "Multi",
+        "Seasonal"
+      ],
+      "raw": "3.0",
+      "observed": "Seasonal",
+      "edits": [
+        [
+          "Seasonal",
+          true
+        ],
+        [
+          "Periodic",
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 2",
+      "key": "Blue_timing_type",
+      "options": [
+        "Constant",
+        "Day Night",
+        "Multi",
+        "Periodic",
+        "Seasonal"
+      ],
+      "raw": 3,
+      "observed": "Periodic",
+      "edits": [
+        [
+          "Periodic",
+          true
+        ],
+        [
+          "Seasonal",
+          true
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Yellow_output_type",
+      "options": [
+        "pulse",
+        "dimming"
+      ],
+      "raw": "0.0",
+      "observed": "pulse",
+      "edits": [
+        [
+          "pulse",
+          true
+        ],
+        [
+          "on_off",
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Red_output_type",
+      "options": [
+        "pulse",
+        "dimming"
+      ],
+      "raw": 1,
+      "observed": "dimming",
+      "edits": [
+        [
+          "dimming",
+          true
+        ],
+        [
+          true,
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Yellow_control_pin",
+      "options": [
+        "fixed",
+        "heating",
+        "cooling"
+      ],
+      "raw": true,
+      "observed": null,
+      "edits": [
+        [
+          "unknown",
+          false
+        ]
+      ]
+    },
+    {
+      "model": "Evo Connect 3",
+      "key": "Blue_timing_type",
+      "options": [
+        "Constant",
+        "Day Night",
+        "Multi",
+        "Periodic",
+        "Seasonal"
+      ],
+      "raw": {
+        "special": "infinity"
+      },
+      "observed": null,
+      "edits": [
+        [
+          "Constant",
+          true
+        ]
+      ]
+    }
+  ],
+  "schedules": [
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 86399,
+          "target_native": 100
+        }
+      ],
+      "valid": true
+    },
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 0,
+          "target_native": 25
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 3600,
+          "target_native": 25
+        },
+        {
+          "seconds": 7200,
+          "target_native": 30
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 3600,
+          "target_native": 20
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 0.1
+        },
+        {
+          "seconds": 3600,
+          "target_native": 100
+        }
+      ],
+      "valid": true
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 3600,
+          "target_native": 20
+        },
+        {
+          "seconds": 0,
+          "target_native": 25
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 3600,
+          "target_native": 20
+        },
+        {
+          "seconds": 7200,
+          "target_native": 20
+        },
+        {
+          "seconds": 10800,
+          "target_native": 20
+        },
+        {
+          "seconds": 14400,
+          "target_native": 20
+        },
+        {
+          "seconds": 18000,
+          "target_native": 20
+        },
+        {
+          "seconds": 21600,
+          "target_native": 20
+        },
+        {
+          "seconds": 25200,
+          "target_native": 20
+        }
+      ],
+      "valid": true
+    },
+    {
+      "mode": "Multi",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 3600,
+          "target_native": 20
+        },
+        {
+          "seconds": 7200,
+          "target_native": 20
+        },
+        {
+          "seconds": 10800,
+          "target_native": 20
+        },
+        {
+          "seconds": 14400,
+          "target_native": 20
+        },
+        {
+          "seconds": 18000,
+          "target_native": 20
+        },
+        {
+          "seconds": 21600,
+          "target_native": 20
+        },
+        {
+          "seconds": 25200,
+          "target_native": 20
+        },
+        {
+          "seconds": 28800,
+          "target_native": 20
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Seasonal",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 3600,
+          "target_native": 100
+        },
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 3600,
+          "target_native": 100
+        },
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 3600,
+          "target_native": 100
+        },
+        {
+          "seconds": 0,
+          "target_native": 0
+        },
+        {
+          "seconds": 3600,
+          "target_native": 100
+        }
+      ],
+      "valid": true
+    },
+    {
+      "mode": "Seasonal",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 3600,
+          "target_native": 25
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": -1
+        },
+        {
+          "seconds": 3600,
+          "target_native": 20
+        }
+      ],
+      "valid": false
+    },
+    {
+      "mode": "Day Night",
+      "points": [
+        {
+          "seconds": 0,
+          "target_native": 20
+        },
+        {
+          "seconds": 86400,
+          "target_native": 25
+        }
+      ],
+      "valid": false
+    }
+  ],
+  "applicability": [
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 1,
+      "control_code": 1,
+      "slot": 1,
+      "present": true,
+      "writable": true,
+      "unit": "°C"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 1,
+      "control_code": 1,
+      "slot": 3,
+      "present": true,
+      "writable": false,
+      "unit": "°C"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 0,
+      "control_code": 1,
+      "slot": 1,
+      "present": true,
+      "writable": false,
+      "unit": "°C"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 3,
+      "control_code": 2,
+      "slot": 8,
+      "present": true,
+      "writable": true,
+      "unit": "°C"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 2,
+      "control_code": 0,
+      "slot": 1,
+      "present": true,
+      "writable": true,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Red",
+      "mode_code": 3,
+      "control_code": 1,
+      "slot": 8,
+      "present": true,
+      "writable": true,
+      "unit": "°C"
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "mode_code": 3,
+      "control_code": 0,
+      "slot": 1,
+      "present": true,
+      "writable": false,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect 2",
+      "channel": "Blue",
+      "mode_code": 4,
+      "control_code": 0,
+      "slot": 8,
+      "present": true,
+      "writable": true,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "mode_code": 1,
+      "control_code": 1,
+      "slot": 1,
+      "present": true,
+      "writable": false,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect",
+      "channel": "Blue",
+      "mode_code": 1,
+      "control_code": 0,
+      "slot": 1,
+      "present": true,
+      "writable": true,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 2,
+      "control_code": null,
+      "slot": 1,
+      "present": true,
+      "writable": false,
+      "unit": "%"
+    },
+    {
+      "model": "Evo Connect 3",
+      "channel": "Yellow",
+      "mode_code": 2,
+      "control_code": 1,
+      "slot": 1,
+      "present": false,
+      "writable": false,
+      "unit": "°C"
+    }
+  ],
+  "time_encoding": [
+    {
+      "raw": "3600\u00003600\u0000Europe/London\u0000opaque\u0000tail",
+      "seconds": 7201,
+      "observed_seconds": 3600,
+      "expected": "7201\u00007201\u0000Europe/London\u0000opaque\u0000tail"
+    },
+    {
+      "raw": "3600\u00004000\u0000Europe/London\u00000",
+      "seconds": 7201,
+      "observed_seconds": 3600,
+      "expected": null
+    },
+    {
+      "raw": "3600\u00003600\u0000Invalid/Zone\u00000",
+      "seconds": 7201,
+      "observed_seconds": 3600,
+      "expected": null
+    },
+    {
+      "raw": "sr\u00000\u0000Europe/London\u00000",
+      "seconds": 7201,
+      "observed_seconds": null,
+      "expected": null
+    },
+    {
+      "raw": "86399\u000086399\u0000Europe/London\u00000",
+      "seconds": 0,
+      "observed_seconds": 86399,
+      "expected": "0\u00000\u0000Europe/London\u00000"
+    }
+  ]
+}

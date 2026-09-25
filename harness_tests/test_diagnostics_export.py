@@ -39,7 +39,7 @@ async def test_download_redacts_and_bounds_nested_response(hass):
     assert report["entry"]["options"] == {"enable_writes": True, "log_raw_response": False}
     assert report["entry"]["other_option_count"] == 1
     assert report["integration"]["model"] == "Evo Connect 2"
-    assert report["integration"]["version"] == "1.4.0"
+    assert report["integration"]["version"] == "1.4.1"
     shape = report["response_shape"]
     assert shape["field_count"] == len(data)
     assert shape["sampled_fields"] == MAX_SAMPLED_FIELDS

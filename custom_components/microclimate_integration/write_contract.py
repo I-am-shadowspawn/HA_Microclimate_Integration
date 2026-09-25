@@ -10,6 +10,7 @@ from .const import (CHANNEL_CAPABILITIES, CHANNEL_PINS, CHANNELS, CONTROL_TYPE_M
                     DEVICE_METADATA_PINS, MODEL_CHANNEL_OPTIONS, OUTPUT_TYPE_MAPPING,
                     timing_type_mapping)
 from .const_helpers import enum_value
+from .constraints import MAX_TARGET, MAX_RAMP_MINUTES, SECONDS_PER_DAY
 
 
 class WriteValidationError(ValueError):
@@ -110,7 +111,7 @@ def context(field, data):
     return None
 
 
-def numeric(value, *, maximum=100):
+def numeric(value, *, maximum=MAX_TARGET):
     if type(value) not in (str, int, float, Decimal):
         raise WriteValidationError('invalid_number')
     try:
@@ -157,7 +158,7 @@ def _clock(value):
     if not re.fullmatch(r'[0-9]+(?:\.0+)?',value):
         raise WriteValidationError('unsupported_encoding')
     seconds=Decimal(value)
-    if not 0 <= seconds < 86400:
+    if not 0 <= seconds < SECONDS_PER_DAY:
         raise WriteValidationError('unsupported_encoding')
     return seconds
 
@@ -278,8 +279,6 @@ def validate_season_sequence(field, value, data):
         if forward_span!=365:
             raise WriteValidationError('invalid_season_order')
 
-
-MAX_RAMP_MINUTES = 240
 
 
 def ramp_minutes(value):
