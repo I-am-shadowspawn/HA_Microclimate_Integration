@@ -1,12 +1,12 @@
-# Compact schedule cards — 1.3.2
+# Compact schedule cards — 1.4.0
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-The compact series adds channel schedule cards and a root-controller season-date card with explicit Save/Cancel. See [installation and card usage](docs/CARD-USAGE.md) and [card API](docs/CARD-API.md). A clean reinstall was required for the 1.3.0 transition from the disposable prototype; upgrading an existing compact 1.3.0 entry to 1.3.1 preserves its identity. Individual schedule time/setpoint entities were removed; the cards use the aggregate schedule sensor as their permission scope. See [clean reinstall](docs/CLEAN-INSTALL-1.3.0.md) if still on the prototype.
+The compact series adds channel schedule cards and a root-controller season-date card with explicit Save/Cancel. See [installation and card usage](docs/CARD-USAGE.md) and [card API](docs/CARD-API.md). A clean reinstall was required for the 1.3.0 transition from the disposable prototype; upgrades within the compact series preserve entry and entity identity. Individual schedule time/setpoint entities were removed; the cards use the aggregate schedule sensor as their permission scope. See [clean reinstall](docs/CLEAN-INSTALL-1.3.0.md) if still on the prototype.
 
 # Microclimate Integration for Home Assistant
 
-Version **1.3.2**. This custom integration reads Microclimate Evo Connect controller data and adds readback-confirmed configuration controls. Configuration writes remain enabled by default and can be disabled in entry options. Raw-pin diagnostic entities are disabled by default; the Reported schedule periods sensor remains enabled because the card uses it for permissions. Existing climate/sensor observations stay read-only. The channel card can import/export schedule preset files, and HA actions can export, apply or copy compatible schedules; see [schedule presets](docs/SCHEDULE-PRESETS.md) and [write controls](docs/WRITE-CONTROLS.md).
+Version **1.4.0**. This custom integration reads Microclimate Evo Connect controller data and adds readback-confirmed configuration controls. Configuration writes remain enabled by default and can be disabled in entry options. Raw-pin diagnostic entities are disabled by default; the Reported schedule periods sensor remains enabled because the card uses it for permissions. Existing climate/sensor observations stay read-only. The channel card can import/export schedule preset files, and HA actions can export, apply or copy compatible schedules; see [schedule presets](docs/SCHEDULE-PRESETS.md) and [write controls](docs/WRITE-CONTROLS.md).
 
 ## Supported Home Assistant baseline
 

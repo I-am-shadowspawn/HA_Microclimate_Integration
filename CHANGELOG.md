@@ -1,3 +1,9 @@
+# 1.4.0 — entry-bound climate cleanup
+
+- Use the config entry and channel for the climate device identity, removing the obsolete name-based base identity.
+- Keep climate IDs and observed state behavior while following controller and channel renames; let Home Assistant's coordinator publish each refresh once.
+- Clarify that the climate entity is read-only while separate configuration controls can write supported settings.
+
 # 1.3.2 — schedule presets and automation actions
 
 - Remove test-only transformation and recursive pin-helper scaffolding; retain the live Celsius parser, enum normalization and canonical pin maps without changing entity IDs or behavior.
