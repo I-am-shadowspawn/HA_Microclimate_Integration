@@ -21,6 +21,8 @@ async def async_setup(hass: HomeAssistant, _config: dict):
     hass.data.setdefault(DOMAIN, {})
     from .card_api import async_setup_card_api
     await async_setup_card_api(hass)
+    from .services import async_setup_services
+    await async_setup_services(hass)
     return True
 
 

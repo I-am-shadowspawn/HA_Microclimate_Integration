@@ -91,6 +91,7 @@ class CardAPI:
                'user_id': user.id, 'request_id': msg['request_id'], 'digest': digest,
                'generation': generation(c), 'coordinator': c, 'plan': plan, 'sequence': 0, 'status': 'pending',
                'phase': 'Preflight', 'confirmed': 0, 'total': len(plan.steps), 'reason': None,
+               'completion': asyncio.get_running_loop().create_future(),
                'fields': [{'key': s.field.key, 'label': s.field.name if s.field.index is None else
                            f'Point {s.field.index} {"start" if s.field.kind == "time" else "target"}',
                            'status': 'not-sent'} for s in plan.steps], 'stop': False}
@@ -181,6 +182,8 @@ class CardAPI:
             self.prune()
             if not c.closed:
                 c.async_update_listeners()
+            if not job['completion'].done():
+                job['completion'].set_result(self.public_job(job))
 
     async def handle(self, connection, msg, verb):
         user = connection.user

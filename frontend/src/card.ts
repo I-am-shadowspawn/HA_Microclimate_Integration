@@ -1,5 +1,6 @@
 import { validateColors, targetColors } from "./colors";
 import { newId } from "./id";
+import { exportPreset, importPreset, MAX_PRESET_BYTES } from "./preset";
 import { LitElement, html, css, nothing } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { live } from "lit/directives/live.js";
@@ -660,6 +661,37 @@ export class MicroclimateCard extends LitElement {
     this.notice =
       "Review the rebuilt list before Save. Unknown values require correction.";
   }
+  private downloadPreset() {
+    if (!this.working || !this.view?.channel) return;
+    try {
+      const contents = JSON.stringify(exportPreset(this.working), null, 2);
+      const url = URL.createObjectURL(new Blob([contents], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `microclimate-${this.mode.toLowerCase().replaceAll(" ", "-")}-schedule.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      this.notice = "Schedule preset downloaded in native Celsius/% units; no controller identity included.";
+    } catch (e) {
+      this.error = (e as Error).message;
+    }
+  }
+  private async loadPreset(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file || !this.draft || this.saving || !this.canEdit || !this.allScheduleWritable) return;
+    try {
+      if (file.size > MAX_PRESET_BYTES) throw new Error("Preset file is too large.");
+      const parsed: unknown = JSON.parse(await file.text());
+      this.draft = importPreset(this.draft, parsed);
+      this.selected = this.draft.points[0]?.draft_id ?? "";
+      this.notice = "Preset loaded into a local draft. Review changes, then Save or Cancel.";
+      this.error = "";
+    } catch (e) {
+      this.error = e instanceof SyntaxError ? "Invalid preset JSON." : (e as Error).message;
+    }
+  }
   private setField(f: Field, e: Event) {
     if (!this.draft || this.saving) return;
     const input = e.target as HTMLInputElement;
@@ -1257,6 +1289,29 @@ export class MicroclimateCard extends LitElement {
                       ${pointError(d)} Edit to review/rebuild; observations are
                       unchanged.
                     </div>`
+                  : nothing}
+                ${["Day Night", "Multi", "Seasonal"].includes(this.mode)
+                  ? html`<div class="actions">
+                      <button
+                        ?disabled=${!!pointError(d)}
+                        @click=${this.downloadPreset}
+                      >Download preset</button>
+                      ${this.draft
+                        ? html`<button
+                              ?disabled=${this.saving || !this.canEdit || !this.allScheduleWritable}
+                              @click=${() =>
+                                (this.renderRoot.querySelector<HTMLInputElement>("#preset-file")?.click())}
+                            >Import preset</button>
+                            <input
+                              id="preset-file"
+                              type="file"
+                              accept=".json,application/json"
+                              hidden
+                              @change=${this.loadPreset}
+                            />`
+                        : nothing}
+                    </div>
+                    <p class="muted">Presets contain schedule points only, in native Celsius or percent. Import stays local until Save. To copy between cards, download then import on a compatible channel.</p>`
                   : nothing}
                 <details class="settings" ?open=${!!this.draft}>
                   <summary>Channel settings</summary>

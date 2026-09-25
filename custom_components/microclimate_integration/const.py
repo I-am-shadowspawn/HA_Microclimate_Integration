@@ -40,21 +40,6 @@ def timing_type_mapping(channel):
 
 OUTPUT_TYPE_MAPPING = {'0': 'pulse', '1': 'dimming'}
 
-COMMON_ATTRIBUTES = {'temp_pin': {'description': 'Current Temp', 'transformation': 'temperature'},
- 'setpoint_pin': {'description': 'Current Set Point', 'transformation': 'setpoint'},
- 'control_pin': {'description': 'Control Type', 'transformation': 'control_type'},
- 'ramp_time_pin': {'description': 'Ramp Time', 'transformation': 'duration_minutes'},
- 'lower_alarm_pin': {'description': 'Lower Alarm Point', 'transformation': 'temperature'},
- 'upper_alarm_pin': {'description': 'Upper Alarm Point', 'transformation': 'temperature'},
- 'timing_type_pin': {'description': 'Timing Type', 'transformation': 'timing_type'},
- 'output_type_pin': {'description': 'Output Type', 'transformation': 'output_type'},
- 'channel_name_pin': {'description': 'Channel Name', 'transformation': 'none'},
- 'current_power_pin': {'description': 'Power', 'transformation': 'none'},
- 'schedule_start_time_pin': {'description': 'Start time', 'transformation': 'time'},
- 'schedule_set_point_pin': {'description': 'Set point', 'transformation': 'setpoint'},
- 'periodic_interval_pin': {'description': 'Periodic interval', 'transformation': 'time'},
- 'periodic_duration_pin': {'description': 'Periodic duration', 'transformation': 'time'}}
-
 CHANNEL_PINS = {'Yellow': {'temperature': {'temp_pin': 'v0', 'setpoint_pin': 'v8'},
             'alarm': {'lower_alarm_pin': 'v49', 'upper_alarm_pin': 'v50'},
             'metadata': {'control_pin': 'v52',

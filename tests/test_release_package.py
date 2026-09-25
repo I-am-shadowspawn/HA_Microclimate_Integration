@@ -50,6 +50,7 @@ class ReleasePackageTests(unittest.TestCase):
                     assert component + "LICENSE" in names
                     assert component + "frontend/microclimate-cards.js" in names
                     assert component + "frontend/THIRD_PARTY_NOTICES.txt" in names
+                    assert component + "services.yaml" in names
                     with TemporaryDirectory() as extraction:
                         bundle.extractall(extraction)
                         manifest = json.loads(

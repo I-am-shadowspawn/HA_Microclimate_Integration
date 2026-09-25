@@ -174,19 +174,6 @@ def test_ramp_minutes(value,expected):
     assert result['ramp_time']['unit']=='min'
 
 
-@pytest.mark.parametrize('value,expected',[(120,120),('60',60),(0,0),(60.5,60.5)])
-def test_duration_transformation_uses_minutes(value,expected):
-    from custom_components.microclimate_integration.transformation import format_sensor_value
-    assert format_sensor_value('v48',value,'duration_minutes',{},'Yellow')==expected
-
-
-@pytest.mark.parametrize('value',[None,True,-1,'nan'])
-def test_duration_transformation_rejects_invalid_values(value):
-    from custom_components.microclimate_integration.transformation import convert_duration_minutes
-    with pytest.raises(ValueError):
-        convert_duration_minutes(value)
-
-
 def test_captured_model_probe_profiles():
     from custom_components.microclimate_integration.const import MODEL_CHANNEL_OPTIONS
     for model,filename,expected in [

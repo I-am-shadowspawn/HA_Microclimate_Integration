@@ -6,9 +6,9 @@ from homeassistant.helpers import entity_registry as er, device_registry as dr
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.microclimate_integration import const
-from custom_components.microclimate_integration.const_helpers import get_device_channels, get_pin_data, enum_value
-from custom_components.microclimate_integration.transformation import convert_setpoint, format_sensor_value
-from custom_components.microclimate_integration.validation import safe_scalar
+from custom_components.microclimate_integration.const_helpers import enum_value
+from custom_components.microclimate_integration.validation import safe_scalar, safe_temperature, control_mode
+from custom_components.microclimate_integration.schedule import observe_time
 
 
 def test_single_source_and_preserved_schedule():
@@ -20,14 +20,12 @@ def test_single_source_and_preserved_schedule():
         for period in range(1,9):
             expected=f'v{first+2*(period-1)}'
             assert schedule[f'period_{period}']['schedule_start_time_pin']==expected
-            assert get_pin_data(get_device_channels('Evo Connect 3'),channel,
-                f'schedule.period_{period}.schedule_start_time_pin')['pin']==expected
-        assert get_pin_data(get_device_channels('Evo Connect 3'),channel,'schedule_start_time_pin') is None
+            assert schedule[f'period_{period}']['schedule_set_point_pin']==f'v{first+2*(period-1)+1}'
         assert const.CHANNEL_PINS[channel]['metadata']['control_pin']==const.CHANNELS[channel]['control_pin']
         assert const.CHANNELS[channel]['control_pin'] != const.CHANNELS[channel]['output_type']
     assert const.CHANNEL_PINS['Red']['schedule']['periodic_interval_pin']=='v85'
     assert const.CHANNEL_PINS['Blue']['schedule']['periodic_duration_pin']=='v116'
-    assert convert_setpoint('20.0',{'v82':'1.0','v111':'0.0'},'Red')==20
+    assert control_mode('1.0')=='heating' and safe_temperature('20.0')==20
 
 
 @pytest.mark.parametrize('raw,expected',[(0,'fixed'),('1.0','heating'),(2.0,'cooling'),('2.5',None),
@@ -36,10 +34,12 @@ def test_enum_normalization(raw,expected):
     assert enum_value(raw,const.CONTROL_TYPE_MAPPING)==expected
 
 
-@pytest.mark.parametrize('kind,raw,expected',[('control_type','1.0','heating'),('timing_type','1.0','Day Night'),
-    ('output_type',0.0,'pulse'),('time','3600','01:00'),('temperature','20°F',20)])
-def test_shared_transformation_dispatch(kind,raw,expected):
-    assert format_sensor_value('v1',raw,kind,{},'Red')==expected
+def test_typed_readers_share_current_contract():
+    assert control_mode('1.0')=='heating'
+    assert enum_value('1.0', const.timing_type_mapping('Red'))=='Day Night'
+    assert enum_value(0.0,const.OUTPUT_TYPE_MAPPING)=='pulse'
+    assert observe_time('3600')['time']=='01:00:00'
+    assert safe_temperature('20°F')==20
 
 
 @pytest.mark.parametrize('raw',[None,True,{},[],float('inf'),'','\x00bad','x'*256])
@@ -93,4 +93,3 @@ async def test_red_and_root_metadata_real_setup_refresh_reload(hass):
         assert api.await_count==3
         assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()
-

@@ -1,4 +1,4 @@
-# Configuration writes — candidate 1.3.1
+# Configuration writes — 1.3.2
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
@@ -31,7 +31,7 @@ Day Night makes the first two pairs editable. Multi and Seasonal make all eight 
 - Times: manual local clock values 00:00:00–23:59:59, whole seconds, without a supplied timezone. No sunrise/sunset modes. An encoded time preserves the controller's timezone and every trailing opaque field. A plain-seconds value needs agreeing same-channel four-field templates, checked against any reported root timezone; an absent/conflicting/unsupported template blocks that edit.
 - Season dates: exactly DD/MM. Calendar validity uses a non-leap year solely for validation; no year is sent. 29/02, 31/04, 00/00 and malformed values are rejected. Season starts must also follow one strictly ordered annual cycle, including season 4 back to next season 1. Distinct dates may cross December/January once, so `09/10, 01/01, 01/06, 01/07` and `01/05, 01/09, 01/01, 01/03` are valid. `01/01, 02/12, 01/04, 01/11` and `20/02, 01/02, 30/06, 20/06` are rejected. `01/13` is invalid; the maintainer corrected that example to `01/03`. Existing unset/invalid observations can remain unknown; writing an unset sentinel is intentionally not offered.
 
-For retained independent controls, automations can use HA's `select.select_option`, `number.set_value` or `text.set_value`. Schedule edits use the card's documented authenticated batch API (see CARD-API.md); no `time.set_value` or per-point number entities are exposed. The API is intended for the bundled card; a general automation schedule service is outside this release. There is no arbitrary-pin service.
+For retained independent controls, automations can use HA's `select.select_option`, `number.set_value` or `text.set_value`. Schedule edits use the card's authenticated batch API or the `apply_schedule`/`copy_schedule` actions, which share the same planner and readback-confirmed job. The read-only `export_schedule` action returns a portable template. See [schedule presets](SCHEDULE-PRESETS.md) and [card API](CARD-API.md). No `time.set_value`, per-point number entities or arbitrary-pin service are exposed.
 
 ## Completion, conflicts and recovery
 

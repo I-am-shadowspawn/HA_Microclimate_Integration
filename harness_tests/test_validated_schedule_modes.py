@@ -1,10 +1,10 @@
 """Maintainer-validated timing, schedule grouping and output capabilities."""
 import pytest
 from custom_components.microclimate_integration.api_client import normalize_response
-from custom_components.microclimate_integration.const import timing_type_mapping
+from custom_components.microclimate_integration.const import timing_type_mapping, CHANNEL_CAPABILITIES
 from custom_components.microclimate_integration.schedule import schedule_observation
 from custom_components.microclimate_integration.sensor_contract import VERIFIED_MEASUREMENTS
-from custom_components.microclimate_integration.transformation import format_sensor_value, convert_timing_type
+from custom_components.microclimate_integration.const_helpers import enum_value
 
 
 @pytest.mark.parametrize('channel,timing_pin,first_pin,season_code', [
@@ -48,19 +48,19 @@ def test_blue_has_no_ramp_measurement_in_any_model(model):
 
 @pytest.mark.parametrize('channel', ['Yellow','Red','Blue'])
 @pytest.mark.parametrize('code', [0,1,2,3,4])
-def test_legacy_formatter_uses_same_channel_table(channel,code):
+def test_live_enum_reader_uses_channel_table(channel,code):
     expected = ({0:'Constant',1:'Day Night',2:'Multi',3:'Periodic',4:'Seasonal'} if channel=='Blue'
                 else {0:'Constant',1:'Day Night',2:'Multi',3:'Seasonal'})
     assert timing_type_mapping(channel).get(str(code))==expected.get(code)
     if code in expected:
-        assert convert_timing_type(str(code)+'.0',channel)==expected[code]
-        assert format_sensor_value('unused',code,'timing_type',{},channel)==expected[code]
+        assert enum_value(str(code)+'.0',timing_type_mapping(channel))==expected[code]
+        assert enum_value(code,timing_type_mapping(channel))==expected[code]
     else:
-        with pytest.raises(ValueError):convert_timing_type(code,channel)
+        assert enum_value(code,timing_type_mapping(channel)) is None
 
 
-def test_contextless_ambiguous_code_is_not_silently_decoded_as_blue():
-    with pytest.raises(ValueError):convert_timing_type(3)
+def test_unknown_channel_does_not_decode_ambiguous_code():
+    assert enum_value(3,timing_type_mapping('Unknown')) is None
     assert timing_type_mapping('Unknown')=={}
 
 
@@ -75,5 +75,5 @@ def test_only_blue_periodic_exposes_unparsed_periodic_fields():
     assert result['periodic_interval']['raw']==60
     assert result['periodic_duration']['raw']==0
     assert result['periodic_interval']['interpretation']=='reported_unparsed'
-    assert format_sensor_value('v114',1,'output_type',payload,'Blue')=='on_off'
-    assert format_sensor_value('v108',9,'duration_minutes',payload,'Blue') is None
+    assert CHANNEL_CAPABILITIES['Blue']['variable_output'] is False
+    assert 'ramp_time' not in result

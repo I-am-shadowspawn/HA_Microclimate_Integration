@@ -1,3 +1,9 @@
+# 1.3.2 — schedule presets and automation actions
+
+- Remove test-only transformation and recursive pin-helper scaffolding; retain the live Celsius parser, enum normalization and canonical pin maps without changing entity IDs or behavior.
+- Download/import device-free schedule preset JSON from channel cards. Add authenticated HA actions to export, apply or copy compatible schedules through the existing sequential, readback-confirmed planner.
+- Preserve controller-native Celsius/percent units, destination time encoding and explicit partial-failure results. No new per-point entities or server-side preset storage.
+
 # 1.3.1 — support diagnostics and public defaults
 
 - Disable raw-pin diagnostic entities by default without changing registry choices on reload. Keep schedule sensors enabled as ordinary entities for card permissions; writes retain their enabled default.

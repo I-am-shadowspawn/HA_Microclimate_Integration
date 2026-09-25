@@ -6,7 +6,6 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.microclimate_integration.const import DOMAIN
 from custom_components.microclimate_integration.schedule import schedule_observation, observe_time
-from custom_components.microclimate_integration.transformation import convert_time
 
 
 @pytest.mark.parametrize('token',['sr','ss'])
@@ -16,7 +15,6 @@ def test_solar_tokens_are_unsupported_raw_input(token):
     assert observed['status']=='unsupported'
     assert observed['raw']==raw
     assert 'event' not in observed and 'time' not in observed
-    with pytest.raises(ValueError):convert_time(raw)
 
 
 @pytest.mark.parametrize('code,label',[(0,'Constant'),(1,'Day & Night'),(2,'Multi'),(3,'Seasonal'),(99,'Unknown')])

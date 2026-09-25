@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { Buffer } from "node:buffer";
 test.beforeEach(async ({ page }) => {
   await page.route("**/*", (route) =>
     new URL(route.request().url()).hostname === "127.0.0.1"
@@ -19,6 +20,31 @@ test("draft changes and Cancel never call save", async ({ page }) => {
     .blur();
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   expect(await page.evaluate(() => (window as any).calls)).toEqual([]);
+});
+test("preset import stays local until explicit Save", async ({ page }) => {
+  await page.goto("/frontend/demo/?count=2");
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  const preset = {
+    format: "microclimate.schedule.v1",
+    mode: "Multi",
+    unit: "celsius",
+    points: [
+      { seconds: 3600, target_native: 21 },
+      { seconds: 7200, target_native: 22 },
+      { seconds: 10800, target_native: 23 },
+    ],
+  };
+  await page.locator("#preset-file").setInputFiles({
+    name: "schedule.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(preset)),
+  });
+  await expect(page.getByRole("status")).toContainText("local draft");
+  expect(await page.evaluate(() => (window as any).calls)).toEqual([]);
+  await page.getByRole("button", { name: "Save changes" }).click();
+  const calls = await page.evaluate(() => (window as any).calls);
+  expect(calls).toHaveLength(1);
+  expect(calls[0].patch.schedule.points).toHaveLength(3);
 });
 test("two time changes produce one final save", async ({ page }) => {
   await page.goto("/frontend/demo/?mode=Day%20Night");

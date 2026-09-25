@@ -10,7 +10,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.microclimate_integration.climate import MicroclimateClimate
 from custom_components.microclimate_integration.const import CHANNELS, DOMAIN
 from custom_components.microclimate_integration.identity import channel_identity, token_identity
-from custom_components.microclimate_integration.transformation import convert_setpoint
 
 
 @pytest.mark.parametrize('control,mode,active', [(1,'heat','heating'),('1','heat','heating'),(2,'cool','cooling'),('2','cool','cooling')])
@@ -29,7 +28,6 @@ def test_fixed_or_invalid_not_temperature(control):
     assert entity.hvac_mode is None
     assert entity.hvac_action is None
     assert entity.target_temperature is None
-    assert convert_setpoint('1', {'v52':control}, 'Yellow') is None
 
 
 def entry(token='token-a', name='same'):
@@ -86,7 +84,6 @@ async def test_reconfigure_duplicate_rejected(hass):
     result = await hass.config_entries.flow.async_configure(flow['flow_id'],{'evo_device':'renamed','token':'token-b'})
     assert result['errors'] == {'base':'already_configured'}
     assert first.data['token'] == 'token-a'
-
 
 
 

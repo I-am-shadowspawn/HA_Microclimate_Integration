@@ -39,6 +39,8 @@ Same retained user/entry/request UUID and patch digest returns the same operatio
 
 Frontend uses HA's `hass` connection/setConfig/custom-element interfaces for the pinned HA release. The module and dependencies are bundled locally. References: [custom card interface](https://developers.home-assistant.io/docs/frontend/custom-ui/custom-card/), [WebSocket extension](https://developers.home-assistant.io/docs/frontend/extending/websocket-api/).
 
+Portable schedule presets and HA automation actions are described in [Schedule presets](SCHEDULE-PRESETS.md). They use this same save/planner path and do not add writable schedule entities.
+
 ## Compact schedule authorization (1.3.0)
 
 Schema 1 is retained because field keys/types and patch contracts are unchanged. `fields[].entity_id` identifies an authorization anchor, not necessarily a distinct control entity. All indexed fields in one channel bind to that channel's enabled Reported schedule periods sensor, resolved from its registry unique ID and verified against entry/device identity. `authorization_scope` is `channel_schedule` for indexed fields and `entity` otherwise. The frontend uses field keys, not entity IDs, to identify inputs.

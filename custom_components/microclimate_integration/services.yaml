@@ -1,0 +1,42 @@
+apply_schedule:
+  name: Apply schedule preset
+  description: Apply a versioned JSON schedule to a compatible channel using sequential, readback-confirmed writes. No automatic retry or rollback occurs.
+  fields:
+    device_id:
+      name: Target channel device
+      required: true
+      selector:
+        device:
+          integration: microclimate_integration
+    template:
+      name: Schedule template JSON
+      required: true
+      selector:
+        text:
+          multiline: true
+copy_schedule:
+  name: Copy reported schedule
+  description: Copy a complete reported schedule between compatible channel devices. Shared root season dates and channel modes are not copied.
+  fields:
+    source_device_id:
+      name: Source channel device
+      required: true
+      selector:
+        device:
+          integration: microclimate_integration
+    target_device_id:
+      name: Target channel device
+      required: true
+      selector:
+        device:
+          integration: microclimate_integration
+export_schedule:
+  name: Export schedule preset
+  description: Return a versioned JSON schedule template without controller identity, pins or credentials. Requires a response variable.
+  fields:
+    device_id:
+      name: Source channel device
+      required: true
+      selector:
+        device:
+          integration: microclimate_integration
