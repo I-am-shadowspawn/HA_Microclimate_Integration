@@ -22,6 +22,7 @@ PUBLIC_FIXTURES = (
     "schedule_contract.json",
     "synthetic_get_all.json",
     "temperature_contract.json",
+    "validation_contract.json",
     "write_captures.json",
 )
 DEVELOPMENT_DIRECTORIES = (

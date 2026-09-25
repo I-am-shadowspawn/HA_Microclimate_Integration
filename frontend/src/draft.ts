@@ -1,4 +1,5 @@
 import { newId } from "./id";
+import { boundedNumber, validSeconds, validPointCount, dateOrdinal } from "./constraints";
 import type { Draft, Snapshot, Point } from "./types";
 export const isEmpty = (p: Point) => p.seconds === 0 && p.target_native === 0;
 export const clock = (seconds: number | null) =>
@@ -62,19 +63,12 @@ export function makeDraft(base: Snapshot): Draft {
 }
 export function pointError(d: Draft): string | null {
   if (!["Multi", "Day Night", "Seasonal"].includes(d.mode)) return null;
-  if (d.mode === "Multi" && (d.points.length < 2 || d.points.length > 8))
-    return "Multi needs 2–8 points.";
+  if (!validPointCount(d.mode, d.points.length))
+    return d.mode === "Multi" ? "Multi needs 2–8 points." : `${d.mode} needs ${d.mode === "Day Night" ? 2 : 8} points.`;
   if (
     d.points.some(
       (p) =>
-        p.seconds === null ||
-        !Number.isInteger(p.seconds) ||
-        p.seconds < 0 ||
-        p.seconds >= 86400 ||
-        p.target_native === null ||
-        !Number.isFinite(p.target_native) ||
-        p.target_native < 0 ||
-        p.target_native > 100,
+        !validSeconds(p.seconds) || !boundedNumber(p.target_native),
     )
   )
     return "Complete every time and target (0–100).";
@@ -99,11 +93,10 @@ export function dateError(values: (string | number | null)[]): string | null {
     if (v === "00/00") continue;
     if (typeof v !== "string" || !/^\d{2}\/\d{2}$/.test(v))
       return "Use DD/MM for every season date.";
-    const [d, m] = v.split("/").map(Number);
-    const dt = new Date(Date.UTC(2001, m - 1, d));
-    if (dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d)
+    const ordinal = dateOrdinal(v);
+    if (ordinal === null)
       return "Use valid calendar dates; 29/02 is not supported.";
-    ord.push(Math.floor((dt.getTime() - Date.UTC(2001, 0, 1)) / 86400000));
+    ord.push(ordinal);
   }
   if (new Set(ord).size !== ord.length)
     return "Season starts must be distinct.";
@@ -160,14 +153,14 @@ export function errorFor(d: Draft): string | null {
     if (!f.writable) return `${f.label} is not editable.`;
     if (
       ["number", "setpoint", "ramp"].includes(f.kind) &&
-      (typeof v !== "number" ||
-        !Number.isFinite(v) ||
+      (!boundedNumber(v, f.maximum) ||
         v < f.minimum ||
-        v > f.maximum ||
         (f.kind === "ramp" && !Number.isInteger(v)))
     )
       return `${f.label}: enter ${f.minimum}–${f.maximum}${f.kind === "ramp" ? " whole minutes" : ""}.`;
-    if (f.kind === "enum" && !f.options.includes(String(v)))
+    if (f.kind === "date" && dateOrdinal(v) === null)
+      return "Use a valid DD/MM date; unset dates cannot be written.";
+    if (f.kind === "enum" && (typeof v !== "string" || !f.options.includes(v)))
       return "Choose a supported mode.";
   }
   if (!d.base.channel && keys.length) {

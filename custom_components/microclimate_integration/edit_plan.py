@@ -1,6 +1,7 @@
 """Pure whole-draft validation and deterministic, frozen-source pin ordering."""
 from dataclasses import dataclass
 from itertools import permutations
+from .constraints import valid_seconds, valid_point_count
 from .card_model import input_value, value_of
 from .write_contract import (definition_for, write_definitions, applicable, serialize, matches,
                              validate_input, timing_mode, WriteValidationError)
@@ -43,11 +44,11 @@ def build_plan(model, channel, data, patch):
         mode_field = definition_for(model, f'{channel}_period_1_time')
         mode = timing_mode(mode_field, data)
         require(schedule['mode'] == mode and mode in ('Day Night', 'Seasonal', 'Multi'), 'stale_context')
-        require(mode == 'Multi' or len(points) == (2 if mode == 'Day Night' else 8))
+        require(valid_point_count(mode, len(points)))
         for point in points:
             require(type(point) is dict and set(point) <= {'seconds', 'target_native', 'draft_id', 'source_slot'}
                     and {'seconds', 'target_native'} <= set(point))
-            require(type(point['seconds']) is int and 0 <= point['seconds'] < 86400)
+            require(valid_seconds(point['seconds']))
             require(type(point['target_native']) in (int, float))
         clocks = [p['seconds'] for p in points]
         if mode == 'Multi':

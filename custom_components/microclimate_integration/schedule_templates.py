@@ -2,6 +2,8 @@
 
 import json
 
+from .constraints import valid_seconds, valid_point_count
+
 from .card_model import value_of
 from .edit_plan import build_plan
 from .write_contract import control_mode, definition_for, timing_mode, WriteValidationError
@@ -31,14 +33,14 @@ def validate_template(template, mode, unit):
     if template["mode"] != mode or template["unit"] != unit:
         raise WriteValidationError("stale_context")
     points = template["points"]
-    if type(points) is not list or not 2 <= len(points) <= 8 or (MODES[mode] is not None and len(points) != MODES[mode]):
+    if type(points) is not list or not valid_point_count(mode, len(points)):
         raise WriteValidationError("invalid_patch")
     clean = []
     for point in points:
         if type(point) is not dict or set(point) != {"seconds", "target_native"}:
             raise WriteValidationError("invalid_patch")
         seconds, target = point["seconds"], point["target_native"]
-        if type(seconds) is not int or not 0 <= seconds < 86400 or type(target) not in (int, float):
+        if not valid_seconds(seconds) or type(target) not in (int, float):
             raise WriteValidationError("invalid_patch")
         # build_plan performs the full numeric, ordering and reserved-slot checks.
         clean.append({"seconds": seconds, "target_native": target})

@@ -8,6 +8,7 @@ from homeassistant.auth.permissions.const import POLICY_READ, POLICY_CONTROL
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from .const import DOMAIN, MODEL_CHANNEL_OPTIONS
 from .const_helpers import enum_value
+from .constraints import numeric_maximum, valid_seconds, SECONDS_PER_DAY
 from .write_contract import (write_definitions, observed_numeric, applicable,
                              control_mode, timing_mode, date_string, WriteValidationError)
 
@@ -96,7 +97,7 @@ def value_of(field, data):
         if field.kind == 'time':
             raw = data.get(field.pin)
             number = float(str(raw).split('\0')[0])
-            return int(number) if number.is_integer() and 0 <= number < 86400 else None
+            return int(number) if number.is_integer() and 0 <= number < SECONDS_PER_DAY else None
         return float(observed_numeric(field, data))
     except (ValueError, TypeError, OverflowError, WriteValidationError):
         return None
@@ -104,7 +105,7 @@ def value_of(field, data):
 
 def input_value(field, value):
     if field.kind == 'time':
-        if type(value) is not int or not 0 <= value < 86400:
+        if not valid_seconds(value):
             raise WriteValidationError('invalid_time')
         return time(value // 3600, value // 60 % 60, value % 60)
     return value
@@ -136,7 +137,7 @@ def snapshot(hass, coordinator, channel, device, user):
                        'writable': bool(writable), 'reason': None if writable else 'Read only, unavailable or disabled',
                        'options': [label for _, label in field.options],
                        'unit': '°C' if thermal else '%' if field.kind == 'setpoint' else 'min' if field.kind == 'ramp' else None,
-                       'minimum': 0, 'maximum': 240 if field.kind == 'ramp' else 100,
+                       'minimum': 0, 'maximum': numeric_maximum(field.kind),
                        'step': 1 if field.kind == 'ramp' else 'any'})
     if not fields:
         raise WriteValidationError('read_denied')
