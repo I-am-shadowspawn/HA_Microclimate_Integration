@@ -1,6 +1,12 @@
-# 1.3.0 — clean reinstall required
+# Unreleased — distribution tooling
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
+
+- Select reviewed public fixtures and required runtime assets explicitly in reproducible release archives; check clean extraction and version agreement.
+- Run Core 2026.9.3, frontend type/lint/unit/browser checks, bundle reproducibility, HACS and hassfest in GitHub CI. Gate future tagged releases on those results.
+- Document portable Python/Node/uv commands. This is packaging and CI work; integration behaviour is unchanged.
+
+# 1.3.0 — clean reinstall required
 
 - Remove 32 individual schedule entities per channel; preserve aggregate observations, independent controls and card editing.
 - Authorize channel schedule operations through the enabled, registry-bound aggregate sensor, including job recovery and per-step checks.

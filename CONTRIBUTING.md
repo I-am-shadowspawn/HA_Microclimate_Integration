@@ -6,18 +6,17 @@ Discuss substantial changes in a GitHub issue before opening a pull request. Inc
 
 Contributions must be your own or carry compatible redistribution rights and attribution. Contributions to this project are provided under its MIT licence; retain existing third-party notices. Do not add vendor artwork without documented permission.
 
-Use Python 3.14.7 and the environments in [README-TESTING.md](README-TESTING.md). From the repository root:
+Use Python 3.14.x, uv 0.6.1 and Node.js 24.21.0 with the environments in [README-TESTING.md](README-TESTING.md). From the repository root:
 
 ```sh
-python3.14 scripts/test_matrix.py --install --ha 2026.9.3
-python3.14 scripts/test_matrix.py --release-gate --ha 2026.9.3
+python3.14 scripts/test_matrix.py --install --release-gate --ha 2026.9.3
 cd frontend
 npm ci
 npm run typecheck
 npm run lint
 npm test
 npm run build
-npx playwright install chromium
+npx playwright install --with-deps chromium
 npm run test:e2e
 ```
 

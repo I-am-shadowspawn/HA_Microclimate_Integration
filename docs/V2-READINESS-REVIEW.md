@@ -2,6 +2,10 @@
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
+## Tooling follow-up — 25 September 2026
+
+V2-03 and V2-04 are implemented. The builder now has explicit public inputs and deterministic package checks; the portable workflow gates Python, frontend, browser, HACS, hassfest and packaging before a future tagged release. Core 2026.9.3 is the configured minimum. This review below records the earlier baseline; see [tests and release packaging](../README-TESTING.md) and the active [TODO](../TODO.md) for current status.
+
 ## Publication follow-up — 25 September 2026
 
 V2-01 and V2-02 are complete. The source is uploaded and both public HACS and hassfest checks passed; V2-07 HACS install/update and release remain separate. This review below records the earlier baseline. See [publication preparation](V2-PUBLICATION-PREPARATION.md) and the active [TODO](../TODO.md) for current status.

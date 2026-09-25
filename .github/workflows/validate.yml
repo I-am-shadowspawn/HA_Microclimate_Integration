@@ -1,6 +1,8 @@
-name: HACS and hassfest
+name: Validate and package
 on:
   push:
+    branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -18,3 +20,95 @@ jobs:
         with:
           category: integration
           comment: false
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.14.7'
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: '0.6.1'
+          enable-cache: true
+      - name: Lint touched tooling
+        run: |
+          uvx --from ruff==0.16.9 ruff check scripts/build_release.py scripts/test_matrix.py tests/test_release_package.py
+          uvx --from ruff==0.16.9 ruff format --check scripts/build_release.py scripts/test_matrix.py tests/test_release_package.py
+      - name: Test minimum supported Home Assistant Core
+        run: python scripts/test_matrix.py --install --release-gate --ha 2026.9.3
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Typecheck, lint and unit tests
+        working-directory: frontend
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+      - name: Verify committed cards and notices match source
+        working-directory: frontend
+        run: |
+          npm run build
+          git diff --exit-code -- ../custom_components/microclimate_integration/frontend/microclimate-cards.js ../custom_components/microclimate_integration/frontend/THIRD_PARTY_NOTICES.txt
+      - name: Install Chromium and system libraries
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests
+        working-directory: frontend
+        run: npm run test:e2e
+  package:
+    needs: [hassfest, hacs, python, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.14.7'
+      - name: Test archive contents and reproducibility
+        run: python -m unittest tests.test_release_package -q
+      - name: Build twice and compare bytes
+        run: |
+          python scripts/build_release.py --output dist/first
+          python scripts/build_release.py --output dist/second
+          diff -r dist/first dist/second
+          cd dist/first
+          sha256sum --check SHA256SUMS
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: microclimate-candidate
+          path: dist/first/*
+          if-no-files-found: error
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [package]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: microclimate-candidate
+          path: dist
+      - name: Verify tag and checksums
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python -c 'import json,os; from pathlib import Path; version=json.loads(Path("custom_components/microclimate_integration/manifest.json").read_text())["version"]; assert os.environ["RELEASE_TAG"] == "v" + version, "Tag/manifest mismatch"'
+          cd dist
+          sha256sum --check SHA256SUMS
+      - name: Publish GitHub Release from validated archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" dist/*.zip dist/SHA256SUMS --verify-tag --title "$RELEASE_TAG" --generate-notes
