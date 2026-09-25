@@ -136,7 +136,7 @@ async def test_entities_share_transforms_and_schedule_cache(hass):
         await hass.async_block_till_done()
         coordinator=hass.data[DOMAIN][entry.entry_id]
         coordinator.data=api_client.normalize_response(PAYLOAD)  # Fresh unread snapshot.
-        climate=MicroclimateClimate(coordinator,'test','Evo Connect','Yellow',CHANNELS['Yellow'])
+        climate=MicroclimateClimate(coordinator,'Yellow',CHANNELS['Yellow'])
         definition=next(d for d in VERIFIED_MEASUREMENTS['Evo Connect'] if d.key=='temperature' and d.channel=='Yellow')
         sensor=MicroclimateMeasurement(coordinator,entry,definition)
         schedule=MicroclimateSchedule(coordinator,entry,'Yellow')

@@ -32,7 +32,7 @@ async def test_consistent_output_boundaries(hass,raw,expected,control,active):
     entry=MockConfigEntry(domain=DOMAIN,data={'evo_device':'test','model':'Evo Connect','token':'fake'})
     coordinator=DataUpdateCoordinator(hass,logging.getLogger(__name__),name='test',config_entry=entry)
     coordinator.async_set_updated_data(normalize_response({'v52':control,'v4':raw}))
-    climate=MicroclimateClimate(coordinator,'test','Evo Connect','Yellow',CHANNELS['Yellow'])
+    climate=MicroclimateClimate(coordinator,'Yellow',CHANNELS['Yellow'])
     definition=next(d for d in VERIFIED_MEASUREMENTS['Evo Connect'] if d.key=='output' and d.channel=='Yellow')
     sensor=MicroclimateMeasurement(coordinator,entry,definition)
     assert sensor.native_value==climate.extra_state_attributes['current_power']==expected
@@ -49,7 +49,7 @@ async def test_consistent_ramp_boundaries(hass,raw,expected):
     entry=MockConfigEntry(domain=DOMAIN,data={'evo_device':'test','model':'Evo Connect','token':'fake'})
     coordinator=DataUpdateCoordinator(hass,logging.getLogger(__name__),name='test',config_entry=entry)
     coordinator.async_set_updated_data(normalize_response({'v48':raw}))
-    climate=MicroclimateClimate(coordinator,'test','Evo Connect','Yellow',CHANNELS['Yellow'])
+    climate=MicroclimateClimate(coordinator,'Yellow',CHANNELS['Yellow'])
     definition=next(d for d in VERIFIED_MEASUREMENTS['Evo Connect'] if d.key=='ramp_time' and d.channel=='Yellow')
     sensor=MicroclimateMeasurement(coordinator,entry,definition)
     assert sensor.native_value==climate.extra_state_attributes['ramp_time']==expected

@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant import config_entries
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er, device_registry as dr
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -15,7 +16,7 @@ from custom_components.microclimate_integration.identity import channel_identity
 @pytest.mark.parametrize('control,mode,active', [(1,'heat','heating'),('1','heat','heating'),(2,'cool','cooling'),('2','cool','cooling')])
 @pytest.mark.parametrize('power,activity', [(0,'idle'),('0','idle'),(50,'active'),('50','active'),(None,None),('bad',None),(-1,None)])
 def test_mode_independent_of_activity(control, mode, active, power, activity):
-    entity = MicroclimateClimate(SimpleNamespace(config_entry=SimpleNamespace(entry_id="test-entry", data={"evo_device":"test","model":"Evo Connect"}), hass=None, data={'v52':control,'v4':power}), 'same','Evo Connect','Yellow',CHANNELS['Yellow'])
+    entity = MicroclimateClimate(SimpleNamespace(config_entry=SimpleNamespace(entry_id="test-entry", data={"evo_device":"test","model":"Evo Connect"}), hass=None, data={'v52':control,'v4':power}), 'Yellow',CHANNELS['Yellow'])
     assert entity.hvac_mode == mode
     assert entity.hvac_action == (active if activity == 'active' else activity)
     assert entity.hvac_modes == []  # Observational, including cooling.
@@ -24,10 +25,33 @@ def test_mode_independent_of_activity(control, mode, active, power, activity):
 
 @pytest.mark.parametrize('control', [0,'0',None,'bad',True])
 def test_fixed_or_invalid_not_temperature(control):
-    entity = MicroclimateClimate(SimpleNamespace(config_entry=SimpleNamespace(entry_id="test-entry", data={"evo_device":"test","model":"Evo Connect"}), hass=None, data={'v52':control,'v8':1,'v4':50}), 'same','Evo Connect','Yellow',CHANNELS['Yellow'])
+    entity = MicroclimateClimate(SimpleNamespace(config_entry=SimpleNamespace(entry_id="test-entry", data={"evo_device":"test","model":"Evo Connect"}), hass=None, data={'v52':control,'v8':1,'v4':50}), 'Yellow',CHANNELS['Yellow'])
     assert entity.hvac_mode is None
     assert entity.hvac_action is None
     assert entity.target_temperature is None
+
+
+async def test_climate_name_tracks_entry_and_channel_without_changing_identity():
+    entry = SimpleNamespace(entry_id="test-entry", data={"evo_device": "before", "model": "Evo Connect"})
+    coordinator = SimpleNamespace(config_entry=entry, hass=None, data={"v16": "Yellow"})
+    entity = MicroclimateClimate(coordinator, "Yellow", CHANNELS["Yellow"])
+    assert entity.name == "before: Yellow"
+    unique_id = entity.unique_id
+    device_info = entity.device_info
+    entry.data["evo_device"] = "after"
+    coordinator.data = {"v16": "Warm side"}
+    assert entity.name == "after: Warm side"
+    assert entity.unique_id == unique_id
+    assert entity.device_info["identifiers"] == device_info["identifiers"]
+
+    for method, args in (
+        (entity.async_set_temperature, {"temperature": 25}),
+        (entity.async_set_hvac_mode, {"hvac_mode": "heat"}),
+        (entity.async_turn_on, {}),
+        (entity.async_turn_off, {}),
+    ):
+        with pytest.raises(HomeAssistantError, match="climate entity is read-only"):
+            await method(**args)
 
 
 def entry(token='token-a', name='same'):
@@ -84,6 +108,5 @@ async def test_reconfigure_duplicate_rejected(hass):
     result = await hass.config_entries.flow.async_configure(flow['flow_id'],{'evo_device':'renamed','token':'token-b'})
     assert result['errors'] == {'base':'already_configured'}
     assert first.data['token'] == 'token-a'
-
 
 

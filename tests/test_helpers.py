@@ -44,48 +44,26 @@ async def test_async_update_data2(hass:HomeAssistant):
 
 
 @pytest.mark.asyncio
-async def test_microclimate_base_entity_new():
-    """Test MicroclimateBaseEntity initialization and async_update."""
-    mock_coordinator = AsyncMock()
-    evo_device = "device_123"
-    model = "Evo Connect"
-    channel = "Yellow"
-    logger = logging.getLogger("test_logger")
+async def test_microclimate_base_entity_uses_entry_identity_and_coordinator_refresh(hass):
+    """A renamed controller keeps its device identity and one refresh path."""
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-    with tempfile.TemporaryDirectory() as temp_config_dir:
-        hass_instance = HomeAssistant(temp_config_dir)
+    entry = MockConfigEntry(
+        domain="microclimate_integration",
+        data={"evo_device": "device_123", "model": "Evo Connect", "token": "fake"},
+    )
+    coordinator = DataUpdateCoordinator(
+        hass, logger=logging.getLogger(__name__), name="test_coordinator",
+        config_entry=entry, update_method=AsyncMock(),
+    )
+    entity = MicroclimateBaseEntity(coordinator, "Yellow")
+    assert entity.device_info["identifiers"] == {
+        ("microclimate_integration", f"{entry.entry_id}_Yellow")
+    }
+    assert entity.data == {}
 
-        # Create a real DataUpdateCoordinator with hass
-        coordinator = DataUpdateCoordinator(
-            hass_instance,
-            logger=logger,
-            name="test_coordinator",
-            config_entry=None,  # Standalone test coordinator has no config entry.
-            update_method=AsyncMock(),
-            update_interval=None,  # No auto updates in test
-        )
-        # Patch out async_config_entry_first_refresh to avoid MissingIntegrationFrame error.
-        coordinator.async_config_entry_first_refresh = AsyncMock(return_value=None)
-        await coordinator.async_config_entry_first_refresh()
-
-        entity = MicroclimateBaseEntity(coordinator, evo_device, model, channel)
-        # Manually set hass on the entity to mimic HA's behavior.
-        entity.hass = hass_instance
-
-        # Override async_write_ha_state to bypass the missing entity ID error.
-        entity.async_write_ha_state = lambda: None
-
-    # Verify attributes
-    assert entity.hass is not None  # This should now pass
-    assert entity._evo_device == evo_device
-    assert entity._model == model
-    assert entity._channel == channel
-    assert "identifiers" in entity._attr_device_info
-    assert entity._attr_device_info["identifiers"] == {("microclimate_integration", evo_device)}
-
-    # Mock async_request_refresh on the coordinator
     coordinator.async_request_refresh = AsyncMock()
-
-    # Test async_update
-    await entity.async_update()
-    coordinator.async_request_refresh.assert_called_once()
+    with patch.object(entity, "async_write_ha_state") as publish:
+        await entity.async_update()
+    coordinator.async_request_refresh.assert_awaited_once()
+    publish.assert_not_called()

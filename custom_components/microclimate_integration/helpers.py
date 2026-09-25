@@ -4,7 +4,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, UpdateFailed
 
 from .api_client import get_evo_device_data
-from .const import DOMAIN
+from .identity import channel_device_info, controller_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,30 +21,19 @@ async def async_update_data(hass, config_entry):
 
 
 class MicroclimateBaseEntity(CoordinatorEntity):
-    """Base class for Microclimate entities."""
+    """Coordinator-backed entity bound to the config entry's device identity."""
 
-    def __init__(self, coordinator, evo_device, model, channel=None, pin=None):
+    def __init__(self, coordinator, channel=None):
         super().__init__(coordinator)
-        self._evo_device = evo_device
-        self._model = model
+        self._entry = coordinator.config_entry
         self._channel = channel
-        self._pin = pin
-        self._name = "default_name"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, evo_device)},
-            "name": f"Microclimate {evo_device} {channel if channel else 'System'}",
-            "manufacturer": "Microclimate",
-            "model": model,
-        }
+        self._attr_device_info = (
+            channel_device_info(self._entry, channel, coordinator.hass)
+            if channel else controller_device_info(self._entry)
+        )
 
     @property
     def data(self):
         """Return a safe mapping when no usable coordinator data exists."""
         data = self.coordinator.data
         return data if isinstance(data, dict) else {}
-
-    async def async_update(self):
-        """Ensure updates are requested."""
-        await self.coordinator.async_request_refresh()
-        self.async_write_ha_state()
-
