@@ -10,9 +10,8 @@ The integration brings controller and channel data into Home Assistant and provi
 &#x20;      width="800">
 /</p>
 
-> **Unofficial, independent project.**\
-> This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Product names are used solely to identify compatibility. For support with this integration, use this project's [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
-
+> **Unofficial, independent project.**  
+> This integration and its custom cards are not affiliated with, endorsed by, or supported by **Microclimate or Blynk**. Their names and product/service names are used solely to identify compatibility and the external services on which the integration depends. For support with this integration, use this project's [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 ---
 
 ## Features
@@ -66,6 +65,17 @@ Support may also vary with controller firmware and channel type. See [Supported 
 This integration communicates with the controller through the remote Microclimate/Blynk service. There is currently **no local-controller fallback** if the cloud service or internet connection is unavailable.
 
 See [TESTED-PLATFORM.md](docs/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
+
+---
+## Service dependency and third-party services
+
+This integration communicates with Microclimate controllers through the cloud service used by the official Microclimate platform, which is provided using **Blynk** infrastructure. It does not communicate directly with the controller over the local network.
+
+Use of the Microclimate/Blynk service remains subject to the applicable terms and service arrangements provided by Microclimate and Blynk. This project is not a party to, and makes no representation about, the commercial or licensing arrangements between those companies.
+
+This project is independent and is not affiliated with, endorsed by, or supported by either **Microclimate** or **Blynk**. References to their names and services are solely to describe compatibility and the external services on which the integration depends.
+
+Availability of this integration therefore depends on the continued availability and compatibility of the relevant Microclimate/Blynk cloud service. Changes to that service, its API, authentication requirements or applicable terms may affect or prevent the integration from operating.
 
 ---
 
@@ -561,11 +571,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development and validation guidance.
 The integration aims to preserve controller behaviour exactly where it has been verified and to leave unknown or unconfirmed vendor behaviour explicit rather than attempting to infer it.
 
 ---
-
 # Licence
 
 This project is licensed under the **MIT License**. See [LICENSE](LICENSE) and [LICENSING.md](docs/LICENSING.md).
 
-Maintained by **Simon Burke (`@I-am-shadowspawn`)**.
+Maintained by **`@I-am-shadowspawn`**.
 
-Microclimate product names and trademarks belong to their respective owners. This project is independent and is not affiliated with or endorsed by Microclimate.
+Microclimate and Blynk product names, images, logos and trademarks belong to their respective owners. 
+
+This project is independent and is not affiliated with or endorsed by Microclimate or their service provider Blynk.
