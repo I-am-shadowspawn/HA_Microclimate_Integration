@@ -39,11 +39,10 @@ DEVELOPMENT_ROOT_FILES = (
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "LICENSE",
-    "PIN-VERIFICATION.md",
     "README.md",
-    "TESTING.md",
     "SECURITY.md",
     "SUPPORT.md",
+    "AGENT.md"
     "TODO.md",
     "conftest.py",
     "hacs.json",
