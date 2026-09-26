@@ -1,5 +1,7 @@
 # V2 public-release readiness review
 
+This is a historical review. Its earlier F-labelled-Celsius note was superseded by V2-12-a: current controller responses report `C` or `F` in v25 and return temperature numbers in that unit. See the active [validation contract](VALIDATION-CONTRACT.md).
+
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
 ## Tooling follow-up — 25 September 2026

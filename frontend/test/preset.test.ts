@@ -38,4 +38,20 @@ describe("portable schedule presets", () => {
     expect(() => importPreset(draft, { ...preset, points: [...preset.points].reverse() })).toThrow("chronological");
     expect(() => importPreset(draft, { ...preset, points: [{ seconds: 0, target_native: 0 }, preset.points[1]] })).toThrow("reserved");
   });
+  it("keeps Fahrenheit native values in presets without double conversion", () => {
+    const view = fixture("Multi", 2);
+    for (const field of view.fields.filter((f) => f.kind === "setpoint")) {
+      field.unit = "°F";
+      field.minimum = 32;
+      field.maximum = 212;
+      if (typeof field.value === "number" && field.value > 0)
+        field.value = field.value * 9 / 5 + 32;
+    }
+    const draft = makeDraft(view);
+    const preset = exportPreset(draft);
+    expect(preset.unit).toBe("fahrenheit");
+    expect(preset.points[0].target_native).toBe(69.8);
+    expect(importPreset(draft, preset).points[0].target_native).toBe(69.8);
+    expect(() => importPreset(makeDraft(fixture("Multi", 2)), preset)).toThrow("unit");
+  });
 });

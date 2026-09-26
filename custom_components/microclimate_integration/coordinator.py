@@ -125,7 +125,7 @@ class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             model = self.entry.data.get('model')
             self._check(model)
             field = definition_for(model, key)
-            validate_input(field, value)
+            validate_input(field, value, self.data)
             if not applicable(field, self.data):
                 raise WriteValidationError('unsupported_capability')
             initial_context = context(field, self.data)

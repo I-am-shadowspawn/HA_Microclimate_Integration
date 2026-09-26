@@ -29,7 +29,7 @@ Save patch variants:
 {"kind":"season_dates","fields":{"season_1_start_pin":"09/10"}}
 ```
 
-Canonical keys derive from Python write definitions. The browser cannot supply pins, URLs, tokens or write order. Schedule modes are exact `Day Night`, `Multi`, `Seasonal`; 2, 2–8, 8 points respectively. `draft_id`/`source_slot` are optional untrusted editing metadata; ordering optimization is verified by unchanged retained values against the fresh baseline. Wire numbers are native Celsius/%; seconds and ramp minutes are integral. Root and channel patches cannot be mixed; one enum per mode Save.
+Canonical keys derive from Python write definitions. The browser cannot supply pins, URLs, tokens or write order. Schedule modes are exact `Day Night`, `Multi`, `Seasonal`; 2, 2–8, 8 points respectively. `draft_id`/`source_slot` are optional untrusted editing metadata; ordering optimization is verified by unchanged retained values against the fresh baseline. Wire numbers use the current controller-reported °C/°F unit for thermal fields or % for fixed output; seconds and ramp minutes are integral. Root and channel patches cannot be mixed; one enum per mode Save.
 
 The pure planner validates the full desired state and preserved time templates before dispatch. Single insertions shift backwards, single deletions promote forwards, general changes use the complete frozen final map. Populated pairs use target-then-time; cleared pairs use midnight-then-zero. Final prefix checks do not incorrectly reject necessary transient intermediate duplicates. Date permutations are searched without scratch values.
 

@@ -12,6 +12,7 @@ import {
   segments,
 } from "../src/draft";
 import { fixture } from "./snapshot";
+import temperatureContract from "../../fixtures/temperature_contract.json";
 describe("lossless draft and controller contract", () => {
   it("retains seconds and does not write on import", () => {
     const v = fixture();
@@ -66,6 +67,30 @@ describe("lossless draft and controller contract", () => {
       nativeValue(displayValue(25.125, "°C", true), "°C", true),
     ).toBeCloseTo(25.125, 12);
     expect(displayValue(25, "%", true)).toBe(25);
+    expect(displayValue(77, "°F", true)).toBe(77);
+    expect(displayValue(77, "°F", false)).toBeCloseTo(25, 12);
+    expect(nativeValue(25, "°F", false)).toBeCloseTo(77, 12);
+    const v = fixture("Multi", 2);
+    for (const field of v.fields.filter((f) => f.kind === "setpoint")) {
+      field.unit = "°F";
+      field.minimum = 32;
+      field.maximum = 212;
+      if (typeof field.value === "number" && field.value > 0)
+        field.value = field.value * 9 / 5 + 32;
+    }
+    const d = makeDraft(v);
+    expect(d.points[0].target_native).toBe(69.8);
+    expect(pointError(d)).toBe(null);
+    d.points[0].target_native = nativeValue(25, "°F", false);
+    expect((patchFor(d) as any).schedule.points[0].target_native).toBe(77);
+  });
+  it.each(temperatureContract.examples)("uses native $expected_unit value $raw exactly once", (example) => {
+    const unit = example.expected_unit;
+    const raw = example.expected_value;
+    const celsius = unit === "°F" ? (raw - 32) * 5 / 9 : raw;
+    expect(displayValue(raw, unit, false)).toBeCloseTo(celsius, 10);
+    expect(nativeValue(celsius, unit, false)).toBeCloseTo(raw, 10);
+    expect(displayValue(raw, unit, true)).toBeCloseTo(unit === "°C" ? raw * 9 / 5 + 32 : raw, 10);
   });
   it("renders carry-over without moving a physical day/night point", () => {
     const d = makeDraft(fixture("Day Night", 2));

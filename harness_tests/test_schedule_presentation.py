@@ -19,14 +19,14 @@ def test_solar_tokens_are_unsupported_raw_input(token):
 
 @pytest.mark.parametrize('code,label',[(0,'Constant'),(1,'Day & Night'),(2,'Multi'),(3,'Seasonal'),(99,'Unknown')])
 def test_readable_bounded_summary(code,label):
-    data={'v53':code,'v52':1,'v20':'09/02','v21':'00/00'}
+    data={'v53':code,'v52':1,'v20':'09/02','v21':'00/00','v25':'C'}
     for i in range(8):
         data[f'v{32+2*i}']=str(i*3600)
         data[f'v{33+2*i}']=20+i
     observed=schedule_observation(data,'Yellow')
     assert observed['summary'].startswith(label)
     assert len(observed['summary'])<=255
-    if code==1:assert 'day 00:00:00 = 20 C; night 01:00:00 = 21 C' in observed['summary']
+    if code==1:assert 'day 00:00:00 = 20 °C; night 01:00:00 = 21 °C' in observed['summary']
 
 
 async def test_live_detail_recorder_exclusions_and_same_entity(hass):

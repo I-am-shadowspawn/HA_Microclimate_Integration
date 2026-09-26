@@ -4,7 +4,7 @@
 
 The channel card can **Download preset** from a complete Day Night, Multi or Seasonal schedule. In Edit mode, **Import preset** loads a JSON file into the local draft. Review the changed fields and press Save; import alone sends no controller update. To copy between cards, download from one channel and import on another. Preset files can be kept as named templates outside Home Assistant. The integration does not store a preset library or create extra entities.
 
-The file contains only `format`, `mode`, `unit` and `points`. Time is whole seconds from local midnight (0–86399); `target_native` is 0–100 Celsius or percent according to `unit`. It contains no device ID, token, pin, controller name, timezone or root season dates. Never change `unit` to force an incompatible import: a 25% fixed-output target is not 25°C. HA Fahrenheit display does not change the file's native Celsius values.
+The file contains only `format`, `mode`, `unit` and `points`. Time is whole seconds from local midnight (0–86399); `target_native` is in the source controller's reported Celsius or Fahrenheit unit, or percent for fixed output. It contains no device ID, token, pin, controller name, timezone or root season dates. Never change `unit` to force an incompatible import: 25% is not 25°C, and 77°F is not 77°C. HA's display preference does not change the file's native values. Import requires a matching native unit; convert a preset explicitly before importing across controller unit settings.
 
 ```json
 {"format":"microclimate.schedule.v1","mode":"Multi","unit":"celsius","points":[{"seconds":25200,"target_native":27},{"seconds":68400,"target_native":22}]}

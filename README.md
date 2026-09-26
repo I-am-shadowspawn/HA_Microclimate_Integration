@@ -26,12 +26,12 @@ Each entry creates one root controller device and its channel devices. Supplied 
 
 - Temperature, observed setpoint and lower/upper alarm **thresholds**, where the profile has a probe. No active-alarm status is inferred.
 - Output percentage, control mode and timing type. Yellow and Red expose pulse/dimming output readings and ramp duration in minutes; Blue reports its fixed on/off output capability and has no ramp measurement or attributes.
-- Reported schedule periods, with all eight slots retained in attributes. The count means reported slots, not active slots. Thermal setpoints are Celsius; fixed-output setpoints are percentages. Unexpected tokens, reported timezone and unrecognized fields are preserved without calculating the active schedule.
+- Reported schedule periods, with all eight slots retained in attributes. The count means reported slots, not active slots. Thermal periods use `setpoint_temperature` and `setpoint_unit` with the controller-reported °C or °F unit; fixed-output setpoints are percentages. The former `setpoint_celsius` attribute is replaced. Unexpected tokens, reported timezone and unrecognized fields are preserved without calculating the active schedule.
 - Mode-specific schedule attributes: Day Night exposes `day_night.day` and `.night` from the first two pairs; Multi exposes `daily_points` (eight time/setpoint entries); Seasonal exposes `seasons` (four day/night pairs plus root start dates). Original `periods` remain available in every mode. These are reported settings, not an active-schedule calculation. Blue Periodic retains unparsed interval/duration fields; no periodic meaning is assigned to Yellow/Red fields.
 - Root metadata: four season starts, previous-24-hour power, temperature-unit code, system date/time and system name, plus reported pin count. The 24-hour power unit remains unverified and unset. Dates retain the reported year format; no century or timestamp is invented.
 - Optional raw-pin diagnostics, disabled by default. Individual registry enable/disable choices survive reload.
 
-Missing/invalid readings are unknown; failed refreshes make entities unavailable. Native temperatures are Celsius even when the upstream text is mislabeled F. Home Assistant may convert those native values for display. The reported unit flag does not trigger an extra conversion.
+Missing/invalid readings are unknown; failed refreshes make entities unavailable. The controller's v25 unit flag identifies the native unit for that response. Temperature numbers are retained without conversion; Home Assistant converts typed entities for its configured display unit. A subsequent poll can change the native unit, and an absent/invalid flag leaves thermal observations unknown rather than reusing an old unit.
 
 All entities use one polling coordinator per entry, normally refreshing once per minute. Entries share Home Assistant's HTTP session with explicit request timeouts. One normalization pass and a per-response reading cache avoid duplicate work; unchanged responses suppress entity notifications while failure/recovery transitions remain visible.
 
@@ -103,7 +103,7 @@ Large structured schedule attributes are excluded from recorder history using HA
 
 Each channel has one enabled Reported schedule periods sensor with a summary and structured attributes. Its registry entity is the card's schedule permission anchor. Keep it enabled and grant READ access to view the schedule and CONTROL access to edit it.
 
-Day & Night uses two pairs; Multi and Seasonal use up to eight. Constant and Periodic do not expose editable manual pairs. The card shows thermal setpoints in Celsius (or HA's configured temperature unit) and fixed output as percentages. The sensor remains read-only; validated writes use the card API.
+Day & Night uses two pairs; Multi and Seasonal use up to eight. Constant and Periodic do not expose editable manual pairs. The card shows thermal setpoints in HA's configured temperature unit and fixed output as percentages. The sensor remains read-only; validated writes use the card API.
 
 Raw-pin entities remain registered for optional troubleshooting but are disabled by default. Other diagnostics, including root metadata and Last configuration write, retain their own defaults.
 

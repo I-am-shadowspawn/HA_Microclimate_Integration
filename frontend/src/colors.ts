@@ -52,6 +52,8 @@ export function targetColors(
   unit?: string | null,
   stops?: TemperatureColor[],
 ) {
-  const color = unit === "°C" ? colorFor(value, stops) : "#327b80";
+  const color = unit === "°C" || unit === "°F"
+    ? colorFor(value !== null && unit === "°F" ? (value - 32) * 5 / 9 : value, stops)
+    : "#327b80";
   return `--segment-color:${color};--segment-text:${textColor(color)}`;
 }

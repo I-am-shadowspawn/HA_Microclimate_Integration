@@ -74,7 +74,7 @@ def test_enum_family_contract(row):
 
 @pytest.mark.parametrize('row', VECTORS['schedules'])
 def test_whole_schedule_contract(row):
-    data = {'v52': 1, 'v53': {'Day Night': 1, 'Multi': 2, 'Seasonal': 3}[row['mode']]}
+    data = {'v25': 'C', 'v52': 1, 'v53': {'Day Night': 1, 'Multi': 2, 'Seasonal': 3}[row['mode']]}
     for i in range(1, 9):
         for kind, value in [('time', f'{i*3600}\0{i*3600}\0Europe/London\x000'), ('setpoint', 20)]:
             field = definition_for('Evo Connect 3', f'Yellow_period_{i}_{kind}')
@@ -87,7 +87,7 @@ def test_whole_schedule_contract(row):
 def test_schedule_applicability_and_native_unit(row):
     field = definition_for(row['model'], f"{row['channel']}_period_{row['slot']}_setpoint")
     pins = CHANNELS[row['channel']]
-    data = {pins['control_pin']: row['control_code'], pins['timing_type']: row['mode_code']}
+    data = {'v25': 'C', pins['control_pin']: row['control_code'], pins['timing_type']: row['mode_code']}
     if row['present']:
         data[field.pin] = 25
     assert applicable(field, data) == row['writable']

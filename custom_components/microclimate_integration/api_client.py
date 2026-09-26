@@ -83,7 +83,7 @@ async def fetch_data(token: str, *, session: aiohttp.ClientSession, log_raw_resp
 def normalize_response(data):
     """Require an object; unsupported pin values become unknown.
 
-    Preserve strings (including encoded schedules and mislabeled temperatures).
+    Preserve strings (including encoded schedules and temperature suffixes).
     Typed interpretation belongs to the consuming property.
     """
     if not isinstance(data, dict):

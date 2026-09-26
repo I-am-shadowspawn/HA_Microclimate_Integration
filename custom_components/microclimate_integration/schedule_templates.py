@@ -7,6 +7,7 @@ from .constraints import valid_seconds, valid_point_count
 from .card_model import value_of
 from .edit_plan import build_plan
 from .write_contract import control_mode, definition_for, timing_mode, WriteValidationError
+from .validation import reported_temperature_unit
 
 FORMAT = "microclimate.schedule.v1"
 MAX_TEMPLATE_BYTES = 4096
@@ -21,7 +22,12 @@ def _context(model, channel, data):
     control = control_mode(first, data)
     if mode not in MODES or control not in ("fixed", "heating", "cooling"):
         raise WriteValidationError("unsupported_capability")
-    return mode, "percent" if control == "fixed" else "celsius"
+    if control == "fixed":
+        return mode, "percent"
+    unit = reported_temperature_unit(data)
+    if unit is None:
+        raise WriteValidationError("temperature_unit_unknown")
+    return mode, "fahrenheit" if unit == "°F" else "celsius"
 
 
 def validate_template(template, mode, unit):

@@ -28,7 +28,7 @@ def test_unknown_fields_and_timezone_roundtrip(token):
 
 @pytest.mark.parametrize('channel,modepin,controlpin,start', [('Yellow','v53','v52',32),('Red','v83','v82',62),('Blue','v113','v112',92)])
 def test_day_night_first_two_pairs_only_and_mode_transition(channel,modepin,controlpin,start):
-    base={controlpin:1}
+    base={'v25':'C',controlpin:1}
     for i in range(8):
         base[f'v{start+2*i}']=str((23 if i==0 else i)*3600)
         base[f'v{start+2*i+1}']=20+i
@@ -50,7 +50,7 @@ def test_day_night_first_two_pairs_only_and_mode_transition(channel,modepin,cont
 @pytest.mark.parametrize('time,value,mode,activation', [('0',0,1,'likely_unused'),('0',0,0,'likely_unused'),
     ('0',25,1,'unverified'),('3600',0,0,'unverified'),('sr',0,1,'unverified'),('0',None,1,'unverified')])
 def test_multi_unused_default_is_inference_not_disabled(time,value,mode,activation):
-    result=schedule_observation(normalize_response({'v53':2,'v52':mode,'v32':time,'v33':value}),'Yellow')
+    result=schedule_observation(normalize_response({'v25':'C','v53':2,'v52':mode,'v32':time,'v33':value}),'Yellow')
     period=result['daily_points']['period_1']
     assert period['activation']==activation
     assert period['setpoint_raw']==value
@@ -60,10 +60,10 @@ def test_multi_unused_default_is_inference_not_disabled(time,value,mode,activati
 
 
 def test_duplicate_times_reported_without_precedence():
-    result=schedule_observation({'v53':2,'v52':1,'v32':'3600','v33':20,'v34':'3600','v35':30},'Yellow')
+    result=schedule_observation({'v25':'C','v53':2,'v52':1,'v32':'3600','v33':20,'v34':'3600','v35':30},'Yellow')
     assert result['duplicate_clock_times']=={'01:00:00':['period_1','period_2']}
-    assert result['daily_points']['period_1']['setpoint_celsius']==20
-    assert result['daily_points']['period_2']['setpoint_celsius']==30
+    assert result['daily_points']['period_1']['setpoint_temperature']==20
+    assert result['daily_points']['period_2']['setpoint_temperature']==30
     assert 'active_period' not in result
 
 

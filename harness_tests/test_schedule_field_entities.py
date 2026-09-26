@@ -10,7 +10,7 @@ from custom_components.microclimate_integration.card_model import snapshot
 async def test_schedule_projection_modes_units_and_availability(hass,hass_admin_user,model,channels):
     entry=MockConfigEntry(domain=DOMAIN,data={'model':model,'evo_device':'fields','token':'fake'})
     entry.add_to_hass(hass);registry=er.async_get(hass)
-    payload={'v20':'09/02','v21':'00/00'}
+    payload={'v20':'09/02','v21':'00/00','v25':'C'}
     maps={'Yellow':(32,'v53','v52',3),'Red':(62,'v83','v82',3),'Blue':(92,'v113','v112',4)}
     for channel in channels:
         first,timing,control,season=maps[channel]

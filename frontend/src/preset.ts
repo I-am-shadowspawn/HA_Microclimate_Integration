@@ -10,7 +10,7 @@ type PresetPoint = { seconds: number; target_native: number };
 export interface SchedulePreset {
   format: typeof PRESET_FORMAT;
   mode: "Day Night" | "Multi" | "Seasonal";
-  unit: "celsius" | "percent";
+  unit: "celsius" | "fahrenheit" | "percent";
   points: PresetPoint[];
 }
 
@@ -19,6 +19,7 @@ function unitOf(d: Draft): SchedulePreset["unit"] {
     (f) => f.key === `${d.base.channel}_period_1_setpoint`,
   );
   if (field?.unit === "°C") return "celsius";
+  if (field?.unit === "°F") return "fahrenheit";
   if (field?.unit === "%") return "percent";
   throw new Error(message("preset_unit_missing"));
 }
@@ -57,7 +58,8 @@ export function importPreset(d: Draft, value: unknown): Draft {
       !p ||
       typeof p !== "object" ||
       Object.keys(p).sort().join(",") !== "seconds,target_native" ||
-      !validSeconds(p.seconds) || !boundedNumber(p.target_native)
+      !validSeconds(p.seconds) || !boundedNumber(p.target_native, d.base.fields.find(
+        (f) => f.key === `${d.base.channel}_period_1_setpoint`)?.maximum ?? 100)
     )
       throw new Error(message("preset_point"));
     return {

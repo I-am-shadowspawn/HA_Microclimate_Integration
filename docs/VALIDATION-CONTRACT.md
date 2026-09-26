@@ -8,7 +8,7 @@ The executable examples are [validation_contract.json](../fixtures/validation_co
 
 | Value | Observation | Edit |
 | --- | --- | --- |
-| Temperature | Parse finite Celsius readings, including negative values and values above 100. A misleading °F suffix remains the documented upstream Celsius nuance. | Finite 0–100 inclusive, in native Celsius. Fahrenheit is a card display/input conversion only. |
+| Temperature | Parse finite readings in the unit reported by v25 for the same API response, including negative values and values above the edit maximum. Do not numerically convert at the API boundary. Missing/invalid v25 makes typed thermal observations unknown. | Finite 0–100 °C or 32–212 °F for alarm controls; schedule setpoints also retain the zero-value cleared-tail sentinel. The card converts only between the reported native unit and HA's chosen display unit. |
 | Output/setpoint percentage | Output percentage observations accept only 0–100; invalid values are unknown. Fixed-output schedule setpoints use percent. | Finite 0–100 inclusive. Never Fahrenheit-convert percent. |
 | Ramp minutes | Finite nonnegative observations remain reportable, including fractional values and values above the edit maximum. | Whole minutes 0–240 inclusive; only channels exposing the mapped control. |
 | Missing/non-finite | Unknown; never silently replace with zero. The card retains unknown projected values. | Reject null, booleans, NaN, infinity and invalid types. Backend native numeric controls also accept numeric strings/Decimal; JSON card drafts and preset points require numbers. This adapter difference is deliberate. |
@@ -26,14 +26,14 @@ Time writes replace only the two verified leading clock fields and retain the co
 
 | Previously duplicated rule | Current owner/consumers |
 | --- | --- |
-| Numeric maxima in write validation, number entities and card metadata | Python `constraints.py`; `write_contract.py`, `number.py`, `card_model.py` consume it. Observation parsing in `validation.py` remains separate. |
+| Numeric maxima in write validation, number entities and card metadata | Python `constraints.py` owns non-temperature limits; `write_contract.py` derives temperature bounds from the current v25 unit, consumed by `number.py` and `card_model.py`. Observation parsing in `validation.py` remains separate. |
 | Seconds and point counts in backend draft/preset validation | Python `constraints.py`; `edit_plan.py`, `schedule_templates.py`, `card_model.py` use compatible helpers. |
 | Numeric/seconds/count checks in card draft and preset import | TypeScript `constraints.ts`; `draft.ts` and `preset.ts` consume it. Shared vectors catch cross-language drift. |
 | Strict date parsing in annual-order and changed-field checks | TypeScript `dateOrdinal`; Python `date_string` remains the server authority. Changed unset dates are rejected before Save, as on the server. |
 | Model enum families, pin applicability and native units | Canonical Python pin/capability definitions and `write_contract.py`; the card consumes projected options, writable state and units. No second TypeScript model table. |
 | Observation date/time interpretation vs vendor encoding | Python `schedule.py` observes; `write_contract.py` serializes. The two are intentionally not merged. |
 
-The vectors cover enum families, unknown/non-finite values, Celsius/percent behavior, 0/100 and 0/240 boundaries, date ordering and leap/sentinel dates, time bounds/opaque suffixes, schedule cardinality and model/channel applicability. Python asserts actual projection and serialization. TypeScript asserts draft/preset validation and consumption of server-owned metadata, without pretending to parse the vendor response itself.
+The vectors cover enum families, unknown/non-finite values, Celsius/Fahrenheit/percent behavior, native temperature bounds, 0/240 ramp boundaries, date ordering and leap/sentinel dates, time bounds/opaque suffixes, schedule cardinality and model/channel applicability. Python asserts actual projection and serialization. TypeScript asserts draft/preset validation and consumption of server-owned metadata, without pretending to parse the vendor response itself.
 
 ## Maintaining the contract
 

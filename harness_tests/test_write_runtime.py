@@ -16,7 +16,7 @@ from custom_components.microclimate_integration.api_client import Unauthenticate
 
 
 def payload(model='Evo Connect 3'):
-    data={'v20':'01/01','v21':'00/00','v22':'00/00','v23':'00/00'}
+    data={'v20':'01/01','v21':'00/00','v22':'00/00','v23':'00/00','v25':'C'}
     for field in write_definitions(model):
         if field.kind=='time':data[field.pin]='0\0'+'0\0Europe/London\0'+'0'
         elif field.kind in ('number','setpoint','ramp'):data[field.pin]=20
@@ -383,7 +383,7 @@ async def test_units_switch_and_unrounded_observation(hass,runtime,hass_admin_us
     device=dr.async_get(hass).async_get_device_by_identifier((DOMAIN,f'{entry.entry_id}_Yellow'),entry.entry_id)
     def field():
         return next(f for f in snapshot(hass,c,'Yellow',device,hass_admin_user)['fields'] if f['key']=='Yellow_period_1_setpoint')
-    data['v33']='25.125°F';await c.async_refresh()
+    data['v33']='25.125°C';await c.async_refresh()
     assert field()['value']==25.125 and field()['unit']=='°C'
     data['v52']=0;data['v33']=33.375;await c.async_refresh()
     assert field()['unit']=='%' and field()['value']==33.375
@@ -391,6 +391,63 @@ async def test_units_switch_and_unrounded_observation(hass,runtime,hass_admin_us
     assert writer.call_args.args[1:]==('v33','45.125')
     data['v33']=100.04;await c.async_refresh()
     assert field()['value'] is None
+
+
+async def test_controller_unit_change_refreshes_entities_schedule_and_card(hass,runtime,hass_admin_user):
+    from homeassistant.helpers import device_registry as dr
+    from homeassistant.util.unit_system import METRIC_SYSTEM
+    from custom_components.microclimate_integration.card_model import snapshot
+    from custom_components.microclimate_integration.schedule import schedule_observation
+    hass.config.units=METRIC_SYSTEM
+    entry,c,data,_,writer=runtime
+    registry=er.async_get(hass)
+    device=dr.async_get(hass).async_get_device_by_identifier((DOMAIN,f'{entry.entry_id}_Yellow'),entry.entry_id)
+    sensor_id=registry.async_get_entity_id('sensor',DOMAIN,f'{entry.entry_id}_Yellow_measurement_temperature')
+    climate_id=registry.async_get_entity_id('climate',DOMAIN,f'{entry.entry_id}_Yellow')
+    alarm_id=entity_id(hass,entry,'number','Yellow_lower_alarm')
+
+    def projected():
+        view=snapshot(hass,c,'Yellow',device,hass_admin_user)
+        target=next(field for field in view['fields'] if field['key']=='Yellow_period_1_setpoint')
+        alarm=next(field for field in view['fields'] if field['key']=='Yellow_lower_alarm')
+        period=schedule_observation(c.data,'Yellow')['periods']['period_1']
+        return view,target,alarm,period
+
+    data.update({'v25':'C','v0':25,'v8':24,'v33':20,'v49':20})
+    await c.async_refresh();await hass.async_block_till_done()
+    old_revision,target,alarm,period=projected()
+    assert (target['value'],target['unit'],alarm['value'],alarm['unit'])==(20,'°C',20,'°C')
+    assert period['setpoint_temperature']==20 and period['setpoint_unit']=='°C'
+
+    data.update({'v25':'F','v0':77,'v8':75.2,'v33':68,'v49':68})
+    await c.async_refresh();await hass.async_block_till_done()
+    view,target,alarm,period=projected()
+    assert view['revision']!=old_revision['revision']
+    assert (target['value'],target['unit'],target['maximum'])==(68,'°F',212)
+    assert (alarm['value'],alarm['unit'],alarm['minimum'],alarm['maximum'])==(68,'°F',32,212)
+    assert period['setpoint_temperature']==68 and period['setpoint_unit']=='°F'
+    assert hass.states.get(sensor_id).attributes['unit_of_measurement']=='°C'
+    assert float(hass.states.get(sensor_id).state)==25  # HA converts native 77 °F exactly once.
+    assert hass.states.get(climate_id).attributes['reported_temperature_unit']=='°F'
+    assert hass.states.get(climate_id).attributes['observed_target_temperature']==75.2
+    assert float(hass.states.get(alarm_id).state)==20
+    await hass.services.async_call('number','set_value',{'entity_id':alarm_id,'value':25},blocking=True)
+    assert writer.call_args.args[1:]==('v49','77')  # HA converts display °C to native °F once.
+
+    data.update({'v25':'C','v0':26,'v8':25,'v33':21,'v49':21})
+    await c.async_refresh();await hass.async_block_till_done()
+    view,target,alarm,period=projected()
+    assert (target['value'],target['unit'],alarm['value'],alarm['unit'])==(21,'°C',21,'°C')
+    assert period['setpoint_temperature']==21 and period['setpoint_unit']=='°C'
+    assert float(hass.states.get(sensor_id).state)==26
+
+    del data['v25']
+    await c.async_refresh();await hass.async_block_till_done()
+    _,target,alarm,period=projected()
+    assert target['unit'] is None and target['value'] is None and not target['writable']
+    assert alarm['unit'] is None and alarm['value'] is None and not alarm['writable']
+    assert 'setpoint_temperature' not in period
+    assert hass.states.get(sensor_id).state=='unknown'
 
 
 async def test_us_display_converts_once(hass):

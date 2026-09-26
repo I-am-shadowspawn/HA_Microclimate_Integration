@@ -5,10 +5,9 @@ import re
 
 
 def convert_temperature(value, data=None) -> float:
-    """Read Celsius, preserving upstream Celsius numbers mislabeled F.
+    """Parse the reported numeric value without converting its unit.
 
-    The optional data argument retains the live parser's call contract; the
-    reported unit flag never changes the upstream numeric Celsius value.
+    The controller-wide unit is read separately from the same API response.
     """
     if type(value) not in (str, int, float):
         raise ValueError(f"Error Converting temperature from input: {value}")

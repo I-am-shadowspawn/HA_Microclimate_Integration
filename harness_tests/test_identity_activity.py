@@ -63,7 +63,7 @@ async def test_same_name_entries_are_isolated(hass):
     first.add_to_hass(hass)
     second.add_to_hass(hass)
     async def fetch(token, *, session, log_raw_response=False):
-        return {'v0': 21 if token == 'token-a' else 28,'v52':1,'v4':0}
+        return {'v0': 21 if token == 'token-a' else 28,'v52':1,'v4':0,'v25':'C'}
     with patch('custom_components.microclimate_integration.api_client.fetch_data',side_effect=fetch) as api:
         assert await hass.config_entries.async_setup(first.entry_id)
         await hass.async_block_till_done()
@@ -108,5 +108,4 @@ async def test_reconfigure_duplicate_rejected(hass):
     result = await hass.config_entries.flow.async_configure(flow['flow_id'],{'evo_device':'renamed','token':'token-b'})
     assert result['errors'] == {'base':'already_configured'}
     assert first.data['token'] == 'token-a'
-
 

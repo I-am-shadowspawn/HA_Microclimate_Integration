@@ -9,6 +9,8 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from .const import DOMAIN, MODEL_CHANNEL_OPTIONS
 from .const_helpers import enum_value
 from .constraints import numeric_maximum, valid_seconds, SECONDS_PER_DAY
+from .validation import reported_temperature_unit
+from .write_contract import numeric_bounds
 from .write_contract import (write_definitions, observed_numeric, applicable,
                              control_mode, timing_mode, date_string, WriteValidationError)
 
@@ -46,7 +48,7 @@ def revision(coordinator, channel, data=None):
     # All editable values, including preserved time suffixes, but no measurements.
     values = {f.key: (data.get(f.pin) if f.kind == 'time' else value_of(f, data))
               for f in scoped_fields(coordinator, channel)}
-    payload = json.dumps([generation(coordinator), values], sort_keys=True, separators=(',', ':'), allow_nan=False)
+    payload = json.dumps([generation(coordinator), reported_temperature_unit(data), values], sort_keys=True, separators=(',', ':'), allow_nan=False)
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -122,6 +124,9 @@ def snapshot(hass, coordinator, channel, device, user):
                     and coordinator.last_update_success and entity.disabled_by is None
                     and allowed(user, entity.entity_id, POLICY_CONTROL) and applicable(field, data))
         thermal = field.kind == 'number' or field.kind == 'setpoint' and control_mode(field, data) in ('heating', 'cooling')
+        unit = reported_temperature_unit(data) if thermal else None
+        if thermal and unit is None:
+            writable = False
         name = field.name
         if field.index:
             mode = timing_mode(field, data)
@@ -136,8 +141,10 @@ def snapshot(hass, coordinator, channel, device, user):
                        'authorization_scope': 'channel_schedule' if field.index is not None else 'entity',
                        'writable': bool(writable), 'reason': None if writable else 'Read only, unavailable or disabled',
                        'options': [label for _, label in field.options],
-                       'unit': '°C' if thermal else '%' if field.kind == 'setpoint' else 'min' if field.kind == 'ramp' else None,
-                       'minimum': 0, 'maximum': numeric_maximum(field.kind),
+                       'unit': unit if thermal else '%' if field.kind == 'setpoint' else 'min' if field.kind == 'ramp' else None,
+                       'minimum': (32 if unit == '°F' and field.kind == 'setpoint'
+                                   else numeric_bounds(field, data)[0]) if thermal and unit else 0,
+                       'maximum': numeric_bounds(field, data)[1] if thermal and unit else numeric_maximum(field.kind),
                        'step': 1 if field.kind == 'ramp' else 'any'})
     if not fields:
         raise WriteValidationError('read_denied')

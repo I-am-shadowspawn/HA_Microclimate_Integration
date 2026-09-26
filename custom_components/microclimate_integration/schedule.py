@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .readings import cached, read_pin, read_enum
 from .const import CHANNEL_PINS, CHANNELS, CHANNEL_CAPABILITIES, DEVICE_METADATA_PINS, timing_type_mapping
-from .validation import control_mode, safe_temperature, percentage, nonnegative_number
+from .validation import control_mode, safe_temperature, percentage, nonnegative_number, reported_temperature_unit
 
 
 def reported_value(value):
@@ -96,10 +96,12 @@ def _schedule_observation(data, channel):
     data = data if isinstance(data, dict) else {}
     schema = CHANNEL_PINS[channel]['schedule']
     mode = read_pin(data, CHANNELS[channel]['control_pin'], control_mode)
+    temperature_unit = reported_temperature_unit(data)
     result = {
         'interpretation': 'reported_configuration_not_active_schedule',
         'timing_type': read_enum(data, schema['timing_type_pin'], timing_type_mapping(channel)),
         'control_mode': mode,
+        'temperature_unit': temperature_unit,
         'periods': {},
         'reported_period_count': 0,
     }
@@ -135,16 +137,18 @@ def _schedule_observation(data, channel):
             'setpoint_raw': raw,
             'setpoint_interpretation': 'reported_unparsed',
         }
-        if mode in ('heating', 'cooling'):
+        if mode in ('heating', 'cooling') and temperature_unit is not None:
             temperature = read_pin(data, setpoint_pin, safe_temperature)
             if temperature is not None:
-                period.update(setpoint_celsius=temperature, setpoint_interpretation='temperature')
+                period.update(setpoint_temperature=temperature, setpoint_unit=temperature_unit,
+                              setpoint_interpretation='temperature')
         elif mode == 'fixed':
             output = read_pin(data, setpoint_pin, percentage)
             if output is not None:
                 period.update(setpoint_percentage=output, setpoint_interpretation='percentage')
-        converted = period.get('setpoint_celsius', period.get('setpoint_percentage'))
-        period['setpoint_status'] = _typed_status(data, setpoint_pin, converted, mode in ('heating', 'cooling', 'fixed'))
+        converted = period.get('setpoint_temperature', period.get('setpoint_percentage'))
+        period['setpoint_status'] = _typed_status(data, setpoint_pin, converted,
+                                                  mode == 'fixed' or mode in ('heating', 'cooling') and temperature_unit is not None)
         period['activation'] = 'unverified'
         if (result['timing_type'] == 'Multi' and period['start'].get('kind') == 'clock'
                 and period['start'].get('seconds') == 0 and converted == 0):
@@ -191,8 +195,8 @@ def _summary(observation):
             return 'likely unused'
         start = period['start']
         time = start.get('time', start.get('status', 'unknown'))
-        if 'setpoint_celsius' in period:
-            value = f"{period['setpoint_celsius']:g} C"
+        if 'setpoint_temperature' in period:
+            value = f"{period['setpoint_temperature']:g} {period['setpoint_unit']}"
         elif 'setpoint_percentage' in period:
             value = f"{period['setpoint_percentage']:g}%"
         else:

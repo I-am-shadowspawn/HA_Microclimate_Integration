@@ -20,12 +20,14 @@ export const displayValue = (
   n: number,
   unit: string | null,
   fahrenheit: boolean,
-) => (unit === "°C" && fahrenheit ? (n * 9) / 5 + 32 : n);
+) => (unit === "°C" && fahrenheit ? (n * 9) / 5 + 32
+  : unit === "°F" && !fahrenheit ? ((n - 32) * 5) / 9 : n);
 export const nativeValue = (
   n: number,
   unit: string | null,
   fahrenheit: boolean,
-) => (unit === "°C" && fahrenheit ? ((n - 32) * 5) / 9 : n);
+) => (unit === "°C" && fahrenheit ? ((n - 32) * 5) / 9
+  : unit === "°F" && !fahrenheit ? (n * 9) / 5 + 32 : n);
 export function makeDraft(base: Snapshot): Draft {
   const mode = String(
     base.fields.find((f) => f.key === `${base.channel}_timing_type`)?.value ??
@@ -66,10 +68,12 @@ export function pointError(d: Draft): string | null {
   if (!["Multi", "Day Night", "Seasonal"].includes(d.mode)) return null;
   if (!validPointCount(d.mode, d.points.length))
     return d.mode === "Multi" ? message("multi_count") : message("mode_count", { mode: d.mode, count: d.mode === "Day Night" ? 2 : 8 });
+  const targetField = d.base.fields.find((f) => f.key === `${d.base.channel}_period_1_setpoint`);
   if (
     d.points.some(
       (p) =>
-        !validSeconds(p.seconds) || !boundedNumber(p.target_native),
+        !validSeconds(p.seconds) || !boundedNumber(p.target_native, targetField?.maximum ?? 100)
+          || p.target_native! < (targetField?.minimum ?? 0),
     )
   )
     return message("complete_points");

@@ -16,7 +16,7 @@ async def test_evo_connect_setup(hass):
     )
     entry.add_to_hass(hass)
     # Synthetic wiring fixture, not evidence of vendor pin correctness.
-    payload = {'v0': '25°F', 'v8': '27°F', 'v16': 'Yellow',
+    payload = {'v25': 'C', 'v0': '25°C', 'v8': '27°C', 'v16': 'Yellow',
                'v52': '1', 'v4': 50}
     with patch(
         'custom_components.microclimate_integration.api_client.fetch_data',

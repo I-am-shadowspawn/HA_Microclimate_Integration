@@ -12,7 +12,7 @@ from custom_components.microclimate_integration.const_helpers import enum_value
 ])
 def test_same_slots_have_mode_specific_meaning(channel,timing_pin,first_pin,season_code):
     control={'Yellow':'v52','Red':'v82','Blue':'v112'}[channel]
-    payload={control:1, 'v20':'09/02','v21':'00/00','v22':'01/08','v23':'01/11', 'v48':9,'v78':7,'v108':99}
+    payload={control:1, 'v20':'09/02','v21':'00/00','v22':'01/08','v23':'01/11', 'v25':'C','v48':9,'v78':7,'v108':99}
     for index in range(8):
         payload[f'v{first_pin+2*index}']=f'{index*3600}\x00{index*3600}\x00Europe/London\x000'
         payload[f'v{first_pin+2*index+1}']=20+index/2
@@ -23,8 +23,8 @@ def test_same_slots_have_mode_specific_meaning(channel,timing_pin,first_pin,seas
         group=seasonal['seasons'][f'season_{season}']
         assert group['day']['start_pin']==f'v{first_pin+4*(season-1)}'
         assert group['night']['setpoint_pin']==f'v{first_pin+4*(season-1)+3}'
-        assert group['day']['setpoint_celsius']==20+(season-1)
-        assert group['night']['setpoint_celsius']==20.5+(season-1)
+        assert group['day']['setpoint_temperature']==20+(season-1)
+        assert group['night']['setpoint_temperature']==20.5+(season-1)
         assert group['start_date']['source_pin']==f'v{19+season}'
     assert seasonal['seasons']['season_1']['start_date']['day']==9
     assert seasonal['seasons']['season_1']['start_date']['month']==2
