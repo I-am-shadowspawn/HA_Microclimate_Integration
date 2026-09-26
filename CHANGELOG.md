@@ -1,3 +1,7 @@
+# Unreleased — measured batch read reduction
+
+- Share each batch write's fresh coordinator baseline with post-write revision validation, reducing immediate-confirmation saves from `3N+2` to `2N+2` reads for N pin updates. Preserve serialized writes, current permission/context checks, per-pin readback and final confirmation. A full eight-point save now uses 34 reads instead of 50; notification behavior is unchanged.
+
 # 1.4.5-delta2 — controller temperature units and HACS screenshots
 
 - Use absolute image URLs in the public README so HACS can display screenshots from the repository.
