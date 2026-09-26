@@ -1,3 +1,4 @@
+import { message } from "./localize";
 import type { TemperatureColor } from "./types";
 
 // Native Celsius thresholds stay stable when HA displays Fahrenheit.
@@ -28,7 +29,7 @@ export function validateColors(
     new Set(value.map((v) => v.temperature)).size !== value.length
   )
     throw new Error(
-      "Temperature colours require unique Celsius bounds from 0 to 100 and #RRGGBB colours.",
+      message("color_invalid"),
     );
 }
 export function colorFor(value: number | null, stops = DEFAULT_COLORS): string {

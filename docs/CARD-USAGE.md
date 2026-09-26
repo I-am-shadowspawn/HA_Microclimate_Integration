@@ -52,6 +52,8 @@ The combined midnight/zero target is reserved for unused Multi slots. Midnight w
 
 The timeline is a configured daily preview, not proof of which point is physically active. The hatched leading segment is the previous day's configured continuation. There is no automatic solar scheduling, weekly program or animated ramp curve. All times are controller-local clock values. Direct input supports seconds; dragging snaps to five minutes, arrow keys one minute and Shift+arrow five minutes. Use the numeric inputs instead of dragging on a small screen. 24:00 is an axis label only; writable times end at 23:59:59.
 
+The card labels these values **Controller-local time (timezone not reported)** because the card API does not provide the controller timezone. Browser and HA timezones do not change the schedule display. Timeline boundaries are keyboard-selectable; Add/Remove restores focus to a remaining boundary. Expand the collapsed slot table for exact time and target input. Touch dragging keeps vertical page scrolling available. The English message catalogue is the fallback for HA languages without a supplied translation; wire values and preset data remain in native form.
+
 Thermal targets/alarms use HA's chosen °C/°F presentation and convert edited values once to native Celsius. Fixed-output targets use %. Native bounds remain 0–100; ramp is 0–240 whole minutes. Blue has no ramp/output-type control. Mode selectors are saved individually before editing settings under their new meaning. Do not interpret a temperature draft as percentage values.
 
 **All timing modes share the same stored schedule pairs.** Changing one mode's pairs changes what another mode later sees. The card does not keep independent programs or restore hidden mode backups. Constant target and Blue Periodic duration/interval editing remain unmapped and are explicitly unavailable.
@@ -90,7 +92,7 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run test:e2e
 ```
 

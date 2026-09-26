@@ -22,7 +22,7 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
-npx playwright install --with-deps chromium
+npx playwright install --with-deps chromium firefox webkit
 npm run test:e2e
 cd ..
 git diff --exit-code -- custom_components/microclimate_integration/frontend/microclimate-cards.js custom_components/microclimate_integration/frontend/THIRD_PARTY_NOTICES.txt
@@ -30,7 +30,7 @@ python3.14 -m unittest tests.test_release_package -q
 python3.14 scripts/build_release.py --output dist
 ```
 
-The frontend build check proves the committed browser bundle and bundled dependency notices match the source and lockfile. Browser tests use a local HTTP server on port 8767; no running Home Assistant is needed. The builder itself uses only the Python standard library and does not run npm. Test output is under `results/matrix/` and is not packaged.
+The frontend build check proves the committed browser bundle and bundled dependency notices match the source and lockfile. Browser tests run in Chromium, Firefox and WebKit against a local HTTP server on port 8767; no running Home Assistant is needed. The tests include malformed WebSocket data, stale replies, local-only edits, focus after Multi changes, keyboard input and mobile-size touch behavior. WebKit's Linux binaries require the Playwright supported system libraries; CI installs them on Ubuntu. The builder itself uses only the Python standard library and does not run npm. Test output is under `results/matrix/` and is not packaged.
 
 ## What the archives contain
 
