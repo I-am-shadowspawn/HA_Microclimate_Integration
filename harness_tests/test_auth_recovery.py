@@ -48,8 +48,8 @@ async def test_http_auth_classification(hass, status,payload,error,caplog,capsys
     (400,{'error':{'message':'Invalid token.'}},'invalid_auth'),
     (401,None,'invalid_auth'),
     (500,{},'cannot_connect'),
-    (200,[],'cannot_connect'),
-    (200,{'error':'unknown failure'},'cannot_connect'),
+    (200,[],'invalid_payload'),
+    (200,{'error':'unknown failure'},'invalid_payload'),
 ])
 async def test_onboarding_validates_and_allows_retry(hass,status,payload,expected):
     with patch('aiohttp.ClientSession.get',return_value=http_response(status,payload)) as http:

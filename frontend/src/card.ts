@@ -1386,7 +1386,7 @@ export class MicroclimateCard extends LitElement {
               value=${this.job.confirmed}
             ></progress
             >${this.job.reason
-              ? html`<p>${this.job.reason.replaceAll("_", " ")}</p>`
+              ? html`<p>${this.job.reason_message ?? this.job.reason.replaceAll("_", " ")}</p>`
               : nothing}
             <details>
               <summary>Change results</summary>

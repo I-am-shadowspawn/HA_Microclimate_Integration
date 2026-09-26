@@ -1,12 +1,11 @@
 """Shared entry/channel identity and observed-state configuration controls."""
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN
 from .identity import channel_device_info, controller_device_info
 from .write_contract import write_definitions, applicable, control_mode
 
 
 def setup_controls(hass, entry, async_add_entities, platform, entity_class):
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     async_add_entities(entity_class(coordinator, entry, field)
                        for field in write_definitions(entry.data['model']) if field.platform == platform and field.index is None)
 

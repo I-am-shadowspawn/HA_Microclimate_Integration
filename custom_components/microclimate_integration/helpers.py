@@ -1,9 +1,10 @@
 import logging
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.update_coordinator import CoordinatorEntity, UpdateFailed
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api_client import get_evo_device_data
+from .api_client import get_evo_device_data, EvoDeviceDataError
+from .errors import ReadUpdateFailed
 from .identity import channel_device_info, controller_device_info
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,9 +16,10 @@ async def async_update_data(hass, config_entry):
         return await get_evo_device_data(hass, config_entry)
     except ConfigEntryAuthFailed:
         raise ConfigEntryAuthFailed("Authentication failed for Microclimate integration") from None
+    except EvoDeviceDataError as err:
+        raise ReadUpdateFailed(err.code) from None
     except Exception:
-        # Do not log or chain transport exceptions containing request URLs.
-        raise UpdateFailed("Unable to update Microclimate data") from None
+        raise ReadUpdateFailed("unavailable") from None
 
 
 class MicroclimateBaseEntity(CoordinatorEntity):

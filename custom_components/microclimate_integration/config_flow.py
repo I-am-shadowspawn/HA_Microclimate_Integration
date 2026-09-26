@@ -33,7 +33,9 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await api_client.fetch_data(token, session=async_get_clientsession(self.hass))
         except api_client.UnauthenticatedError:
             return "invalid_auth"
-        except (api_client.EvoDeviceDataError, TimeoutError):
+        except api_client.EvoDeviceDataError as err:
+            return "cannot_connect" if err.code == "unavailable" else err.code
+        except TimeoutError:
             return "cannot_connect"
         except Exception:
             # Never surface transport exception URLs or response bodies in UI/logs.

@@ -10,7 +10,7 @@ from homeassistant.const import UnitOfTemperature
 from .readings import read_pin
 from .validation import percentage, nonnegative_number, control_mode, safe_temperature
 from homeassistant.exceptions import HomeAssistantError
-from .const import CHANNEL_CAPABILITIES, CHANNELS, HVAC_MODE_MAPPING, DOMAIN, MODEL_CHANNEL_OPTIONS
+from .const import CHANNEL_CAPABILITIES, CHANNELS, HVAC_MODE_MAPPING, MODEL_CHANNEL_OPTIONS
 from .helpers import MicroclimateBaseEntity
 from .identity import channel_identity
 
@@ -23,7 +23,7 @@ _READ_ONLY_MESSAGE = (
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up devices and entities."""
     model = entry.data.get("model", "Unknown")
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
 
     entities = []
 

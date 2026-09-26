@@ -26,8 +26,9 @@ async def async_setup(hass: HomeAssistant, _config: dict):
     return True
 
 
-async def async_setup_entry(hass, entry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry[MicroclimateCoordinator]):
     coordinator = MicroclimateCoordinator(hass, entry)
+    entry.runtime_data = coordinator
     forwarding = False
     try:
         await coordinator.async_config_entry_first_refresh()

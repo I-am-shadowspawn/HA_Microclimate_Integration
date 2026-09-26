@@ -83,22 +83,22 @@ async def context(hass,runtime,user):
 async def wait_job(hass,api,result):
     for _ in range(500):
         await asyncio.sleep(0)
-        job=api.jobs[result['operation_id']]
+        job=api.manager.jobs[result['operation_id']]
         if job['status'] in ('succeeded','failed','partial','uncertain','stopped'):return job
     pytest.fail('job did not finish')
 
 
 async def test_save_full_prefix_and_idempotency(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
-    api=CardAPI(hass);result=await api.save(msg,hass_admin_user)
-    assert await api.save(msg,hass_admin_user)==result
+    api=CardAPI(hass);result=await api.manager.save(msg,hass_admin_user)
+    assert await api.manager.save(msg,hass_admin_user)==result
     job=await wait_job(hass,api,result)
     assert job['status']=='succeeded',job
     assert job['confirmed']==2 and data['v39']=='0' and data['v38'].startswith('0\0')
     count=writer.await_count
-    assert await api.save(msg,hass_admin_user)==result and writer.await_count==count
+    assert await api.manager.save(msg,hass_admin_user)==result and writer.await_count==count
     msg['patch']={'kind':'channel','fields':{'Yellow_lower_alarm':40}}
-    with pytest.raises(WriteValidationError,match='request_id_reused'):await api.save(msg,hass_admin_user)
+    with pytest.raises(WriteValidationError,match='request_id_reused'):await api.manager.save(msg,hass_admin_user)
 
 
 async def test_revision_rename_and_fresh_conflict(hass,runtime,hass_admin_user):
@@ -109,7 +109,7 @@ async def test_revision_rename_and_fresh_conflict(hass,runtime,hass_admin_user):
     registry.async_update_entity(entity,new_entity_id='text.my_renamed_season')
     assert snapshot(hass,c,'Yellow',device,hass_admin_user)['fields'][0]['entity_id']=='text.my_renamed_season'
     data['v49']=99
-    api=CardAPI(hass);job=await wait_job(hass,api,await api.save(msg,hass_admin_user))
+    api=CardAPI(hass);job=await wait_job(hass,api,await api.manager.save(msg,hass_admin_user))
     assert job['reason']=='conflict' and writer.await_count==0
 
 
@@ -117,9 +117,9 @@ async def test_permissions_and_forged_fields(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
     denied=Mock(id='restricted');denied.permissions.check_entity.return_value=False
     with pytest.raises(WriteValidationError,match='read_denied'):snapshot(hass,c,'Yellow',device,denied)
-    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).save(msg,denied)
+    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).manager.save(msg,denied)
     msg['patch']={'kind':'channel','fields':{'Blue_lower_alarm':22}}
-    with pytest.raises(WriteValidationError):await CardAPI(hass).save(msg,hass_admin_user)
+    with pytest.raises(WriteValidationError):await CardAPI(hass).manager.save(msg,hass_admin_user)
     assert writer.await_count==0
 
 
@@ -131,7 +131,7 @@ async def test_partial_failure_stops(hass,runtime,hass_admin_user):
         if writer.await_count==2:return UpdateResult('rejected')
         return await original(*args,**kwargs)
     writer.side_effect=update
-    api=CardAPI(hass);job=await wait_job(hass,api,await api.save(msg,hass_admin_user))
+    api=CardAPI(hass);job=await wait_job(hass,api,await api.manager.save(msg,hass_admin_user))
     assert job['status']=='partial' and job['confirmed']==1 and writer.await_count==2
     assert job['fields'][1]['status']=='failed'
 
@@ -158,12 +158,12 @@ async def test_stop_between_pairs_and_service_lock(hass,runtime,hass_admin_user)
     api=CardAPI(hass)
     original=writer.side_effect
     async def update(*args,**kwargs):
-        for job in api.jobs.values():job['stop']=True
+        for job in api.manager.jobs.values():job['stop']=True
         return await original(*args,**kwargs)
     writer.side_effect=update
-    result=await api.save(msg,hass_admin_user)
+    result=await api.manager.save(msg,hass_admin_user)
     with pytest.raises(WriteValidationError,match='busy'):
-        await api.save({**msg,'request_id':str(uuid4())},hass_admin_user)
+        await api.manager.save({**msg,'request_id':str(uuid4())},hass_admin_user)
     job=await wait_job(hass,api,result)
     assert job['status']=='stopped' and writer.await_count==1
     assert not c._write_lock.locked() and not c._io_lock.locked()
@@ -177,10 +177,10 @@ async def test_unload_cancels_during_second_pin(hass,runtime,hass_admin_user):
             started.set();await blocked.wait()
         return await original(*args,**kwargs)
     writer.side_effect=update
-    api=CardAPI(hass);result=await api.save(msg,hass_admin_user)
+    api=CardAPI(hass);result=await api.manager.save(msg,hass_admin_user)
     await asyncio.wait_for(started.wait(),2)
     await c.async_stop_writes()
-    job=api.jobs[result['operation_id']]
+    job=api.manager.jobs[result['operation_id']]
     assert job['status']=='uncertain' and writer.await_count==2
     assert not c._write_lock.locked()
 
@@ -207,22 +207,22 @@ async def test_disabled_registry_and_token_generation(hass,runtime,hass_admin_us
     entity=next(f['entity_id'] for f in view['fields'] if f['key']=='Yellow_period_4_time')
     er.async_get(hass).async_update_entity(entity,disabled_by=er.RegistryEntryDisabler.USER)
     await hass.async_block_till_done()
-    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).save(msg,hass_admin_user)
+    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).manager.save(msg,hass_admin_user)
     hass.config_entries.async_update_entry(c.entry,data={**c.entry.data,'token':'rotated-dummy'})
-    with pytest.raises(WriteValidationError,match='version_changed'):await CardAPI(hass).save(msg,hass_admin_user)
+    with pytest.raises(WriteValidationError,match='version_changed'):await CardAPI(hass).manager.save(msg,hass_admin_user)
     assert writer.await_count==0
 
 
 async def test_completed_job_scope_expiry_and_noop(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
     msg['patch']=patch(points(4));api=CardAPI(hass)
-    result=await api.save(msg,hass_admin_user);job=await wait_job(hass,api,result)
+    result=await api.manager.save(msg,hass_admin_user);job=await wait_job(hass,api,result)
     assert job['status']=='succeeded' and job['total']==0 and writer.await_count==0
     stranger=Mock(id='another-user')
-    with pytest.raises(WriteValidationError):api.find_job(result,stranger)
+    with pytest.raises(WriteValidationError):api.manager.find_job(result,stranger)
     job['finished']-=3601
-    with pytest.raises(WriteValidationError):api.find_job(result,hass_admin_user)
-    assert not api.jobs
+    with pytest.raises(WriteValidationError):api.manager.find_job(result,hass_admin_user)
+    assert not api.manager.jobs
 
 
 @pytest.mark.parametrize('channel,model,control',[('Yellow','Evo Connect',1),('Blue','Evo Connect',0),('Yellow','Evo Connect 2',2),('Blue','Evo Connect 2',1),('Red','Evo Connect 3',1)])
@@ -240,7 +240,7 @@ async def test_static_bundle_served_and_request_recovery(hass,runtime,hass_admin
     client=await hass_client()
     response=await client.get('/microclimate_integration/microclimate-cards.js?v=1.2.0')
     assert response.status==200 and 'microclimate-channel-card' in await response.text()
-    api=hass.data[KEY];result=await api.save(msg,hass_admin_user);await wait_job(hass,api,result)
+    api=hass.data[KEY];result=await api.manager.save(msg,hass_admin_user);await wait_job(hass,api,result)
     connection=Mock(user=hass_admin_user,subscriptions={})
     await api.handle(connection,{'id':1,'device_id':device.id,'request_id':msg['request_id']},'request')
     assert connection.send_result.call_args.args==(1,result)
@@ -248,9 +248,9 @@ async def test_static_bundle_served_and_request_recovery(hass,runtime,hass_admin
 
 async def test_job_results_still_readable_when_writes_disabled(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
-    api=CardAPI(hass);result=await api.save(msg,hass_admin_user);await wait_job(hass,api,result)
+    api=CardAPI(hass);result=await api.manager.save(msg,hass_admin_user);await wait_job(hass,api,result)
     hass.config_entries.async_update_entry(c.entry,options={'enable_writes':False})
-    assert api.find_job(result,hass_admin_user)['status']=='succeeded'
+    assert api.manager.find_job(result,hass_admin_user)['status']=='succeeded'
 
 
 async def test_websocket_save_operation_and_recovery(hass,runtime,hass_ws_client,hass_admin_user):

@@ -570,7 +570,7 @@ var me=[{temperature:0,color:"#f6c85f"},{temperature:20,color:"#f5a623"},{temper
               max=${Math.max(1,this.job.total)}
               value=${this.job.confirmed}
             ></progress
-            >${this.job.reason?c`<p>${this.job.reason.replaceAll("_"," ")}</p>`:h}
+            >${this.job.reason?c`<p>${this.job.reason_message??this.job.reason.replaceAll("_"," ")}</p>`:h}
             <details>
               <summary>Change results</summary>
               ${this.job.fields.map(a=>c`<div class="status">${a.label}: ${a.status}</div>`)}

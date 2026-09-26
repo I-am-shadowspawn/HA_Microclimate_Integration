@@ -19,8 +19,10 @@ class UnauthenticatedError(Exception):
     """Raised when the request is unauthenticated."""
     pass
 class EvoDeviceDataError(Exception):
-    """Custom exception for errors fetching Evo Device data."""
-    pass
+    """Sanitized read failure with a stable classification."""
+    def __init__(self, message, *, code="unavailable"):
+        super().__init__(message)
+        self.code = code if code in ("unavailable", "invalid_payload", "rate_limited") else "unavailable"
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -50,6 +52,8 @@ async def fetch_data(token: str, *, session: aiohttp.ClientSession, log_raw_resp
                                   json.dumps(redact_response(data, token), ensure_ascii=True))
             if response.status == 401:
                 raise UnauthenticatedError("Authentication failed: invalid token")
+            if response.status == 429:
+                raise EvoDeviceDataError("Microclimate service throttled requests", code="rate_limited")
             if response.status not in (200, 400):
                 raise EvoDeviceDataError(f"Unexpected response status: {response.status}")
             if payload_error is not None:
@@ -70,7 +74,7 @@ async def fetch_data(token: str, *, session: aiohttp.ClientSession, log_raw_resp
     except aiohttp.ClientError:
         raise EvoDeviceDataError("Microclimate transport or response error") from None
     except ValueError:
-        raise EvoDeviceDataError("Invalid Microclimate JSON response") from None
+        raise EvoDeviceDataError("Invalid Microclimate JSON response", code="invalid_payload") from None
     except Exception:
         # Transport/JSON exceptions can embed the full credential-bearing URL.
         raise EvoDeviceDataError("Unable to fetch Microclimate data") from None
@@ -83,9 +87,9 @@ def normalize_response(data):
     Typed interpretation belongs to the consuming property.
     """
     if not isinstance(data, dict):
-        raise EvoDeviceDataError("Expected a Microclimate JSON object")
+        raise EvoDeviceDataError("Expected a Microclimate JSON object", code="invalid_payload")
     if "error" in data:
-        raise EvoDeviceDataError("Microclimate API returned an error")
+        raise EvoDeviceDataError("Microclimate API returned an error", code="invalid_payload")
     return DataSnapshot({
         key: value if (type(value) in (str, int) or type(value) is float and math.isfinite(value)) else None
         for key, value in data.items() if isinstance(key, str)
@@ -105,6 +109,8 @@ async def get_evo_device_data(hass: HomeAssistant, config_entry) -> Dict[str, An
         return data
     except UnauthenticatedError:
         raise ConfigEntryAuthFailed("Authentication error for Microclimate") from None
+    except EvoDeviceDataError:
+        raise
     except Exception:
         raise EvoDeviceDataError("Failed to fetch Microclimate data") from None
 
