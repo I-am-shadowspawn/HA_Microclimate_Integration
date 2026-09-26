@@ -94,7 +94,6 @@ def main():
             "-c",
             "pytest-review.ini",
             "tests",
-            "harness_tests",
             "-q",
             f"--junitxml={output}/{suffix}.xml",
             "--cov=custom_components.microclimate_integration",

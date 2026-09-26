@@ -1,23 +1,25 @@
 # custom_components/microclimate_integration/climate.py
 import logging
-from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (
-    HVACMode, HVACAction
-)
-from homeassistant.components.climate.const import ClimateEntityFeature
-from homeassistant.const import UnitOfTemperature
 
-from .readings import read_pin
-from .validation import percentage, nonnegative_number, control_mode, safe_temperature, reported_temperature_unit
+from homeassistant.components.climate import ClimateEntity
+from homeassistant.components.climate.const import ClimateEntityFeature, HVACAction, HVACMode
+from homeassistant.const import UnitOfTemperature
 from homeassistant.exceptions import HomeAssistantError
+
 from .const import CHANNEL_CAPABILITIES, CHANNELS, HVAC_MODE_MAPPING, MODEL_CHANNEL_OPTIONS
 from .helpers import MicroclimateBaseEntity
 from .identity import channel_identity
+from .readings import read_pin
+from .validation import (
+    control_mode,
+    nonnegative_number,
+    percentage,
+    reported_temperature_unit,
+    safe_temperature,
+)
 
 _LOGGER = logging.getLogger(__name__)
-_READ_ONLY_MESSAGE = (
-    "This climate entity is read-only; use the Microclimate configuration controls"
-)
+_READ_ONLY_MESSAGE = "This climate entity is read-only; use the Microclimate configuration controls"
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -40,10 +42,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
     """Read-only climate observation of a channel with separate configuration controls."""
+
     _attr_hvac_modes = []
     _attr_supported_features = ClimateEntityFeature(0)
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS  # HA requires a valid unit during entity registration.
-
+    _attr_temperature_unit = (
+        UnitOfTemperature.CELSIUS
+    )  # HA requires a valid unit during entity registration.
 
     def __init__(self, coordinator, channel, pins):
         super().__init__(coordinator, channel)
@@ -64,11 +68,12 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
     def available(self):
         return super().available and reported_temperature_unit(self.data) is not None
 
-
     @property
     def target_temperature(self):
         """Return a temperature only for a known thermal control mode."""
-        if reported_temperature_unit(self.data) is None or read_pin(self.data, self._pins.get("control_pin"), control_mode) not in ("heating", "cooling"):
+        if reported_temperature_unit(self.data) is None or read_pin(
+            self.data, self._pins.get("control_pin"), control_mode
+        ) not in ("heating", "cooling"):
             return None
         return read_pin(self.data, self._pins.get("setpoint_pin"), safe_temperature)
 
@@ -95,19 +100,29 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
         attributes = {
             "reported_temperature_unit": reported_temperature_unit(self.data),
             "observed_target_temperature": self.target_temperature,
-            "lower_alarm": read_pin(self.data, self._pins.get("lower_alarm"), safe_temperature) if reported_temperature_unit(self.data) else None,
-            "upper_alarm": read_pin(self.data, self._pins.get("upper_alarm"), safe_temperature) if reported_temperature_unit(self.data) else None,
+            "lower_alarm": read_pin(self.data, self._pins.get("lower_alarm"), safe_temperature)
+            if reported_temperature_unit(self.data)
+            else None,
+            "upper_alarm": read_pin(self.data, self._pins.get("upper_alarm"), safe_temperature)
+            if reported_temperature_unit(self.data)
+            else None,
             "mode": read_pin(self.data, self._pins.get("control_pin"), control_mode),
             "current_power": read_pin(self.data, self._pins.get("current_power"), percentage),
         }
 
         if CHANNEL_CAPABILITIES[self._channel]["ramp"]:
-            attributes["ramp_time"] = read_pin(self.data, self._pins.get("ramp_time"), nonnegative_number)
+            attributes["ramp_time"] = read_pin(
+                self.data, self._pins.get("ramp_time"), nonnegative_number
+            )
         return attributes
 
     @property
     def current_temperature(self):
-        return read_pin(self.data, self._pins.get("temp_pin"), safe_temperature) if reported_temperature_unit(self.data) else None
+        return (
+            read_pin(self.data, self._pins.get("temp_pin"), safe_temperature)
+            if reported_temperature_unit(self.data)
+            else None
+        )
 
     async def async_set_temperature(self, **kwargs):
         raise HomeAssistantError(_READ_ONLY_MESSAGE)

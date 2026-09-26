@@ -27,7 +27,6 @@ PUBLIC_FIXTURES = (
 )
 DEVELOPMENT_DIRECTORIES = (
     "tests",
-    "harness_tests",
     "requirements",
     "scripts",
     "docs",

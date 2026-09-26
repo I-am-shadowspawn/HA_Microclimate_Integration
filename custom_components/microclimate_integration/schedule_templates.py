@@ -2,12 +2,11 @@
 
 import json
 
-from .constraints import valid_seconds, valid_point_count
-
 from .card_model import value_of
+from .constraints import valid_point_count, valid_seconds
 from .edit_plan import build_plan
-from .write_contract import control_mode, definition_for, timing_mode, WriteValidationError
 from .validation import reported_temperature_unit
+from .write_contract import WriteValidationError, control_mode, definition_for, timing_mode
 
 FORMAT = "microclimate.schedule.v1"
 MAX_TEMPLATE_BYTES = 4096
@@ -69,8 +68,9 @@ def export_template(model, channel, data):
     for index in range(1, (MODES[mode] or 8) + 1):
         time_field = definition_for(model, f"{channel}_period_{index}_time")
         target_field = definition_for(model, f"{channel}_period_{index}_setpoint")
-        points.append({"seconds": value_of(time_field, data),
-                       "target_native": value_of(target_field, data)})
+        points.append(
+            {"seconds": value_of(time_field, data), "target_native": value_of(target_field, data)}
+        )
     if mode == "Multi":
         while points and points[-1] == {"seconds": 0, "target_native": 0.0}:
             points.pop()
@@ -87,5 +87,5 @@ def parse_template(value):
         if len(value.encode("utf-8")) > MAX_TEMPLATE_BYTES:
             raise WriteValidationError("invalid_patch")
         return json.loads(value)
-    except (ValueError, TypeError, UnicodeError):
+    except ValueError, TypeError, UnicodeError:
         raise WriteValidationError("invalid_patch") from None

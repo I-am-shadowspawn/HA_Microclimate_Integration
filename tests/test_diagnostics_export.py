@@ -2,8 +2,8 @@
 
 import json
 from pathlib import Path
-from urllib.parse import quote
 from unittest.mock import patch
+from urllib.parse import quote
 
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -26,9 +26,15 @@ async def test_download_redacts_and_bounds_nested_response(hass):
     )
     entry.add_to_hass(hass)
     data = {f"v{index}": index for index in range(1000)}
-    data.update({"nested": {"token": "another secret", "url": quote(token, safe="")},
-                 "opaque": [secret, token, float("nan")]})
-    with patch("custom_components.microclimate_integration.api_client.fetch_data", return_value=data):
+    data.update(
+        {
+            "nested": {"token": "another secret", "url": quote(token, safe="")},
+            "opaque": [secret, token, float("nan")],
+        }
+    )
+    with patch(
+        "custom_components.microclimate_integration.api_client.fetch_data", return_value=data
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
         report = await async_get_config_entry_diagnostics(hass, entry)
@@ -41,10 +47,10 @@ async def test_download_redacts_and_bounds_nested_response(hass):
     assert report["entry"]["other_option_count"] == 1
     assert report["integration"]["model"] == "Evo Connect 2"
     MANIFEST = (
-            Path(__file__).resolve().parents[1]
-            / "custom_components"
-            / "microclimate_integration"
-            / "manifest.json"
+        Path(__file__).resolve().parents[1]
+        / "custom_components"
+        / "microclimate_integration"
+        / "manifest.json"
     )
 
     EXPECTED_VERSION = json.loads(MANIFEST.read_text())["version"]
@@ -81,17 +87,23 @@ async def test_download_handles_unloaded_and_malformed_state(hass):
     malformed = await async_get_config_entry_diagnostics(hass, entry)
     assert malformed["response_shape"]["kind"] == "unexpected_type"
     assert malformed["coordinator"] == {
-        "loaded": True, "last_update_success": None,
-        "failure_type": "ValueError", "last_write_status": "other",
+        "loaded": True,
+        "last_update_success": None,
+        "failure_type": "ValueError",
+        "last_write_status": "other",
     }
     assert token not in json.dumps(malformed)
 
 
 def test_shared_redactor_handles_nested_encoded_credentials():
     token = "secret+/ token"
-    value = {"connection": {"url": f"https://host/?token={quote(token, safe='')}",
-                            "API-TOKEN": "different secret"},
-             "items": [token, {"authorization": "Bearer different secret"}]}
+    value = {
+        "connection": {
+            "url": f"https://host/?token={quote(token, safe='')}",
+            "API-TOKEN": "different secret",
+        },
+        "items": [token, {"authorization": "Bearer different secret"}],
+    }
     redacted = redact_response(value, token)
     encoded = json.dumps(redacted)
     for secret in (token, quote(token, safe=""), "different secret"):

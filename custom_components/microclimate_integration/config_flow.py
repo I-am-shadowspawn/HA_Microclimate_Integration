@@ -1,11 +1,19 @@
 """Onboarding and credential recovery for Microclimate."""
+
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
-from . import api_client
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from .const import MODEL_OPTIONS, DEFAULT_MODEL
-from .const import DOMAIN, CONF_LOG_RAW_RESPONSE, CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES
+
+from . import api_client
+from .const import (
+    CONF_ENABLE_WRITES,
+    CONF_LOG_RAW_RESPONSE,
+    DEFAULT_ENABLE_WRITES,
+    DEFAULT_MODEL,
+    DOMAIN,
+    MODEL_OPTIONS,
+)
 from .identity import token_identity
 
 
@@ -47,8 +55,10 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             data = {**user_input}
             data.setdefault("model", DEFAULT_MODEL)
-            if not all(isinstance(data.get(key), str) and data[key].strip()
-                       for key in ("evo_device", "token", "model")):
+            if not all(
+                isinstance(data.get(key), str) and data[key].strip()
+                for key in ("evo_device", "token", "model")
+            ):
                 errors["base"] = "required"
             elif data["model"] not in MODEL_OPTIONS:
                 errors["model"] = "invalid_model"
@@ -66,7 +76,9 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     title=f"Microclimate Evo Device: {data['evo_device']}",
                     data={key: data[key] for key in ("evo_device", "token", "model")},
                 )
-        return self.async_show_form(step_id="user", data_schema=self._get_data_schema(), errors=errors)
+        return self.async_show_form(
+            step_id="user", data_schema=self._get_data_schema(), errors=errors
+        )
 
     async def async_step_reauth(self, entry_data):
         """HA initiates this after a coordinator authentication failure."""
@@ -84,7 +96,12 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             token = user_input.get("token", "")
             name = user_input.get("evo_device", entry.data["evo_device"])
-            if not isinstance(token, str) or not token.strip() or not isinstance(name, str) or not name.strip():
+            if (
+                not isinstance(token, str)
+                or not token.strip()
+                or not isinstance(name, str)
+                or not name.strip()
+            ):
                 errors["base"] = "required"
             elif self._duplicate(token, entry):
                 errors["base"] = "already_configured"
@@ -96,7 +113,8 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 # No entry/registry mutation until validation has succeeded.
                 await self.async_set_unique_id(token_identity(token))
                 return self.async_update_reload_and_abort(
-                    entry, unique_id=token_identity(token),
+                    entry,
+                    unique_id=token_identity(token),
                     title=f"Microclimate Evo Device: {name}",
                     data_updates={"evo_device": name, "token": token},
                 )
@@ -108,11 +126,13 @@ class MicroclimateConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _get_data_schema(self):
         if not MODEL_OPTIONS:
             raise vol.Invalid("No valid models available.")
-        return vol.Schema({
-            vol.Required("evo_device"): str,
-            vol.Required("token"): str,
-            vol.Required("model", default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
-        })
+        return vol.Schema(
+            {
+                vol.Required("evo_device"): str,
+                vol.Required("token"): str,
+                vol.Required("model", default=DEFAULT_MODEL): vol.In(MODEL_OPTIONS),
+            }
+        )
 
 
 class MicroclimateOptionsFlow(config_entries.OptionsFlow):
@@ -120,12 +140,34 @@ class MicroclimateOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         if user_input is not None:
-            return self.async_create_entry(title="", data={**self.config_entry.options,
-                CONF_LOG_RAW_RESPONSE: user_input.get(CONF_LOG_RAW_RESPONSE, self.config_entry.options.get(CONF_LOG_RAW_RESPONSE, False)),
-                CONF_ENABLE_WRITES: user_input.get(CONF_ENABLE_WRITES, self.config_entry.options.get(CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES))})
-        return self.async_show_form(step_id="init", data_schema=vol.Schema({
-            vol.Required(CONF_ENABLE_WRITES,
-                         default=self.config_entry.options.get(CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES)): bool,
-            vol.Required(CONF_LOG_RAW_RESPONSE,
-                         default=self.config_entry.options.get(CONF_LOG_RAW_RESPONSE, False)): bool,
-        }))
+            return self.async_create_entry(
+                title="",
+                data={
+                    **self.config_entry.options,
+                    CONF_LOG_RAW_RESPONSE: user_input.get(
+                        CONF_LOG_RAW_RESPONSE,
+                        self.config_entry.options.get(CONF_LOG_RAW_RESPONSE, False),
+                    ),
+                    CONF_ENABLE_WRITES: user_input.get(
+                        CONF_ENABLE_WRITES,
+                        self.config_entry.options.get(CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES),
+                    ),
+                },
+            )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_ENABLE_WRITES,
+                        default=self.config_entry.options.get(
+                            CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES
+                        ),
+                    ): bool,
+                    vol.Required(
+                        CONF_LOG_RAW_RESPONSE,
+                        default=self.config_entry.options.get(CONF_LOG_RAW_RESPONSE, False),
+                    ): bool,
+                }
+            ),
+        )

@@ -1,13 +1,16 @@
 """Microclimate Integration for Home Assistant."""
+
 import logging
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from .coordinator import MicroclimateCoordinator
 from homeassistant.helpers import config_validation as cv
-from .identity import controller_device_info
 from homeassistant.helpers import device_registry as dr
 
 from .const import DOMAIN
+from .coordinator import MicroclimateCoordinator
+from .identity import controller_device_info
+
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 PLATFORMS = ["climate", "sensor", "select", "number", "text"]
@@ -20,8 +23,10 @@ async def async_setup(hass: HomeAssistant, _config: dict):
     """Set up the Microclimate Integration."""
     hass.data.setdefault(DOMAIN, {})
     from .card_api import async_setup_card_api
+
     await async_setup_card_api(hass)
     from .services import async_setup_services
+
     await async_setup_services(hass)
     return True
 
@@ -33,7 +38,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry[Microclimate
     try:
         await coordinator.async_config_entry_first_refresh()
         hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
-        dr.async_get(hass).async_get_or_create(config_entry_id=entry.entry_id, **controller_device_info(entry))
+        dr.async_get(hass).async_get_or_create(
+            config_entry_id=entry.entry_id, **controller_device_info(entry)
+        )
         forwarding = True
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         entry.async_on_unload(entry.add_update_listener(_options_updated))
@@ -44,11 +51,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry[Microclimate
             try:
                 await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
             except Exception:
-                _LOGGER.error('Unable to unload partially initialized Microclimate platforms')
+                _LOGGER.error("Unable to unload partially initialized Microclimate platforms")
         hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
         raise
 
     return True
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""

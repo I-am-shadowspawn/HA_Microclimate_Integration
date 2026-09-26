@@ -3,14 +3,21 @@
 import pytest
 
 from custom_components.microclimate_integration.transformation import convert_temperature
-from custom_components.microclimate_integration.validation import safe_temperature
-from custom_components.microclimate_integration.validation import reported_temperature_unit
+from custom_components.microclimate_integration.validation import (
+    reported_temperature_unit,
+    safe_temperature,
+)
 
 
-@pytest.mark.parametrize("raw,flag,expected", [
-    ("25°C", "C", 25.0), ("77°F", "F", 77.0),
-    ("32°F", "F", 32.0), ("20", None, 20.0),
-])
+@pytest.mark.parametrize(
+    "raw,flag,expected",
+    [
+        ("25°C", "C", 25.0),
+        ("77°F", "F", 77.0),
+        ("32°F", "F", 32.0),
+        ("20", None, 20.0),
+    ],
+)
 def test_reported_value_is_not_converted_twice(raw, flag, expected):
     assert convert_temperature(raw, {"v25": flag}) == expected
     assert safe_temperature(raw) == expected

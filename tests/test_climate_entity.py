@@ -60,4 +60,6 @@ async def test_climate_refresh_failure_recovery_and_unload(hass):
         assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()
         assert hass.states.get(entity_id).state == "unavailable"
-        assert er.async_get(hass).async_get(entity_id).unique_id == channel_identity(entry, "Yellow")
+        assert er.async_get(hass).async_get(entity_id).unique_id == channel_identity(
+            entry, "Yellow"
+        )

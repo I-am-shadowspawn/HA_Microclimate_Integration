@@ -1,50 +1,48 @@
+"""Shared Home Assistant runtime fixture for integration tests."""
+
+from collections.abc import AsyncIterator
+from typing import Any
+from unittest.mock import patch
+
 import pytest
-from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import mock_integration
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+from custom_components.microclimate_integration import coordinator as coordinator_module
+from custom_components.microclimate_integration.const import DOMAIN
+from custom_components.microclimate_integration.write_transport import UpdateResult
+from tests.helpers import payload
 
 
-# Use the pytest fixture to get the Home Assistant instance for testing
-# @pytest.fixture
-# async def hass():
-#     """Create and provide a Home Assistant instance for testing."""
-#     hass_instance = HomeAssistant()
-#
-#     # Optionally mock integrations if needed
-#     await mock_integration(hass_instance, "microclimate_integration")
-#
-#     return hass_instance
-#
-from pytest_homeassistant_custom_component.common import async_test_home_assistant
-@pytest.fixture()#autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
-    """Enable custom integrations defined in the test dir."""
-    yield
+@pytest.fixture
+async def runtime(hass: Any) -> AsyncIterator[tuple[Any, Any, dict[str, Any], Any, Any]]:
+    """Load a controller entry with in-memory mocked API reads and writes."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={"evo_device": "writes", "model": "Evo Connect 3", "token": "fake"},
+    )
+    entry.add_to_hass(hass)
+    data = payload()
 
+    async def read(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        return dict(data)
 
-# @pytest.fixture
-# async def hass():#autouse=True):
-#     """Provide a Home Assistant test instance."""
-#     print("Creating Home Assistant instance...")
-#     async with async_test_home_assistant() as hass_instance:
-#         print("Starting Home Assistant instance...")
-#         await hass_instance.async_start()
-#         print("Home Assistant instance started.")
-#         yield hass_instance
-#         print("Stopping Home Assistant instance...")
-#         await hass_instance.async_stop()
-#         print("Home Assistant instance stopped.")
-#
-# @pytest.fixture
-# def hass2():
-#     """Provide a Home Assistant test instance."""
-#     hass_instance = async_test_home_assistant()  # Call it synchronously for debugging
-#     hass_instance.async_start()  # Ensure HA is started
-#     return hass_instance
+    async def update(token: str, pin: str, value: Any, **kwargs: Any) -> UpdateResult:
+        data[pin] = value
+        return UpdateResult("acknowledged")
 
-
-
-# Now, you can use this fixture in your test cases
-async def test_example(hass):
-    """Test Home Assistant functionality"""
-    assert hass is not None
-    # You can perform actions like service calls or entity state checks here
+    with (
+        patch(
+            "custom_components.microclimate_integration.api_client.fetch_data", side_effect=read
+        ) as reader,
+        patch(
+            "custom_components.microclimate_integration.write_transport.update_pin",
+            side_effect=update,
+        ) as writer,
+        patch.object(coordinator_module, "READBACK_DELAYS", (0, 0, 0, 0)),
+    ):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+        yield entry, hass.data[DOMAIN][entry.entry_id], data, reader, writer
+        if entry.entry_id in hass.data[DOMAIN]:
+            await hass.config_entries.async_unload(entry.entry_id)
+            await hass.async_block_till_done()

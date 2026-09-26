@@ -1,16 +1,19 @@
-from tests.http_mocks import json_stream
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from unittest.mock import AsyncMock, patch
+
 import aiohttp
 import pytest
-from unittest.mock import AsyncMock, patch
-from custom_components.microclimate_integration.api_client import (
-    get_evo_device_data,
-    fetch_data,
-    UnauthenticatedError,
-    EvoDeviceDataError,
-    DOMAIN)
-
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+from custom_components.microclimate_integration.api_client import (
+    DOMAIN,
+    EvoDeviceDataError,
+    UnauthenticatedError,
+    fetch_data,
+    get_evo_device_data,
+)
+from tests.http_mocks import json_stream
+
 
 @pytest.mark.asyncio
 async def test_fetch_data_success(hass):
@@ -43,15 +46,13 @@ async def test_fetch_data_invalid_token(hass, mocker):
     fake_context_manager.__aenter__.return_value = json_stream(mock_response)
 
     with patch("aiohttp.ClientSession.get", return_value=fake_context_manager):
-    #     result = await fetch_data(token, session=async_get_clientsession(hass))
-    #
-    # assert result is None
-
+        #     result = await fetch_data(token, session=async_get_clientsession(hass))
+        #
+        # assert result is None
 
         with pytest.raises(UnauthenticatedError) as excinfo:
             await fetch_data(token, session=async_get_clientsession(hass))
         assert "Authentication failed" in str(excinfo.value)
-
 
 
 @pytest.mark.asyncio
@@ -86,12 +87,11 @@ async def test_fetch_data_network_error(hass):
             await fetch_data(token, session=async_get_clientsession(hass))
 
 
-
-
 # Create a simple fake config entry class to simulate Home Assistant's config entries.
 class FakeConfigEntry:
     def __init__(self, data):
         self.data = data
+
 
 # Create a fake config entries container with an async_entries method.
 class FakeConfigEntries:
@@ -102,10 +102,12 @@ class FakeConfigEntries:
         # Here we assume all entries belong to the same domain.
         return self._entries
 
+
 # Create a fake hass object with a config_entries attribute.
 class FakeHass:
     def __init__(self, entries):
         self.config_entries = FakeConfigEntries(entries)
+
 
 @pytest.mark.asyncio
 async def test_get_evo_device_data_entry_not_found(hass):
@@ -116,6 +118,7 @@ async def test_get_evo_device_data_entry_not_found(hass):
     # Expect a ValueError when the config entry for the evo_device is not found.
     with pytest.raises(ValueError, match="Configuration entry is required"):
         await get_evo_device_data(fake_hass, None)
+
 
 @pytest.mark.asyncio
 async def test_get_evo_device_data_success(hass):
@@ -128,11 +131,15 @@ async def test_get_evo_device_data_success(hass):
     fake_hass = hass
 
     # Patch fetch_data so that it returns the expected_data when called.
-    with patch("custom_components.microclimate_integration.api_client.fetch_data", new=AsyncMock(return_value=expected_data)):
+    with patch(
+        "custom_components.microclimate_integration.api_client.fetch_data",
+        new=AsyncMock(return_value=expected_data),
+    ):
         result = await get_evo_device_data(fake_hass, config_entry)
 
     # Verify that get_evo_device_data returns the value from fetch_data.
     assert result == expected_data
+
 
 @pytest.mark.asyncio
 async def test_get_evo_device_data_auth_error(hass):
@@ -144,8 +151,8 @@ async def test_get_evo_device_data_auth_error(hass):
 
     # Patch fetch_data to simulate an authentication error by raising UnauthenticatedError.
     with patch(
-            "custom_components.microclimate_integration.api_client.fetch_data",
-            new=AsyncMock(side_effect=UnauthenticatedError("Authentication failed: invalid token"))
+        "custom_components.microclimate_integration.api_client.fetch_data",
+        new=AsyncMock(side_effect=UnauthenticatedError("Authentication failed: invalid token")),
     ):
         with pytest.raises(ConfigEntryAuthFailed) as excinfo:
             await get_evo_device_data(fake_hass, config_entry)

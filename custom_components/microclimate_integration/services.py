@@ -13,7 +13,7 @@ from .card_api import KEY
 from .card_model import SCHEMA_VERSION, field_access, generation, resolve, revision
 from .const import DOMAIN
 from .schedule_templates import export_template, import_patch, parse_template
-from .write_contract import definition_for, WriteValidationError
+from .write_contract import WriteValidationError, definition_for
 
 _DEVICE_ID = vol.All(str, vol.Length(min=1, max=128))
 
@@ -22,7 +22,9 @@ async def _caller(hass, call):
     if call.context.user_id is None:
         # Automations run in HA's trusted system context; do not grant this to
         # a named user whose entity permissions can be checked explicitly.
-        return SimpleNamespace(id="system", permissions=SimpleNamespace(check_entity=lambda *_: True))
+        return SimpleNamespace(
+            id="system", permissions=SimpleNamespace(check_entity=lambda *_: True)
+        )
     user = await hass.auth.async_get_user(call.context.user_id)
     if user is None:
         raise WriteValidationError("unauthorized")
@@ -36,7 +38,9 @@ def _source_template(hass, device_id, user):
     template = export_template(coordinator.entry.data["model"], channel, coordinator.data)
     for index in range(1, len(template["points"]) + 1):
         for kind in ("time", "setpoint"):
-            field = definition_for(coordinator.entry.data["model"], f"{channel}_period_{index}_{kind}")
+            field = definition_for(
+                coordinator.entry.data["model"], f"{channel}_period_{index}_{kind}"
+            )
             if not field_access(hass, coordinator, field, user):
                 raise WriteValidationError("read_denied")
     return template
@@ -45,9 +49,14 @@ def _source_template(hass, device_id, user):
 async def _apply(hass, device_id, template, user, *, return_response):
     coordinator, channel, device = resolve(hass, device_id)
     patch = import_patch(coordinator.entry.data["model"], channel, coordinator.data, template)
-    msg = {"schema_version": SCHEMA_VERSION, "device_id": device.id,
-           "runtime_generation": generation(coordinator), "base_revision": revision(coordinator, channel),
-           "request_id": str(uuid4()), "patch": patch}
+    msg = {
+        "schema_version": SCHEMA_VERSION,
+        "device_id": device.id,
+        "runtime_generation": generation(coordinator),
+        "base_revision": revision(coordinator, channel),
+        "request_id": str(uuid4()),
+        "patch": patch,
+    }
     api = hass.data[KEY].manager
     result = await api.save(msg, user)
     outcome = await asyncio.shield(api.jobs[result["operation_id"]]["completion"])
@@ -67,8 +76,13 @@ async def async_setup_services(hass):
 
     async def apply(call):
         try:
-            return await _apply(hass, call.data["device_id"], parse_template(call.data["template"]),
-                                await _caller(hass, call), return_response=call.return_response)
+            return await _apply(
+                hass,
+                call.data["device_id"],
+                parse_template(call.data["template"]),
+                await _caller(hass, call),
+                return_response=call.return_response,
+            )
         except WriteValidationError as err:
             raise HomeAssistantError(f"Schedule action rejected: {err.code}") from None
 
@@ -76,8 +90,13 @@ async def async_setup_services(hass):
         try:
             user = await _caller(hass, call)
             template = _source_template(hass, call.data["source_device_id"], user)
-            return await _apply(hass, call.data["target_device_id"], template, user,
-                                return_response=call.return_response)
+            return await _apply(
+                hass,
+                call.data["target_device_id"],
+                template,
+                user,
+                return_response=call.return_response,
+            )
         except WriteValidationError as err:
             raise HomeAssistantError(f"Schedule action rejected: {err.code}") from None
 
@@ -89,19 +108,33 @@ async def async_setup_services(hass):
             raise HomeAssistantError(f"Schedule export rejected: {err.code}") from None
 
     hass.services.async_register(
-        DOMAIN, "apply_schedule", apply,
-        schema=vol.Schema({vol.Required("device_id"): _DEVICE_ID,
-                           vol.Required("template"): vol.All(str, vol.Length(min=1, max=4096))}),
+        DOMAIN,
+        "apply_schedule",
+        apply,
+        schema=vol.Schema(
+            {
+                vol.Required("device_id"): _DEVICE_ID,
+                vol.Required("template"): vol.All(str, vol.Length(min=1, max=4096)),
+            }
+        ),
         supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(
-        DOMAIN, "copy_schedule", copy,
-        schema=vol.Schema({vol.Required("source_device_id"): _DEVICE_ID,
-                           vol.Required("target_device_id"): _DEVICE_ID}),
+        DOMAIN,
+        "copy_schedule",
+        copy,
+        schema=vol.Schema(
+            {
+                vol.Required("source_device_id"): _DEVICE_ID,
+                vol.Required("target_device_id"): _DEVICE_ID,
+            }
+        ),
         supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(
-        DOMAIN, "export_schedule", export,
+        DOMAIN,
+        "export_schedule",
+        export,
         schema=vol.Schema({vol.Required("device_id"): _DEVICE_ID}),
         supports_response=SupportsResponse.ONLY,
     )

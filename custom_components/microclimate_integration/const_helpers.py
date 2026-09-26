@@ -11,6 +11,6 @@ def enum_value(value, mapping):
         number = float(value)
         if math.isfinite(number) and number.is_integer():
             return mapping.get(str(int(number)))
-    except (ValueError, OverflowError):
+    except ValueError, OverflowError:
         pass
     return None
