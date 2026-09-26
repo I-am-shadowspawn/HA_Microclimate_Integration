@@ -42,7 +42,7 @@ DEVELOPMENT_ROOT_FILES = (
     "README.md",
     "SECURITY.md",
     "SUPPORT.md",
-    "AGENT.md",
+    "AGENTS.md",
     "TODO.md",
     "conftest.py",
     "hacs.json",
