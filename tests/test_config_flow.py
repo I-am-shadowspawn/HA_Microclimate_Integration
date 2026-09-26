@@ -1,10 +1,17 @@
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from homeassistant import data_entry_flow
-from custom_components.microclimate_integration.config_flow import  MicroclimateConfigFlow  # Import the config flow directly
-from custom_components.microclimate_integration.const import MODEL_OPTIONS  # Import the constants if needed
-from homeassistant.data_entry_flow import FlowResultType
 import voluptuous as vol
+from homeassistant import data_entry_flow
+from homeassistant.data_entry_flow import FlowResultType
+
+from custom_components.microclimate_integration.config_flow import (
+    MicroclimateConfigFlow,  # Import the config flow directly
+)
+from custom_components.microclimate_integration.const import (
+    MODEL_OPTIONS,  # Import the constants if needed
+)
+
 
 @pytest.mark.asyncio
 async def test_async_step_user_form_displayed():
@@ -45,7 +52,9 @@ async def test_async_step_user_create_entry(hass):
         },
     }
     # Mock async_create_entry to track if it's called
-    with patch.object(flow, "async_create_entry", return_value=expected_result) as mock_create_entry:
+    with patch.object(
+        flow, "async_create_entry", return_value=expected_result
+    ) as mock_create_entry:
         result = await flow.async_step_user(user_input)
 
         # Ensure the async_create_entry method was called with the expected data
@@ -55,7 +64,7 @@ async def test_async_step_user_create_entry(hass):
                 "evo_device": "Device_123",
                 "token": "valid_token",
                 "model": "Evo Connect",
-            }
+            },
         )
 
         # Ensure the result is a flow result with type create_entry
@@ -68,7 +77,7 @@ async def test_async_step_user_missing_field():
 
     user_input = {
         "evo_device": "Device_123",
-        #"token": "valid_token",
+        # "token": "valid_token",
         # Missing "model" field
     }
 
@@ -79,7 +88,6 @@ async def test_async_step_user_missing_field():
     # Check if the form is shown again due to missing required fields
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert "model" in result["data_schema"].schema
-
 
 
 @pytest.mark.asyncio
@@ -103,6 +111,7 @@ async def test_async_step_user_invalid_model():
 
         # Ensure the result is a flow result with type FORM (as the model is invalid)
         assert result["type"] == data_entry_flow.FlowResultType.FORM
+
 
 @pytest.mark.asyncio
 async def test_async_step_user_default_model(hass):
@@ -128,7 +137,9 @@ async def test_async_step_user_default_model(hass):
         },
     }
     # Mock async_create_entry to track if it's called
-    with patch.object(flow, "async_create_entry", return_value=expected_result) as mock_create_entry:
+    with patch.object(
+        flow, "async_create_entry", return_value=expected_result
+    ) as mock_create_entry:
         result = await flow.async_step_user(user_input)
 
         # Ensure async_create_entry method is called with the default model
@@ -138,11 +149,12 @@ async def test_async_step_user_default_model(hass):
                 "evo_device": "Device_123",
                 "token": "valid_token",
                 "model": next(iter(MODEL_OPTIONS)),  # Default model should be used
-            }
+            },
         )
 
         # Ensure the result is a flow result with type create_entry
         assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
 
 def test_get_data_schema_valid():
     """Test that the schema contains the expected fields and choices for 'model'."""
@@ -160,6 +172,7 @@ def test_get_data_schema_valid():
     assert isinstance(schema_dict["model"], vol.In)  # Ensure 'model' uses vol.In()
     assert set(schema_dict["model"].container) == set(MODEL_OPTIONS)  # Ensure correct options
 
+
 def test_get_data_schema_default_model():
     """Test that the first model in MODEL_OPTIONS is set as the default."""
     flow = MicroclimateConfigFlow()
@@ -172,6 +185,7 @@ def test_get_data_schema_default_model():
 
     assert validated_data["model"] == expected_default  # ✅ Ensure correct default model is applied
 
+
 def test_get_data_schema_no_models():
     """Test that an error is raised when MODEL_OPTIONS is empty."""
     with patch("custom_components.microclimate_integration.config_flow.MODEL_OPTIONS", []):
@@ -182,5 +196,8 @@ def test_get_data_schema_no_models():
 
 @pytest.fixture(autouse=True)
 def mock_validation_transport():
-    with patch("custom_components.microclimate_integration.api_client.fetch_data", new=AsyncMock(return_value={})):
+    with patch(
+        "custom_components.microclimate_integration.api_client.fetch_data",
+        new=AsyncMock(return_value={}),
+    ):
         yield

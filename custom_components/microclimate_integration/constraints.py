@@ -22,6 +22,12 @@ def valid_seconds(value):
 
 
 def valid_point_count(mode, count):
-    return (MIN_POINTS <= count <= MAX_POINTS if mode == "Multi"
-            else count == 2 if mode == "Day Night"
-            else count == 8 if mode == "Seasonal" else False)
+    return (
+        MIN_POINTS <= count <= MAX_POINTS
+        if mode == "Multi"
+        else count == 2
+        if mode == "Day Night"
+        else count == 8
+        if mode == "Seasonal"
+        else False
+    )

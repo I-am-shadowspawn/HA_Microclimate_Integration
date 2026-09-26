@@ -6,7 +6,8 @@ from unittest.mock import Mock
 import pytest
 from homeassistant.core import Context
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
 from custom_components.microclimate_integration.const import DOMAIN
 from custom_components.microclimate_integration.schedule_templates import (
@@ -16,22 +17,26 @@ from custom_components.microclimate_integration.schedule_templates import (
     parse_template,
 )
 from custom_components.microclimate_integration.write_contract import WriteValidationError
-from test_card_contract import populate
-from test_write_runtime import runtime
+from tests.helpers import payload, populate
 
 
 def device_id(hass, entry, channel):
-    return dr.async_get(hass).async_get_device_by_identifier((DOMAIN, f"{entry.entry_id}_{channel}"), entry.entry_id).id
+    return (
+        dr.async_get(hass)
+        .async_get_device_by_identifier((DOMAIN, f"{entry.entry_id}_{channel}"), entry.entry_id)
+        .id
+    )
 
 
 def test_portable_template_has_no_pin_or_device_identity():
-    from test_write_runtime import payload
 
     source = payload()
     populate(source, 3, "Yellow")
     template = export_template("Evo Connect 3", "Yellow", source)
     assert template == {
-        "format": FORMAT, "mode": "Multi", "unit": "celsius",
+        "format": FORMAT,
+        "mode": "Multi",
+        "unit": "celsius",
         "points": [
             {"seconds": 3600, "target_native": 21.0},
             {"seconds": 7200, "target_native": 22.0},
@@ -48,7 +53,6 @@ def test_portable_template_has_no_pin_or_device_identity():
 
 
 def test_fahrenheit_preset_retains_native_values_and_requires_matching_unit():
-    from test_write_runtime import payload
 
     source = payload()
     populate(source, 2, "Yellow")
@@ -56,7 +60,10 @@ def test_fahrenheit_preset_retains_native_values_and_requires_matching_unit():
     template = export_template("Evo Connect 3", "Yellow", source)
     assert template["unit"] == "fahrenheit"
     assert [point["target_native"] for point in template["points"]] == [77, 68]
-    assert import_patch("Evo Connect 3", "Yellow", source, template)["schedule"]["points"] == template["points"]
+    assert (
+        import_patch("Evo Connect 3", "Yellow", source, template)["schedule"]["points"]
+        == template["points"]
+    )
     source["v25"] = "C"
     with pytest.raises(WriteValidationError, match="stale_context"):
         import_patch("Evo Connect 3", "Yellow", source, template)
@@ -67,7 +74,6 @@ def test_fahrenheit_preset_retains_native_values_and_requires_matching_unit():
 
 @pytest.mark.parametrize("mode,code,count", [("Day Night", 1, 2), ("Seasonal", 3, 8)])
 def test_export_preserves_mode_specific_point_count_without_root_dates(mode, code, count):
-    from test_write_runtime import payload
 
     data = payload()
     populate(data, count, "Yellow")
@@ -78,16 +84,18 @@ def test_export_preserves_mode_specific_point_count_without_root_dates(mode, cod
     assert "v20" not in json.dumps(template) and "09/02" not in json.dumps(template)
 
 
-@pytest.mark.parametrize("mutate", [
-    lambda t: {**t, "unit": "percent"},
-    lambda t: {**t, "mode": "Seasonal"},
-    lambda t: {**t, "points": t["points"][:1]},
-    lambda t: {**t, "points": list(reversed(t["points"]))},
-    lambda t: {**t, "points": [{"seconds": 0, "target_native": 0}, *t["points"][1:]]},
-    lambda t: {**t, "device_id": "foreign"},
-])
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda t: {**t, "unit": "percent"},
+        lambda t: {**t, "mode": "Seasonal"},
+        lambda t: {**t, "points": t["points"][:1]},
+        lambda t: {**t, "points": list(reversed(t["points"]))},
+        lambda t: {**t, "points": [{"seconds": 0, "target_native": 0}, *t["points"][1:]]},
+        lambda t: {**t, "device_id": "foreign"},
+    ],
+)
 def test_import_rejects_incompatible_or_invalid_templates(mutate):
-    from test_write_runtime import payload
 
     data = payload()
     populate(data, 3)
@@ -103,7 +111,6 @@ def test_import_rejects_oversized_or_malformed_json():
 
 
 def test_fixed_output_percent_cannot_be_imported_as_temperature():
-    from test_write_runtime import payload
 
     fixed = payload("Evo Connect")
     populate(fixed, 2, "Blue")
@@ -120,11 +127,18 @@ async def test_copy_schedule_service_uses_existing_job_and_preserves_source(hass
     populate(data, 3, "Yellow")
     populate(data, 2, "Red")
     coordinator._publish(dict(data))
-    source_before = {pin: value for pin, value in data.items() if pin.startswith("v3") or pin.startswith("v4")}
+    source_before = {
+        pin: value for pin, value in data.items() if pin.startswith("v3") or pin.startswith("v4")
+    }
     result = await hass.services.async_call(
-        DOMAIN, "copy_schedule", {"source_device_id": device_id(hass, entry, "Yellow"),
-                                  "target_device_id": device_id(hass, entry, "Red")},
-        blocking=True, return_response=True,
+        DOMAIN,
+        "copy_schedule",
+        {
+            "source_device_id": device_id(hass, entry, "Yellow"),
+            "target_device_id": device_id(hass, entry, "Red"),
+        },
+        blocking=True,
+        return_response=True,
     )
     assert result["status"] == "succeeded" and result["confirmed"] > 0
     assert writer.await_count == result["confirmed"]
@@ -139,15 +153,20 @@ async def test_export_and_apply_service_copy_without_arbitrary_pins(hass, runtim
     populate(data, 2, "Red")
     coordinator._publish(dict(data))
     exported = await hass.services.async_call(
-        DOMAIN, "export_schedule", {"device_id": device_id(hass, entry, "Yellow")},
-        blocking=True, return_response=True,
+        DOMAIN,
+        "export_schedule",
+        {"device_id": device_id(hass, entry, "Yellow")},
+        blocking=True,
+        return_response=True,
     )
     template = json.loads(exported["template"])
     assert template["format"] == FORMAT and "token" not in exported["template"]
     result = await hass.services.async_call(
-        DOMAIN, "apply_schedule", {"device_id": device_id(hass, entry, "Red"),
-                                   "template": exported["template"]},
-        blocking=True, return_response=True,
+        DOMAIN,
+        "apply_schedule",
+        {"device_id": device_id(hass, entry, "Red"), "template": exported["template"]},
+        blocking=True,
+        return_response=True,
     )
     assert result["status"] == "succeeded" and writer.await_count == result["confirmed"]
 
@@ -158,13 +177,19 @@ async def test_named_user_source_permission_is_checked(hass, runtime, monkeypatc
     coordinator._publish(dict(data))
     user = Mock(id="limited-user")
     user.permissions.check_entity.return_value = False
+
     async def get_user(_uid):
         return user
+
     monkeypatch.setattr(hass.auth, "async_get_user", get_user)
     with pytest.raises(HomeAssistantError, match="read_denied"):
         await hass.services.async_call(
-            DOMAIN, "export_schedule", {"device_id": device_id(hass, entry, "Yellow")},
-            blocking=True, return_response=True, context=Context(user_id="limited-user"),
+            DOMAIN,
+            "export_schedule",
+            {"device_id": device_id(hass, entry, "Yellow")},
+            blocking=True,
+            return_response=True,
+            context=Context(user_id="limited-user"),
         )
     assert writer.await_count == 0
 
@@ -187,9 +212,11 @@ async def test_apply_service_partial_failure_reports_without_retry(hass, runtime
 
     writer.side_effect = reject_second
     result = await hass.services.async_call(
-        DOMAIN, "apply_schedule", {"device_id": device_id(hass, entry, "Yellow"),
-                                   "template": json.dumps(template)},
-        blocking=True, return_response=True,
+        DOMAIN,
+        "apply_schedule",
+        {"device_id": device_id(hass, entry, "Yellow"), "template": json.dumps(template)},
+        blocking=True,
+        return_response=True,
     )
     assert result["status"] == "partial" and result["confirmed"] == 1
     assert writer.await_count == 2
@@ -206,8 +233,10 @@ async def test_disabled_schedule_anchor_blocks_automation(hass, runtime):
     registry.async_update_entity(anchor, disabled_by=er.RegistryEntryDisabler.USER)
     with pytest.raises(HomeAssistantError, match="control_denied"):
         await hass.services.async_call(
-            DOMAIN, "apply_schedule", {"device_id": device_id(hass, entry, "Yellow"),
-                                       "template": json.dumps(template)},
-            blocking=True, return_response=True,
+            DOMAIN,
+            "apply_schedule",
+            {"device_id": device_id(hass, entry, "Yellow"), "template": json.dumps(template)},
+            blocking=True,
+            return_response=True,
         )
     assert writer.await_count == 0

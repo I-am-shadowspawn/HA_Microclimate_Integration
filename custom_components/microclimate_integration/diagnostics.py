@@ -1,26 +1,41 @@
 """Bounded, credential-free support diagnostics for a config entry."""
 
-from collections.abc import Mapping
-from itertools import islice
 import json
 import math
 import re
+from collections.abc import Mapping
+from itertools import islice
 from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_integration
 
 from .api_client import redact_response
-from .const import CONF_ENABLE_WRITES, CONF_LOG_RAW_RESPONSE, DEFAULT_ENABLE_WRITES, DOMAIN, MODEL_CHANNEL_OPTIONS
+from .const import (
+    CONF_ENABLE_WRITES,
+    CONF_LOG_RAW_RESPONSE,
+    DEFAULT_ENABLE_WRITES,
+    DOMAIN,
+    MODEL_CHANNEL_OPTIONS,
+)
 
 MAX_SAMPLED_FIELDS = 256
 MAX_EXPORT_BYTES = 4096
 _PIN = re.compile(r"v[0-9]+\Z")
 _SAFE_NAME = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,63}\Z")
 _WRITE_STATUSES = {
-    "confirmed", "confirmed_no_change", "uncertain", "cancelled_before_dispatch",
-    "invalid_auth", "rejected", "rate_limited", "mismatch", "stale_context",
-    "read_failed", "unsupported_capability", "invalid_input",
+    "confirmed",
+    "confirmed_no_change",
+    "uncertain",
+    "cancelled_before_dispatch",
+    "invalid_auth",
+    "rejected",
+    "rate_limited",
+    "mismatch",
+    "stale_context",
+    "read_failed",
+    "unsupported_capability",
+    "invalid_input",
 }
 
 
@@ -81,9 +96,11 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry) -> dict
                 CONF_ENABLE_WRITES: options.get(CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES) is True,
                 CONF_LOG_RAW_RESPONSE: options.get(CONF_LOG_RAW_RESPONSE, False) is True,
             },
-            "other_option_count": max(0, len(options) - sum(
-                key in options for key in (CONF_ENABLE_WRITES, CONF_LOG_RAW_RESPONSE)
-            )),
+            "other_option_count": max(
+                0,
+                len(options)
+                - sum(key in options for key in (CONF_ENABLE_WRITES, CONF_LOG_RAW_RESPONSE)),
+            ),
         },
         "coordinator": {
             "loaded": coordinator is not None,

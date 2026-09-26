@@ -1,11 +1,13 @@
 """Allowlisted mode selectors, using confirmed numeric enum mappings."""
+
 from homeassistant.components.select import SelectEntity
+
 from .const_helpers import enum_value
 from .write_entity import WriteEntity, setup_controls
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    setup_controls(hass, entry, async_add_entities, 'select', MicroclimateSelect)
+    setup_controls(hass, entry, async_add_entities, "select", MicroclimateSelect)
 
 
 class MicroclimateSelect(WriteEntity, SelectEntity):

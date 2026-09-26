@@ -1,13 +1,15 @@
-import pytest
 import logging
-from unittest.mock import AsyncMock, patch
-from custom_components.microclimate_integration.helpers import (
-    async_update_data,
-    MicroclimateBaseEntity)
-
-from homeassistant.core import HomeAssistant
 import tempfile
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+
+from custom_components.microclimate_integration.helpers import (
+    MicroclimateBaseEntity,
+    async_update_data,
+)
 
 
 @pytest.mark.asyncio
@@ -19,7 +21,10 @@ async def test_async_update_data():
 
         mock_data = {"temperature": 22.5, "humidity": 50}
 
-        with patch("custom_components.microclimate_integration.helpers.get_evo_device_data", new=AsyncMock(return_value=mock_data)) as mock_api:
+        with patch(
+            "custom_components.microclimate_integration.helpers.get_evo_device_data",
+            new=AsyncMock(return_value=mock_data),
+        ) as mock_api:
             data = await async_update_data(hass, "Device_123")
 
         mock_api.assert_awaited_once_with(hass, "Device_123")
@@ -27,20 +32,19 @@ async def test_async_update_data():
 
 
 @pytest.mark.asyncio
-async def test_async_update_data2(hass:HomeAssistant):
+async def test_async_update_data2(hass: HomeAssistant):
     """Test fetching data from the API."""
 
     mock_data = {"temperature": 22.5, "humidity": 50}
 
-    with patch("custom_components.microclimate_integration.helpers.get_evo_device_data", new=AsyncMock(return_value=mock_data)) as mock_api:
+    with patch(
+        "custom_components.microclimate_integration.helpers.get_evo_device_data",
+        new=AsyncMock(return_value=mock_data),
+    ) as mock_api:
         data = await async_update_data(hass, "Device_123")
 
     mock_api.assert_awaited_once_with(hass, "Device_123")
     assert data == mock_data
-
-
-
-
 
 
 @pytest.mark.asyncio
@@ -53,8 +57,11 @@ async def test_microclimate_base_entity_uses_entry_identity_and_coordinator_refr
         data={"evo_device": "device_123", "model": "Evo Connect", "token": "fake"},
     )
     coordinator = DataUpdateCoordinator(
-        hass, logger=logging.getLogger(__name__), name="test_coordinator",
-        config_entry=entry, update_method=AsyncMock(),
+        hass,
+        logger=logging.getLogger(__name__),
+        name="test_coordinator",
+        config_entry=entry,
+        update_method=AsyncMock(),
     )
     entity = MicroclimateBaseEntity(coordinator, "Yellow")
     assert entity.device_info["identifiers"] == {

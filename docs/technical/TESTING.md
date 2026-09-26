@@ -2,6 +2,8 @@
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
+All Python tests live under `tests/`; the CI test matrix discovers and runs this one directory. Shared Home Assistant setup is in `tests/conftest.py`, and test data builders/projections are in `tests/helpers.py`, so tests do not import helpers from one another. The JSON protocol and validation fixtures remain in the repository-root `fixtures/` directory because both backend and frontend contract tests consume them. The release builder includes only the reviewed fixture allowlist in the development archive; fixtures and release evidence stay outside the installed runtime component.
+
 The test harness runs Home Assistant in process with mocked HTTP. It needs no running HA server or controller token. The supported minimum is **Home Assistant Core 2026.9.3**. The 2026.9.2 lockfile is retained as historical evidence, not a supported CI target.
 
 The shared Python/TypeScript [validation contract](VALIDATION-CONTRACT.md) records observation/edit boundaries and the fixture-driven parity tests.
