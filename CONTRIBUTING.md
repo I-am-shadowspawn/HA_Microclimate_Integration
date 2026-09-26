@@ -1,5 +1,5 @@
 # Contributing
-
+AI-assisted contributions should follow [AGENTS.md](AGENTS.md) in addition to these contributor guidelines.
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
 Discuss substantial changes in a GitHub issue before opening a pull request. Include the affected controller model, firmware, expected behaviour and evidence. New pin meanings must have controller/capture evidence; preserve unknowns rather than guessing. Keep credentials and unredacted captures out of issues, commits and pull requests.
