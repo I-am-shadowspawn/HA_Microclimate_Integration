@@ -1,3 +1,4 @@
+import { message } from "./localize";
 import { newId } from "./id";
 import { boundedNumber, validSeconds, validPointCount, dateOrdinal } from "./constraints";
 import type { Draft, Snapshot, Point } from "./types";
@@ -64,27 +65,27 @@ export function makeDraft(base: Snapshot): Draft {
 export function pointError(d: Draft): string | null {
   if (!["Multi", "Day Night", "Seasonal"].includes(d.mode)) return null;
   if (!validPointCount(d.mode, d.points.length))
-    return d.mode === "Multi" ? "Multi needs 2–8 points." : `${d.mode} needs ${d.mode === "Day Night" ? 2 : 8} points.`;
+    return d.mode === "Multi" ? message("multi_count") : message("mode_count", { mode: d.mode, count: d.mode === "Day Night" ? 2 : 8 });
   if (
     d.points.some(
       (p) =>
         !validSeconds(p.seconds) || !boundedNumber(p.target_native),
     )
   )
-    return "Complete every time and target (0–100).";
+    return message("complete_points");
   if (d.mode === "Multi") {
     if (d.points.some(isEmpty))
-      return "Midnight with target zero is reserved for unused slots.";
+      return message("empty_point");
     if (
       d.points.some((p, i) => i > 0 && p.seconds! <= d.points[i - 1].seconds!)
     )
-      return "Multi starts must be distinct and chronological.";
+      return message("multi_order");
   } else if (
     d.points.some(
       (p, i) => i % 2 === 0 && p.seconds === d.points[i + 1]?.seconds,
     )
   )
-    return "Day and Night must have distinct starts.";
+    return message("day_night_order");
   return null;
 }
 export function dateError(values: (string | number | null)[]): string | null {
@@ -92,14 +93,14 @@ export function dateError(values: (string | number | null)[]): string | null {
   for (const v of values) {
     if (v === "00/00") continue;
     if (typeof v !== "string" || !/^\d{2}\/\d{2}$/.test(v))
-      return "Use DD/MM for every season date.";
+      return message("dates_format");
     const ordinal = dateOrdinal(v);
     if (ordinal === null)
-      return "Use valid calendar dates; 29/02 is not supported.";
+      return message("dates_calendar");
     ord.push(ordinal);
   }
   if (new Set(ord).size !== ord.length)
-    return "Season starts must be distinct.";
+    return message("dates_distinct");
   if (
     ord.length > 1 &&
     ord.reduce(
@@ -107,7 +108,7 @@ export function dateError(values: (string | number | null)[]): string | null {
       0,
     ) !== 365
   )
-    return "Seasons must follow one annual cycle (one year wrap is allowed).";
+    return message("dates_cycle");
   return null;
 }
 export function changedFields(d: Draft) {
@@ -146,22 +147,23 @@ export function errorFor(d: Draft): string | null {
     (k) => d.base.fields.find((f) => f.key === k)?.kind === "enum",
   );
   if (modes.length && (keys.length > 1 || scheduleChanged(d)))
-    return "Save one mode change separately from other edits.";
+    return message("separate_mode");
   for (const key of keys) {
     const f = d.base.fields.find((f) => f.key === key)!;
     const v = changed[key];
-    if (!f.writable) return `${f.label} is not editable.`;
+    if (!f.writable) return message("not_editable", { label: f.label });
     if (
       ["number", "setpoint", "ramp"].includes(f.kind) &&
       (!boundedNumber(v, f.maximum) ||
         v < f.minimum ||
         (f.kind === "ramp" && !Number.isInteger(v)))
     )
-      return `${f.label}: enter ${f.minimum}–${f.maximum}${f.kind === "ramp" ? " whole minutes" : ""}.`;
+      return message("range_error", { label: f.label, minimum: f.minimum, maximum: f.maximum,
+        suffix: f.kind === "ramp" ? message("whole_minutes") : "" });
     if (f.kind === "date" && dateOrdinal(v) === null)
-      return "Use a valid DD/MM date; unset dates cannot be written.";
+      return message("date_edit");
     if (f.kind === "enum" && (typeof v !== "string" || !f.options.includes(v)))
-      return "Choose a supported mode.";
+      return message("option_edit");
   }
   if (!d.base.channel && keys.length) {
     // Unset siblings remain unset; changed fields may not be cleared.

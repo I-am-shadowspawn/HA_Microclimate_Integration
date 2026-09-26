@@ -1,5 +1,56 @@
 import { test, expect } from "@playwright/test";
 
+test("Multi add and remove restore keyboard focus and do not write", async ({ page }) => {
+  await page.goto("/frontend/demo/");
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("button", { name: "Add point", exact: true }).click();
+  const added = page.locator(".handle:focus");
+  await expect(added).toHaveCount(1);
+  await expect(added).toHaveAttribute("aria-label", /Point \d+ .* boundary/);
+  await page.getByRole("button", { name: "Remove selected", exact: true }).click();
+  await expect(page.locator(".handle:focus")).toHaveCount(1);
+  expect(await page.evaluate(() => (window as any).calls)).toEqual([]);
+});
+
+test("touch boundary remains locally editable and page can scroll vertically", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.goto("/frontend/demo/");
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  const handle = page.locator(".handle").first();
+  await expect(handle).toHaveCSS("touch-action", "pan-y");
+  const box = await handle.boundingBox();
+  expect(box!.width).toBeGreaterThanOrEqual(24);
+  await handle.dispatchEvent("pointercancel", { pointerId: 1 });
+  expect(await page.evaluate(() => (window as any).calls)).toEqual([]);
+});
+
+test("malformed Save acknowledgement checks original request and does not resubmit", async ({ page }) => {
+  await page.goto("/frontend/demo/");
+  await page.evaluate(() => {
+    const card = (window as any).card;
+    const original = card.hass.callWS.bind(card.hass);
+    card.hass.callWS = async (message: any) => {
+      if (message.type.endsWith("/save")) {
+        (window as any).calls.push(message);
+        return { operation_id: 12 };
+      }
+      if (message.type.endsWith("/request")) {
+        (window as any).calls.push(message);
+        return null;
+      }
+      return original(message);
+    };
+  });
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("button", { name: "Add point", exact: true }).click();
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByText(/No retained Save record found/)).toBeVisible();
+  const calls = await page.evaluate(() => (window as any).calls);
+  expect(calls.filter((call: any) => call.type.endsWith("/save"))).toHaveLength(1);
+  expect(calls.filter((call: any) => call.type.endsWith("/request"))).toHaveLength(1);
+  expect(calls[1].request_id).toBe(calls[0].request_id);
+});
+
 test("season-date typing survives HA updates before blur", async ({ page }) => {
   await page.goto("/frontend/demo/?kind=controller");
   await page.getByRole("button", { name: "Edit", exact: true }).click();

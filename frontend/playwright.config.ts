@@ -6,6 +6,11 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:8767",
     viewport: { width: 768, height: 1100 },
   },
+  projects: [
+    { name: "chromium", use: { browserName: "chromium" } },
+    { name: "firefox", use: { browserName: "firefox" } },
+    { name: "webkit", use: { browserName: "webkit" } },
+  ],
   webServer: {
     command: "python3 -m http.server 8767 --bind 127.0.0.1 --directory ..",
     url: "http://127.0.0.1:8767/frontend/demo/",

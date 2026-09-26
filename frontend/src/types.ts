@@ -69,6 +69,7 @@ export interface Job {
   error?: string;
 }
 export interface Hass {
+  language?: string;
   config: { unit_system: { temperature: string } };
   callWS<T>(message: Record<string, unknown>): Promise<T>;
   connection: {

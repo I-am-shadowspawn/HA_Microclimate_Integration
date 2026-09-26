@@ -2,6 +2,8 @@ import { DEFAULT_COLORS, validateColors } from "./colors";
 import { LitElement, html, css, nothing } from "lit";
 import type { Config, Hass } from "./types";
 import { PREFIX } from "./types";
+import { devices as decodeDevices } from "./protocol";
+import { localize, type MessageKey } from "./localize";
 export class MicroclimateEditor extends LitElement {
   static properties = {
     config: { state: true },
@@ -29,23 +31,30 @@ export class MicroclimateEditor extends LitElement {
       min-height: 0;
     }
   `;
+  t(key: MessageKey, params: Record<string, string | number> = {}) { return localize(key, this._hass?.language, params); }
   config?: Config;
   devices: { device_id: string; kind: string; name: string }[] = [];
   error = "";
   colorError = "";
   private _hass?: Hass;
+  private epoch = 0;
   set hass(h: Hass) {
     if (this._hass === h) return;
-    const first = !this._hass;
     this._hass = h;
-    if (first)
-      void h
-        .callWS<typeof this.devices>({ type: PREFIX + "list" })
-        .then((d) => (this.devices = d))
-        .catch(
-          () =>
-            (this.error = "Unable to list authorized Microclimate devices."),
-        );
+    const epoch = ++this.epoch;
+    this.devices = [];
+    void h.callWS<unknown>({ type: PREFIX + "list" }).then((raw) => {
+      if (epoch !== this.epoch) return;
+      const decoded = decodeDevices(raw);
+      if (!decoded.ok) {
+        this.error = this.t("device_list_invalid");
+        return;
+      }
+      this.devices = decoded.value;
+      this.error = "";
+    }).catch(() => {
+      if (epoch === this.epoch) this.error = this.t("device_list_unavailable");
+    });
   }
   setConfig(c: Config) {
     this.config = { ...c };
@@ -95,16 +104,16 @@ export class MicroclimateEditor extends LitElement {
       : "channel";
     return html`<p>
         ${this.error ||
-        "Select a registered Microclimate device. Entity renames do not change this binding."}
+        this.t("editor_intro")}
       </p>
       <label
-        >Device<select
-          aria-label="Device"
+        >${this.t("editor_device")}<select
+          aria-label=${this.t("editor_device")}
           .value=${this.config?.device_id ?? ""}
           @change=${(e: Event) =>
             this.change("device_id", (e.target as HTMLSelectElement).value)}
         >
-          <option value="">Select device</option>
+          <option value="">${this.t("editor_select_device")}</option>
           ${this.devices
             .filter((d) => d.kind === kind)
             .map(
@@ -118,7 +127,7 @@ export class MicroclimateEditor extends LitElement {
             )}
         </select></label
       ><label
-        >Title<input
+        >${this.t("editor_title")}<input
           .value=${this.config?.title ?? ""}
           @input=${(e: Event) =>
             this.change(
@@ -131,13 +140,12 @@ export class MicroclimateEditor extends LitElement {
           .checked=${!!this.config?.read_only}
           @change=${(e: Event) =>
             this.change("read_only", (e.target as HTMLInputElement).checked)}
-        />Always read only</label
+        />${this.t("editor_read_only")}</label
       >${kind === "channel"
         ? html`<details>
-            <summary>Temperature colours</summary>
+            <summary>${this.t("editor_colors")}</summary>
             <p>
-              Inclusive lower bounds in °C, also when HA displays °F. Below the
-              lowest bound uses its colour. Percentage targets use teal.
+              ${this.t("editor_colors_help")}
             </p>
             ${this.colorError
               ? html`<p role="alert">${this.colorError}</p>`
@@ -145,14 +153,14 @@ export class MicroclimateEditor extends LitElement {
             ${this.colors().map(
               (c, i) =>
                 html`<fieldset>
-                  <legend>Colour ${i + 1}</legend>
+                  <legend>${this.t("editor_color_number", { number: i + 1 })}</legend>
                   <label
-                    >Lower temperature (°C)<input
+                    >${this.t("editor_lower")}<input
                       type="number"
                       min="0"
                       max="100"
                       step="any"
-                      aria-label=${`Colour ${i + 1} lower temperature °C`}
+                      aria-label=${this.t("editor_color_lower", { number: i + 1 })}
                       .value=${String(c.temperature)}
                       @change=${(e: Event) =>
                         this.changeColor(
@@ -162,9 +170,9 @@ export class MicroclimateEditor extends LitElement {
                         )}
                   /></label>
                   <label
-                    >Colour<input
+                    >${this.t("editor_color")}<input
                       type="color"
-                      aria-label=${`Colour ${i + 1} value`}
+                      aria-label=${this.t("editor_color_value", { number: i + 1 })}
                       .value=${c.color}
                       @input=${(e: Event) =>
                         this.changeColor(
@@ -183,7 +191,7 @@ export class MicroclimateEditor extends LitElement {
                       );
                     }}
                   >
-                    Remove colour ${i + 1}
+                    ${this.t("editor_remove_color", { number: i + 1 })}
                   </button>
                 </fieldset>`,
             )}
@@ -199,7 +207,7 @@ export class MicroclimateEditor extends LitElement {
                 ]);
               }}
             >
-              Add temperature colour
+              ${this.t("editor_add_color")}
             </button>
             <button
               @click=${() => {
@@ -207,7 +215,7 @@ export class MicroclimateEditor extends LitElement {
                 this.change("temperature_colors", undefined);
               }}
             >
-              Reset temperature colours
+              ${this.t("editor_reset_color")}
             </button>
           </details>`
         : nothing}`;

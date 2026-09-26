@@ -1,3 +1,4 @@
+import { message } from "./localize";
 import { newId } from "./id";
 import { boundedNumber, validSeconds, validPointCount } from "./constraints";
 import { pointError } from "./draft";
@@ -19,12 +20,12 @@ function unitOf(d: Draft): SchedulePreset["unit"] {
   );
   if (field?.unit === "°C") return "celsius";
   if (field?.unit === "%") return "percent";
-  throw new Error("Schedule unit is unavailable.");
+  throw new Error(message("preset_unit_missing"));
 }
 
 export function exportPreset(d: Draft): SchedulePreset {
   if (!["Day Night", "Multi", "Seasonal"].includes(d.mode) || pointError(d))
-    throw new Error("Complete the supported schedule before exporting.");
+    throw new Error(message("preset_incomplete"));
   return {
     format: PRESET_FORMAT,
     mode: d.mode as SchedulePreset["mode"],
@@ -38,19 +39,19 @@ export function exportPreset(d: Draft): SchedulePreset {
 
 export function importPreset(d: Draft, value: unknown): Draft {
   if (!value || typeof value !== "object" || Array.isArray(value))
-    throw new Error("Invalid schedule preset.");
+    throw new Error(message("preset_invalid"));
   const preset = value as Partial<SchedulePreset>;
   if (
     Object.keys(preset).sort().join(",") !== "format,mode,points,unit" ||
     preset.format !== PRESET_FORMAT
   )
-    throw new Error("Unsupported schedule preset format.");
+    throw new Error(message("preset_format"));
   if (preset.mode !== d.mode || preset.unit !== unitOf(d))
-    throw new Error("Preset mode and native units must match this channel.");
+    throw new Error(message("preset_mode"));
   if (!Array.isArray(preset.points))
-    throw new Error("Invalid schedule points.");
+    throw new Error(message("preset_points"));
   if (!validPointCount(d.mode, preset.points.length))
-    throw new Error("Incorrect number of schedule points.");
+    throw new Error(message("preset_count"));
   const points: Point[] = preset.points.map((p) => {
     if (
       !p ||
@@ -58,7 +59,7 @@ export function importPreset(d: Draft, value: unknown): Draft {
       Object.keys(p).sort().join(",") !== "seconds,target_native" ||
       !validSeconds(p.seconds) || !boundedNumber(p.target_native)
     )
-      throw new Error("Invalid schedule point.");
+      throw new Error(message("preset_point"));
     return {
       draft_id: newId(),
       seconds: p.seconds,

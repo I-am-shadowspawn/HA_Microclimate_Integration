@@ -128,7 +128,7 @@ test("keyboard and pointer edits remain local, preserve untouched seconds", asyn
   await page.goto("/frontend/demo/?mode=Day%20Night");
   await page.getByRole("button", { name: "Edit", exact: true }).click();
   const boundary = page.getByRole("button", {
-    name: "Day & Night 07:00:00 boundary",
+    name: "Day & Night Day 07:00:00 boundary",
     exact: true,
   });
   await boundary.focus();
@@ -137,7 +137,7 @@ test("keyboard and pointer edits remain local, preserve untouched seconds", asyn
     page.getByLabel("Day & Night Day start", { exact: true }),
   ).toHaveValue("07:01:00");
   const moved = page.getByRole("button", {
-    name: "Day & Night 07:01:00 boundary",
+    name: "Day & Night Day 07:01:00 boundary",
     exact: true,
   });
   const box = await moved.boundingBox();
@@ -428,7 +428,7 @@ test("read-only points keep their numbered identity when selected", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Point 3", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Multi 07:00:00 boundary", exact: true }),
+    page.getByRole("button", { name: "Point 3 07:00:00 boundary", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(
     page.getByRole("button", { name: "Point 0", exact: true }),
