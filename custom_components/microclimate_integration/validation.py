@@ -1,7 +1,8 @@
 """Safe typed readings for entity properties."""
 import math
+from homeassistant.const import UnitOfTemperature
 from .transformation import convert_temperature
-from .const import CONTROL_TYPE_MAPPING
+from .const import CONTROL_TYPE_MAPPING, DEVICE_METADATA_PINS
 from .const_helpers import enum_value
 
 
@@ -27,6 +28,17 @@ def safe_temperature(value):
         return convert_temperature(value, {})
     except (ValueError, TypeError, OverflowError):
         return None
+
+
+def reported_temperature_unit(data):
+    """The controller's unit belongs to this response, never a previous poll."""
+    raw = data.get(DEVICE_METADATA_PINS['temperature_units_pin']['pin']) if isinstance(data, dict) else None
+    if type(raw) in (int, float) and math.isfinite(raw) and raw == 0:
+        return UnitOfTemperature.CELSIUS
+    if not isinstance(raw, str):
+        return None
+    return {'C': UnitOfTemperature.CELSIUS, 'F': UnitOfTemperature.FAHRENHEIT,
+            '0': UnitOfTemperature.CELSIUS}.get(raw.strip().upper())
 
 
 def safe_scalar(value):

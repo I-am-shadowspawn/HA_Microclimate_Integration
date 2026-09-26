@@ -47,6 +47,24 @@ def test_portable_template_has_no_pin_or_device_identity():
     assert patch["kind"] == "channel" and patch["fields"] == {}
 
 
+def test_fahrenheit_preset_retains_native_values_and_requires_matching_unit():
+    from test_write_runtime import payload
+
+    source = payload()
+    populate(source, 2, "Yellow")
+    source.update(v25="F", v33=77, v35=68)
+    template = export_template("Evo Connect 3", "Yellow", source)
+    assert template["unit"] == "fahrenheit"
+    assert [point["target_native"] for point in template["points"]] == [77, 68]
+    assert import_patch("Evo Connect 3", "Yellow", source, template)["schedule"]["points"] == template["points"]
+    source["v25"] = "C"
+    with pytest.raises(WriteValidationError, match="stale_context"):
+        import_patch("Evo Connect 3", "Yellow", source, template)
+    del source["v25"]
+    with pytest.raises(WriteValidationError, match="temperature_unit_unknown"):
+        export_template("Evo Connect 3", "Yellow", source)
+
+
 @pytest.mark.parametrize("mode,code,count", [("Day Night", 1, 2), ("Seasonal", 3, 8)])
 def test_export_preserves_mode_specific_point_count_without_root_dates(mode, code, count):
     from test_write_runtime import payload

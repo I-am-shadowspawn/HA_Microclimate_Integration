@@ -81,12 +81,12 @@ export function scheduleRow(card: MicroclimateCard, points: Point[], label: stri
               aria-label=${card.t("selected_target_label", { label })}
               type="range"
               min=${displayValue(
-                0,
+                card.fieldFor(1)?.minimum ?? 0,
                 card.fieldFor(1)?.unit ?? null,
                 card.fahrenheit,
               )}
               max=${displayValue(
-                100,
+                card.fieldFor(1)?.maximum ?? 100,
                 card.fieldFor(1)?.unit ?? null,
                 card.fahrenheit,
               )}
@@ -148,9 +148,9 @@ export function scheduleRow(card: MicroclimateCard, points: Point[], label: stri
                       /><input
                         aria-label=${card.t("point_target", { label, point: prefix, unit: card.unit(f) })}
                         type="number"
-                        min=${displayValue(0, f?.unit ?? null, card.fahrenheit)}
+                        min=${displayValue(f?.minimum ?? 0, f?.unit ?? null, card.fahrenheit)}
                         max=${displayValue(
-                          100,
+                          f?.maximum ?? 100,
                           f?.unit ?? null,
                           card.fahrenheit,
                         )}

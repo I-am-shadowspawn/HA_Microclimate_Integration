@@ -8,7 +8,7 @@ from homeassistant.components.climate.const import ClimateEntityFeature
 from homeassistant.const import UnitOfTemperature
 
 from .readings import read_pin
-from .validation import percentage, nonnegative_number, control_mode, safe_temperature
+from .validation import percentage, nonnegative_number, control_mode, safe_temperature, reported_temperature_unit
 from homeassistant.exceptions import HomeAssistantError
 from .const import CHANNEL_CAPABILITIES, CHANNELS, HVAC_MODE_MAPPING, MODEL_CHANNEL_OPTIONS
 from .helpers import MicroclimateBaseEntity
@@ -42,7 +42,7 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
     """Read-only climate observation of a channel with separate configuration controls."""
     _attr_hvac_modes = []
     _attr_supported_features = ClimateEntityFeature(0)
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS  # HA requires a valid unit during entity registration.
 
 
     def __init__(self, coordinator, channel, pins):
@@ -56,11 +56,19 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
         channel_name = self._pins.get("channel_name")
         return f"{self._entry.data['evo_device']}: {self.data.get(channel_name, 'Unknown')}"
 
+    @property
+    def temperature_unit(self):
+        return reported_temperature_unit(self.data) or UnitOfTemperature.CELSIUS
+
+    @property
+    def available(self):
+        return super().available and reported_temperature_unit(self.data) is not None
+
 
     @property
     def target_temperature(self):
         """Return a temperature only for a known thermal control mode."""
-        if read_pin(self.data, self._pins.get("control_pin"), control_mode) not in ("heating", "cooling"):
+        if reported_temperature_unit(self.data) is None or read_pin(self.data, self._pins.get("control_pin"), control_mode) not in ("heating", "cooling"):
             return None
         return read_pin(self.data, self._pins.get("setpoint_pin"), safe_temperature)
 
@@ -85,9 +93,10 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
     def extra_state_attributes(self):
         """Expose observations without advertising a writable target."""
         attributes = {
+            "reported_temperature_unit": reported_temperature_unit(self.data),
             "observed_target_temperature": self.target_temperature,
-            "lower_alarm": read_pin(self.data, self._pins.get("lower_alarm"), safe_temperature),
-            "upper_alarm": read_pin(self.data, self._pins.get("upper_alarm"), safe_temperature),
+            "lower_alarm": read_pin(self.data, self._pins.get("lower_alarm"), safe_temperature) if reported_temperature_unit(self.data) else None,
+            "upper_alarm": read_pin(self.data, self._pins.get("upper_alarm"), safe_temperature) if reported_temperature_unit(self.data) else None,
             "mode": read_pin(self.data, self._pins.get("control_pin"), control_mode),
             "current_power": read_pin(self.data, self._pins.get("current_power"), percentage),
         }
@@ -98,7 +107,7 @@ class MicroclimateClimate(MicroclimateBaseEntity, ClimateEntity):
 
     @property
     def current_temperature(self):
-        return read_pin(self.data, self._pins.get("temp_pin"), safe_temperature)
+        return read_pin(self.data, self._pins.get("temp_pin"), safe_temperature) if reported_temperature_unit(self.data) else None
 
     async def async_set_temperature(self, **kwargs):
         raise HomeAssistantError(_READ_ONLY_MESSAGE)

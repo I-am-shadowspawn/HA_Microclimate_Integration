@@ -1,18 +1,20 @@
-"""Upstream F-labelled Celsius observations share one live parser."""
+"""Temperature parsing preserves the reported numeric value and response unit."""
 
 import pytest
 
 from custom_components.microclimate_integration.transformation import convert_temperature
 from custom_components.microclimate_integration.validation import safe_temperature
+from custom_components.microclimate_integration.validation import reported_temperature_unit
 
 
 @pytest.mark.parametrize("raw,flag,expected", [
-    ("25°C", "C", 25.0), ("32°F", "F", 32.0),
-    ("0.1°C", "F", 0.1), ("20", None, 20.0),
+    ("25°C", "C", 25.0), ("77°F", "F", 77.0),
+    ("32°F", "F", 32.0), ("20", None, 20.0),
 ])
-def test_upstream_label_never_causes_an_extra_conversion(raw, flag, expected):
+def test_reported_value_is_not_converted_twice(raw, flag, expected):
     assert convert_temperature(raw, {"v25": flag}) == expected
     assert safe_temperature(raw) == expected
+    assert reported_temperature_unit({"v25": flag}) == (f"°{flag}" if flag else None)
 
 
 @pytest.mark.parametrize("raw", ["invalid", "nan°F", "inf", "1e999F", None, True, {}])

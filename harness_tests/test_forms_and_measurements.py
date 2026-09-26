@@ -51,8 +51,10 @@ async def test_all_flow_labels_errors_and_aborts_resolve(hass):
 
 CONTRACT=json.loads((Path(__file__).parents[1]/'fixtures/temperature_contract.json').read_text())
 @pytest.mark.parametrize('example',CONTRACT['examples'])
-def test_upstream_celsius_label_contract(example):
-    assert convert_temperature(example['raw'],{'v25':example['v25']})==example['expected_celsius']
+def test_reported_temperature_unit_contract(example):
+    from custom_components.microclimate_integration.validation import reported_temperature_unit
+    assert convert_temperature(example['raw'],{'v25':example['v25']})==example['expected_value']
+    assert reported_temperature_unit({'v25':example['v25']})==example['expected_unit']
 
 
 @pytest.mark.parametrize('value',['2F5','C25','25CF','1C2','nan°F','inf','1e999F',True,{},None])
@@ -66,7 +68,7 @@ async def test_typed_sensor_units_parentage_and_live_values(hass,units,expected)
     hass.config.units=units
     entry=MockConfigEntry(domain=DOMAIN,data={'evo_device':'verified','token':'fake','model':'Evo Connect'})
     entry.add_to_hass(hass)
-    payload={'v0':'25°F','v8':'27°F','v49':'20°F','v50':'30°F','v52':'1','v4':'50'}
+    payload={'v25':'C','v0':'25°C','v8':'27°C','v49':'20°C','v50':'30°C','v52':'1','v4':'50'}
     with patch('custom_components.microclimate_integration.api_client.fetch_data',new=AsyncMock(return_value=payload)) as api:
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()

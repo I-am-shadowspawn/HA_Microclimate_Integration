@@ -4,13 +4,13 @@
     "authority": "Maintainer confirmation in this review",
     "scope": "Defined integration mappings verified against controller display; firmware version unspecified",
     "capture_kind": "Reconstructed sanitized regression examples, not downloaded hardware captures",
-    "rule": "Temperature numbers are Celsius even when the upstream suffix or v25 flag says F. HA display-unit conversion still applies normally."
+    "rule": "v25 reports the unit of temperature values in that response. Numeric values are not converted at the API boundary; HA converts typed entities for display."
   },
   "examples": [
-    {"raw": "25°F", "v25": "F", "expected_celsius": 25.0},
-    {"raw": "25°C", "v25": "C", "expected_celsius": 25.0},
-    {"raw": "25", "v25": "F", "expected_celsius": 25.0},
-    {"raw": "-5°F", "v25": "F", "expected_celsius": -5.0},
-    {"raw": "32°F", "v25": "F", "expected_celsius": 32.0}
+    {"raw": "25°C", "v25": "C", "expected_value": 25.0, "expected_unit": "°C"},
+    {"raw": "77°F", "v25": "F", "expected_value": 77.0, "expected_unit": "°F"},
+    {"raw": "68", "v25": "F", "expected_value": 68.0, "expected_unit": "°F"},
+    {"raw": "-5°C", "v25": "C", "expected_value": -5.0, "expected_unit": "°C"},
+    {"raw": "32°F", "v25": "F", "expected_value": 32.0, "expected_unit": "°F"}
   ]
 }

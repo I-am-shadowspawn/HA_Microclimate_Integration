@@ -21,7 +21,7 @@ from custom_components.microclimate_integration.sensor import MicroclimateMeasur
 from custom_components.microclimate_integration.sensor_contract import VERIFIED_MEASUREMENTS
 from custom_components.microclimate_integration.schedule import _schedule_observation
 
-PAYLOAD={'v0':'25°F','v8':27,'v52':1,'v4':0,'v32':'3600\x003600\x00Europe/London\x000','v33':20}
+PAYLOAD={'v0':'25°C','v8':27,'v52':1,'v4':0,'v25':'C','v32':'3600\x003600\x00Europe/London\x000','v33':20}
 
 
 def response(payload=PAYLOAD,status=200):

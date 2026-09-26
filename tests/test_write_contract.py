@@ -104,9 +104,29 @@ def test_every_enum_code_and_suffix_readback():
                 assert matches(d,code,{d.pin:float(code)})
             if d.options:
                 with pytest.raises(WriteValidationError):serialize(d,'unknown',{})
-    assert matches(field(),'25.25',{'v33':'25.25°F','v52':1})
-    assert not matches(field(),'25.25',{'v33':'25.25°F','v52':0})
-    assert not matches(field(),'25.25',{'v33':25.3,'v52':1})
+    assert matches(field(),'77.45',{'v25':'F','v33':'77.45°F','v52':1})
+    assert not matches(field(),'77.45',{'v25':'F','v33':'77.45°F','v52':0})
+    assert not matches(field(),'77.45',{'v25':'F','v33':77.5,'v52':1})
+
+
+def test_thermal_write_uses_current_reported_unit_without_conversion():
+    alarm=field('Yellow_lower_alarm')
+    setpoint=field('Yellow_period_1_setpoint')
+    fahrenheit={'v25':'F','v52':1}
+    assert serialize(alarm,77,fahrenheit)=='77'
+    assert serialize(setpoint,77,fahrenheit)=='77'
+    assert serialize(alarm,212,fahrenheit)=='212'
+    assert serialize(setpoint,0,fahrenheit)=='0'  # Cleared Multi tail sentinel.
+    for value in (213,-1):
+        with pytest.raises(WriteValidationError,match='invalid_number'):
+            serialize(alarm,value,fahrenheit)
+    with pytest.raises(WriteValidationError,match='invalid_number'):
+        serialize(setpoint,31,fahrenheit)
+    with pytest.raises(WriteValidationError,match='temperature_unit_unknown'):
+        serialize(alarm,77,{'v25':None,'v52':1})
+    assert serialize(alarm,25,{'v25':'C','v52':1})=='25'
+    with pytest.raises(WriteValidationError,match='invalid_number'):
+        serialize(alarm,101,{'v25':'C','v52':1})
 
 
 def test_sanitized_evidence_replay():

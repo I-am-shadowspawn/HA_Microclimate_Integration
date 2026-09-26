@@ -148,13 +148,16 @@ async def test_supplied_day_night_capture_keeps_stored_slots_without_activation(
         view=snapshot(hass,c,'Blue',device,hass_admin_user)
         fields={f['key']:f for f in view['fields']}
         assert fields['Blue_period_1_time']['value']==26700
-        assert fields['Blue_period_1_setpoint']['value']==31.5
+        assert fields['Blue_period_1_setpoint']['value'] is None
+        assert fields['Blue_period_1_setpoint']['unit'] is None  # Capture omits v25; do not guess.
         assert fields['Blue_period_2_time']['value']==56700
-        assert fields['Blue_period_2_setpoint']['value']==25
+        assert fields['Blue_period_2_setpoint']['value'] is None
         assert all(not fields[f'Blue_period_{i}_time']['writable'] for i in range(3,9))
         eid=er.async_get(hass).async_get_entity_id('sensor',DOMAIN,f'{entry.entry_id}_Blue_schedule')
         state=hass.states.get(eid)
         assert len(state.attributes['periods'])==8
+        assert state.attributes['periods']['period_1']['setpoint_raw']==31.5
+        assert state.attributes['periods']['period_2']['setpoint_raw']==25
         assert state.attributes['interpretation']=='reported_configuration_not_active_schedule'
         assert state.attributes['activation']=='unverified'
         await hass.config_entries.async_unload(entry.entry_id)

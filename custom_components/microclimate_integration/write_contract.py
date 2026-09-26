@@ -11,6 +11,7 @@ from .const import (CHANNEL_CAPABILITIES, CHANNEL_PINS, CHANNELS, CONTROL_TYPE_M
                     timing_type_mapping)
 from .const_helpers import enum_value
 from .constraints import MAX_TARGET, MAX_RAMP_MINUTES, SECONDS_PER_DAY
+from .validation import reported_temperature_unit
 
 
 class WriteValidationError(ValueError):
@@ -105,22 +106,38 @@ def context(field, data):
         if field.kind == 'time':
             raw = data.get(field.pin)
             suffix = tuple(raw.split('\0')[2:]) if isinstance(raw,str) and '\0' in raw else ()
-        return (timing_mode(field,data), control_mode(field,data), suffix)
+        return (timing_mode(field,data), control_mode(field,data), suffix,
+                reported_temperature_unit(data) if field.kind == 'setpoint' and control_mode(field, data) in ('heating', 'cooling') else None)
+    if field.kind == 'number':
+        return reported_temperature_unit(data)
     if field.kind == 'enum':
         return enum_value(data.get(field.pin), dict(field.options))
     return None
 
 
-def numeric(value, *, maximum=MAX_TARGET):
+def numeric(value, *, minimum=0, maximum=MAX_TARGET):
     if type(value) not in (str, int, float, Decimal):
         raise WriteValidationError('invalid_number')
     try:
         number = Decimal(str(value))
     except InvalidOperation:
         raise WriteValidationError('invalid_number') from None
-    if not number.is_finite() or not 0 <= number <= maximum:
+    if not number.is_finite() or not minimum <= number <= maximum:
         raise WriteValidationError('invalid_number')
     return number
+
+
+def numeric_bounds(field, data):
+    """Keep the 0–100 °C physical edit range in the controller's wire unit."""
+    thermal = field.kind == 'number' or field.kind == 'setpoint' and control_mode(field, data) in ('heating', 'cooling')
+    if not thermal:
+        return 0, MAX_TARGET
+    unit = reported_temperature_unit(data)
+    if unit == '°C':
+        return 0, MAX_TARGET
+    if unit == '°F':
+        return (0 if field.kind == 'setpoint' else 32), 212
+    raise WriteValidationError('temperature_unit_unknown')
 
 
 def date_string(value):
@@ -140,12 +157,18 @@ def time_seconds(value):
     return value.hour*3600+value.minute*60+value.second
 
 
-def validate_input(field,value):
+def validate_input(field,value,data=None):
     if field.kind == 'enum':
         if not isinstance(value,str) or value not in dict(field.options).values():
             raise WriteValidationError('invalid_option')
     elif field.kind in ('number','setpoint'):
-        numeric(value)
+        minimum, maximum = numeric_bounds(field, data) if data is not None else (0, MAX_TARGET)
+        parsed = numeric(value, minimum=minimum, maximum=maximum)
+        if (data is not None and field.kind == 'setpoint' and minimum == 0
+                and reported_temperature_unit(data) == '°F'
+                and control_mode(field, data) in ('heating', 'cooling')
+                and parsed != 0 and parsed < 32):
+            raise WriteValidationError('invalid_number')
     elif field.kind == 'ramp':
         ramp_minutes(value)
     elif field.kind == 'date':
@@ -214,11 +237,12 @@ def encode_time(field,value,data):
 
 
 def serialize(field,value,data):
-    validate_input(field,value)
+    validate_input(field,value,data)
     if field.kind=='enum':
         return next(code for code,label in field.options if label==value)
     if field.kind in ('number','setpoint'):
-        number=numeric(value)
+        minimum, maximum = numeric_bounds(field, data)
+        number=numeric(value, minimum=minimum, maximum=maximum)
         text=format(number,'f') if number.adjusted() >= -20 else str(number)
         return text.rstrip('0').rstrip('.') if '.' in text and 'E' not in text else text
     if field.kind=='ramp':
@@ -242,7 +266,7 @@ def matches(field,expected,data):
 
 
 def observed_numeric(field,data):
-    """Unrounded native value; F suffixes are the known upstream Celsius nuance."""
+    """Unrounded value in this response's controller unit, without conversion."""
     actual=data.get(field.pin)
     if field.kind=='ramp':
         return ramp_minutes(actual)
@@ -250,7 +274,8 @@ def observed_numeric(field,data):
         thermal = field.kind=='number' or control_mode(field,data) in ('heating','cooling')
         if thermal:
             actual=re.sub(r'\s*°?[CF]\s*$','',actual,flags=re.I)
-    return numeric(actual)
+    minimum, maximum = numeric_bounds(field, data) if field.kind in ('number', 'setpoint') else (0, MAX_TARGET)
+    return numeric(actual, minimum=minimum, maximum=maximum)
 
 
 SEASON_PINS = tuple(DEVICE_METADATA_PINS[f'season_{index}_start_pin']['pin'] for index in range(1,5))

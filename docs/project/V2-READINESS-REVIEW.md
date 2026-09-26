@@ -57,4 +57,4 @@ HA's core Integration Quality Scale is a useful checklist, not a HACS certificat
 - v24 units, v25 interpretation, Constant target writes and Blue Periodic writes remain unverified or unsupported. They can stay clearly unavailable in V2; completing them is not a prerequisite for honest publication.
 - Observed setpoint stays read-only. Calculated current period, reusable presets and public batch automation actions remain optional product extensions.
 
-The new TODO.md is the sole active backlog; the previous content is archived in docs/TODO-PRE-V2-HISTORY.md. Old release reports/checklists remain historical evidence. No existing 1.3.0 release archive was changed.
+The new TODO.md is the sole active backlog; the previous content is archived in docs/archive/TODO-PRE-V2-HISTORY.md. Old release reports/checklists remain historical evidence. No existing 1.3.0 release archive was changed.

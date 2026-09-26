@@ -102,7 +102,8 @@ export class MicroclimateCard extends LitElement {
   get conflict() { return this.session.conflict; }
   get canEdit() { return this.session.canEdit; }
   unit(field?: Field) {
-    return field?.unit === "°C" && this.fahrenheit ? "°F" : (field?.unit ?? "");
+    return field?.unit === "°C" || field?.unit === "°F"
+      ? this.fahrenheit ? "°F" : "°C" : (field?.unit ?? "");
   }
   format(n: number | null, field?: Field) {
     return n === null
@@ -148,7 +149,8 @@ export class MicroclimateCard extends LitElement {
       seconds = 1;
       while (used.has(seconds)) seconds++;
     }
-    const point = { draft_id: newId(), seconds, target_native: 20 };
+    const point = { draft_id: newId(), seconds,
+      target_native: this.fieldFor(1)?.unit === "°F" ? 68 : 20 };
     this.draft = {
       ...this.draft,
       points: [...this.draft.points, point].sort(

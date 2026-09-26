@@ -1,5 +1,5 @@
 from .const import CHANNEL_CAPABILITIES, timing_type_mapping, DEFAULT_ENABLE_DIAGNOSTICS
-from homeassistant.const import UnitOfTemperature, PERCENTAGE
+from homeassistant.const import PERCENTAGE
 import re
 from .readings import cached, read_pin, read_enum
 from homeassistant.helpers.entity import EntityCategory
@@ -7,7 +7,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.sensor import SensorEntity
 from .identity import channel_identity, controller_device_info, channel_device_info
 from .sensor_contract import VERIFIED_MEASUREMENTS
-from .validation import finite_number, safe_temperature, control_mode, safe_scalar, nonnegative_number, percentage
+from .validation import finite_number, safe_temperature, control_mode, safe_scalar, nonnegative_number, percentage, reported_temperature_unit
 from custom_components.microclimate_integration.const import MODEL_CHANNEL_OPTIONS, CHANNELS, DEVICE_METADATA_PINS, CONTROL_TYPE_MAPPING, OUTPUT_TYPE_MAPPING
 from .const_helpers import enum_value
 from .schedule import schedule_observation, reported_value, observe_time, observe_date, observe_field
@@ -92,8 +92,16 @@ class MicroclimateMeasurement(CoordinatorEntity, SensorEntity):
         self._attr_extra_state_attributes = {"source_pin": definition.pin, "evidence": definition.evidence}
 
     @property
+    def native_unit_of_measurement(self):
+        if self.definition.kind in ("temperature", "setpoint"):
+            return reported_temperature_unit(self.coordinator.data)
+        return self.definition.unit
+
+    @property
     def native_value(self):
         data = self.coordinator.data
+        if self.definition.kind in ("temperature", "setpoint") and reported_temperature_unit(data) is None:
+            return None
         if self.definition.kind == "setpoint":
             if read_pin(data, CHANNELS[self.definition.channel].get("control_pin"), control_mode) not in ("heating", "cooling"):
                 return None

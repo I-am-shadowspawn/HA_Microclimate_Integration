@@ -2,6 +2,7 @@
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .identity import channel_device_info, controller_device_info
 from .write_contract import write_definitions, applicable, control_mode
+from .validation import reported_temperature_unit
 
 
 def setup_controls(hass, entry, async_add_entities, platform, entity_class):
@@ -28,7 +29,8 @@ class WriteEntity(CoordinatorEntity):
 
     @property
     def available(self):
-        return super().available and self.coordinator.writes_enabled and applicable(self.field, self.data)
+        return (super().available and self.coordinator.writes_enabled and applicable(self.field, self.data)
+                and (not self.thermal or reported_temperature_unit(self.data) is not None))
 
     @property
     def name(self):
@@ -36,7 +38,8 @@ class WriteEntity(CoordinatorEntity):
 
     @property
     def thermal(self):
-        return self.field.kind == 'number' or control_mode(self.field, self.data) in ('heating', 'cooling')
+        return (self.field.kind == 'number' or
+                (self.field.kind == 'setpoint' and control_mode(self.field, self.data) in ('heating', 'cooling')))
 
     async def _write(self, value):
         await self.coordinator.async_write(self.field.key, value)

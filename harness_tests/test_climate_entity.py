@@ -17,7 +17,7 @@ async def test_climate_refresh_failure_recovery_and_unload(hass):
         data={"evo_device": "review_controller", "model": "Evo Connect", "token": "fake"},
     )
     entry.add_to_hass(hass)
-    payload = {"v0": 25, "v8": 27, "v16": "Yellow", "v52": 1, "v4": 0}
+    payload = {"v0": 25, "v8": 27, "v16": "Yellow", "v52": 1, "v4": 0, "v25": "C"}
     with patch(
         "custom_components.microclimate_integration.api_client.fetch_data",
         new=AsyncMock(return_value=payload),

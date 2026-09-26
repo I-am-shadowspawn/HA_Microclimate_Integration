@@ -26,8 +26,8 @@ class MeasurementDefinition:
             raise ValueError("Documented pin/unit evidence is required")
         if self.kind not in ("temperature", "setpoint", "number", "percentage", "alarm", "duration"):
             raise ValueError("Unknown measurement kind")
-        if self.kind in ("temperature", "setpoint") and (self.unit != UnitOfTemperature.CELSIUS or self.device_class != SensorDeviceClass.TEMPERATURE):
-            raise ValueError("Microclimate native temperatures are Celsius")
+        if self.kind in ("temperature", "setpoint") and (self.unit is not None or self.device_class != SensorDeviceClass.TEMPERATURE):
+            raise ValueError("Temperature units come from the current controller response")
         if self.kind == "alarm" and (not self.alarm_codes or self.unit is not None or self.device_class != SensorDeviceClass.ENUM):
             raise ValueError("Alarm meanings require explicit code definitions and no units")
 
@@ -54,7 +54,7 @@ for model, channels in MODEL_CHANNEL_OPTIONS.items():
                 if pin_key in pins:
                     definitions.append(MeasurementDefinition(
                         key=key, name=name, channel=channel, pin=pins[pin_key],
-                        kind=kind, evidence=EVIDENCE, unit=UnitOfTemperature.CELSIUS,
+                        kind=kind, evidence=EVIDENCE, unit=None,
                         device_class=SensorDeviceClass.TEMPERATURE,
                         state_class=SensorStateClass.MEASUREMENT if key=="temperature" else None,
                     ))

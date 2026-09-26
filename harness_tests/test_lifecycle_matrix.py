@@ -39,7 +39,7 @@ async def test_models_refresh_reload_and_unload(hass, model_entry, expected, syn
         registry = er.async_get(hass)
         original_ids = {e.entity_id for e in er.async_entries_for_config_entry(registry,model_entry.entry_id)}
         coordinator = hass.data[DOMAIN][model_entry.entry_id]
-        api.return_value = {**synthetic_payload,'v0':'26°F'}
+        api.return_value = {**synthetic_payload,'v0':'26°C'}
         await coordinator.async_refresh()
         await hass.async_block_till_done()
         assert api.await_count == 2

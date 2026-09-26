@@ -18,6 +18,7 @@ describe("temperature colours", () => {
     expect(colorFor(100, stops)).toBe("#ff0000");
     expect(colorFor(null)).toBe("#737373");
     expect(targetColors(100, "%", stops)).toContain("#327b80");
+    expect(targetColors(77, "°F", stops)).toEqual(targetColors(25, "°C", stops));
     expect(textColor("#ffffff")).toBe("#000000");
     expect(textColor("#000000")).toBe("#ffffff");
   });

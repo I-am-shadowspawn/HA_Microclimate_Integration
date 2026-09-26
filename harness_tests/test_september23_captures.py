@@ -105,7 +105,7 @@ def test_later_evo_ii_preserves_all_eight_distinct_yellow_slots():
         data = normalize_response(sample["payload"])
         periods = list(schedule_observation(data, "Yellow")["periods"].values())
         assert [p["start"]["time"] for p in periods] == ["02:00:00", "05:00:00", "08:00:00", "11:00:00", "13:00:00", "15:00:00", "20:00:00", "23:00:00"]
-        assert [p["setpoint_celsius"] for p in periods] == [24.5, 25, 24, 26, 23.5, 27, 27.5, 28]
+        assert [p["setpoint_temperature"] for p in periods] == [24.5, 25, 24, 26, 23.5, 27, 27.5, 28]
         assert schedule_observation(data, "Yellow")["ramp_time"]["minutes"] == 9
         blue = schedule_observation(data, "Blue")
         assert blue["periodic_interval"]["raw"] == 60

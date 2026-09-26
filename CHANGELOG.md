@@ -1,3 +1,8 @@
+# Unreleased — controller temperature units
+
+- Use the controller-reported `C` or `F` unit for temperature entities, climate attributes, schedule observations, card controls and presets. Keep API numbers in their reported unit and let Home Assistant handle display conversion.
+- Refresh unit metadata with each API response; unknown units leave thermal readings unknown, and a unit change invalidates an open card draft. The schedule attribute `setpoint_celsius` becomes `setpoint_temperature` with `setpoint_unit`.
+
 # 1.4.2 — runtime lifecycle and actionable failures
 
 - Separate bounded save-job ownership from WebSocket routing; expose explicit typed coordinator runtime and batch I/O methods without adding a poller or changing write order.
@@ -85,7 +90,7 @@
 - Serialize one-shot updates with fresh baseline/context checks, bounded readback/deadline and safe cancellation/reauthentication. Poll publication shares the same lock.
 - Enforce numeric/date/time constraints; preserve NUL encoding and opaque suffixes; no inferred Constant targets, Blue output modes or arbitrary pin service.
 - Bound response bodies, refuse redirects and redact encoded tokens. No live controller write or deployment was performed.
-- See docs/WRITE-CONTROLS.md for usage and remaining model/firmware physical validation.
+- See docs/user/WRITE-CONTROLS.md for usage and remaining model/firmware physical validation.
 
 ## 1.0.9 — individual schedule field sensors
 

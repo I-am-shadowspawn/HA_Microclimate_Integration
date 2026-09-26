@@ -230,7 +230,7 @@ Depending on the channel, these can include:
 
 Unavailable or invalid controller readings are represented as unknown or unavailable rather than being guessed.
 
-Temperature values supplied by the supported controller API are treated as Celsius internally. Home Assistant can convert these for display according to the Home Assistant unit configuration.
+Temperature values use the controller-reported Celsius or Fahrenheit unit. The integration keeps the reported numeric values in that unit, and Home Assistant can convert typed entities for display. If a response has no recognized temperature unit, thermal readings remain unknown until a later refresh reports one.
 
 ---
 

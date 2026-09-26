@@ -24,6 +24,6 @@ No field is verified by this blank worksheet. Maintain separate evidence per mod
 |---|---|---|---|---|---|---|
 | | | | | | | |
 
-Use passive comparisons first. Do not infer that a percentage is watts, that an absent alarm means healthy, or that an F suffix proves Fahrenheit: the maintainer has confirmed Celsius numbers can carry an F label. Record the relevant endpoint/firmware scope as evidence becomes available. Remove API tokens, query URLs containing tokens, account information and unrelated response fields before sharing fixtures.
+Use passive comparisons first. Do not infer that a percentage is watts or that an absent alarm means healthy. For temperatures, record the controller's v25 unit (`C` or `F`) from the same response; current API responses return numbers in that unit. Older captures showed `0` for Celsius, and other encodings remain unverified. Record the relevant endpoint/firmware scope as evidence becomes available. Remove API tokens, query URLs containing tokens, account information and unrelated response fields before sharing fixtures.
 
 Promotion criterion: repeatable agreement with a known physical/display quantity, documented units and missing-value behavior for that model/firmware, followed by fixture-backed tests. Synthetic test data alone cannot satisfy this criterion.

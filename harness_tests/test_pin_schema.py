@@ -48,6 +48,8 @@ def test_metadata_rejects_unsafe_states(raw):
 
 
 async def test_red_and_root_metadata_real_setup_refresh_reload(hass):
+    from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
+    hass.config.units=US_CUSTOMARY_SYSTEM
     entry=MockConfigEntry(domain=const.DOMAIN,data={'evo_device':'controller','token':'fake','model':'Evo Connect 3'})
     entry.add_to_hass(hass)
     metadata={'v20':'01/03','v21':'01/06','v22':'01/09','v23':'01/12','v24':'12.5',

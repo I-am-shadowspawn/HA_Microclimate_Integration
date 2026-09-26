@@ -43,7 +43,8 @@ def test_captured_schedule_periods(filename,channel,start,temperature):
     assert period['start']['reported_timezone']=='Europe/London'
     assert period['start']['timezone_recognized'] is True
     assert period['start']['fields']==payload[period['start_pin']].split('\x00')
-    assert period['setpoint_celsius']==temperature
+    assert period['setpoint_temperature']==temperature
+    assert period['setpoint_unit']=='°C'
     assert result['timing_type']=='Day Night'
     assert len(result['periods'])==8
 
@@ -53,7 +54,7 @@ def test_fixed_output_percentage_and_zero_retained():
     assert result['control_mode']=='fixed'
     assert result['periods']['period_1']['setpoint_raw']==0
     assert result['periods']['period_1']['setpoint_percentage']==0
-    assert 'setpoint_celsius' not in result['periods']['period_1']
+    assert 'setpoint_temperature' not in result['periods']['period_1']
     assert result['periods']['period_8']['start']['time']=='00:00:00'
     assert result['reported_period_count']==8  # Counts reported slots, not active slots.
 
@@ -164,7 +165,7 @@ def test_all_retained_modules_import_and_no_dormant_platforms():
 def test_fixed_schedule_percentage_boundaries(value,expected):
     period=schedule_observation({'v112':0,'v93':value},'Blue')['periods']['period_1']
     assert period.get('setpoint_percentage')==expected
-    assert 'setpoint_celsius' not in period
+    assert 'setpoint_temperature' not in period
 
 
 @pytest.mark.parametrize('value,expected',[(120,120),('60',60),(0,0),(-1,None),('nan',None),(None,None),(True,None)])

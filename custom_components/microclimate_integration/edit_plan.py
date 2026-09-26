@@ -99,7 +99,7 @@ def build_plan(model, channel, data, patch):
     for f in fields:
         require(f.channel == channel)
         require(applicable(f, data), 'unsupported_capability')
-        validate_input(f, input_value(f, desired[f.key]))
+        validate_input(f, input_value(f, desired[f.key]), data)
         if kind == 'mode':
             require(len(fields) == 1 and f.kind == 'enum')
         elif kind == 'channel':

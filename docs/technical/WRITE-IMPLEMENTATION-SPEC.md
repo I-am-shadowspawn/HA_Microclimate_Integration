@@ -63,9 +63,9 @@ Derive pin addresses from the canonical schema; platform modules must not mainta
 | Control Mode | v52 | v82 | v112 | Select: 0 fixed, 1 heating, 2 cooling; thermal options only on probe-capable profiles. Evo I Blue is fixed-only: do not offer unsupported thermal choices. |
 | Output Type | v54 | v84 | None | Select: 0 pulse, 1 dimming. Blue is on/off; v114 must not become writable pulse/dimming. |
 | Timing Type | v53 | v83 | v113 | Yellow/Red: 0 Constant, 1 Day Night, 2 Multi, 3 Seasonal. Blue: 0 Constant, 1 Day Night, 2 Multi, 3 Periodic, 4 Seasonal. |
-| Schedule setpoints | v33/35/37/39/41/43/45/47 | v63/65/67/69/71/73/75/77 | v93/95/97/99/101/103/105/107 | Number, 0–100. Native °C in heating/cooling; % in fixed-output mode. |
+| Schedule setpoints | v33/35/37/39/41/43/45/47 | v63/65/67/69/71/73/75/77 | v93/95/97/99/101/103/105/107 | Number, 0–100 °C or 32–212 °F in heating/cooling according to v25; % in fixed-output mode. Zero remains the cleared-tail sentinel. |
 | Schedule starts | v32/34/36/38/40/42/44/46 | v62/64/66/68/70/72/74/76 | v92/94/96/98/100/102/104/106 | Time, second precision, encoded using the rules below. |
-| Lower/upper alarm | v49/v50 | v79/v80 | v109/v110 for probe-capable profiles | Number, 0–100°C. Do not enforce lower < upper: 100/45 is a maintainer-confirmed displayed configuration. |
+| Lower/upper alarm | v49/v50 | v79/v80 | v109/v110 for probe-capable profiles | Number, 0–100 °C or 32–212 °F according to v25. Do not enforce lower < upper: 100/45 is a maintainer-confirmed displayed configuration. |
 | Season starts | Root v20/v21/v22/v23 | Same root set | Same root set | Four root-owned DD/MM Text controls; not duplicated on channels. |
 
 Day Night permits schedule slots 1–2. Multi and Seasonal permit all eight. Constant and Periodic do not expose these clock/setpoint edits. Likely-unused midnight/zero Multi pairs remain editable so users can populate them. No enable/disable toggle is invented.
@@ -89,7 +89,7 @@ This decision supports the supplied plain→encoded successful example without i
 ### Other values
 
 - Enums: exact integral wire codes from the channel table; reject booleans/unknown options.
-- Numeric settings: finite 0–100 inclusive, minimal decimal wire string, no suffix added. Compare raw readback numerically (using Decimal or equivalent), stripping only the established Microclimate C/F label while retaining the upstream Celsius number. Never compare a display-rounded temperature to claim exact application.
+- Numeric settings: finite values within the current native unit's edit bounds, minimal decimal wire string, no suffix added. Compare raw readback numerically (using Decimal or equivalent), stripping a C/F label without converting the already-native number. Never compare a display-rounded temperature to claim exact application.
 - Dates: zero-padded exact DD/MM, validated against a non-leap reference calendar. Send and compare the exact string. Existing observed `00/00` or `29/02` data may remain visible/read-only; the new write validation must not erase or rewrite it automatically.
 - No automatic writes to neighbouring fields, no implicit mode change, no date reordering, no client clamping and no rollback/batch-atomicity claim.
 
