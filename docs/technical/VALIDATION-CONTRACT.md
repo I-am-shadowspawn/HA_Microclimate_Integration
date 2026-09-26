@@ -2,7 +2,7 @@
 
 This is an unofficial, independent integration, not affiliated with, endorsed by or supported by Microclimate. Product names identify compatibility only.
 
-The executable examples are [validation_contract.json](../fixtures/validation_contract.json). Both Python and TypeScript tests load that same reviewed, synthetic file. These examples distinguish reported data from values a user may write; applying edit limits to all observations would lose useful controller information.
+The executable examples are [validation_contract.json](../../fixtures/validation_contract.json). Both Python and TypeScript tests load that same reviewed, synthetic file. These examples distinguish reported data from values a user may write; applying edit limits to all observations would lose useful controller information.
 
 ## Contract
 
@@ -45,4 +45,4 @@ cd frontend
 npx vitest run test/validation-contract.test.ts
 ```
 
-See [testing instructions](../README-TESTING.md) for creating the locked environment and running the complete release gate. Version 1.4.1 changes no entity IDs, pin mappings, transport behavior or observation limits.
+See [testing instructions](TESTING.md) for creating the locked environment and running the complete release gate. Version 1.4.1 changes no entity IDs, pin mappings, transport behavior or observation limits.

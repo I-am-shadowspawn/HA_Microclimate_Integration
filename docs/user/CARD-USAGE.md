@@ -6,7 +6,7 @@ The release includes **Microclimate channel** and **Microclimate controller** ca
 
 ## Upgrading compact releases
 
-For the 1.3.0 compact transition, follow [the clean-install runbook](CLEAN-INSTALL-1.3.0.md). If already on the compact series, install 1.4.2 and retain the entry and card configuration. Update the JavaScript module resource to `/microclimate_integration/microclimate-cards.js?v=1.4.2`, then refresh the frontend. Preserve any custom colour configuration.
+For the 1.3.0 compact transition, follow [the clean-install runbook](../archive/CLEAN-INSTALL-1.3.0.md). If already on the compact series, install 1.4.2 and retain the entry and card configuration. Update the JavaScript module resource to `/microclimate_integration/microclimate-cards.js?v=1.4.2`, then refresh the frontend. Preserve any custom colour configuration.
 
 Individual time/setpoint entities no longer exist. Keep the channel's **Reported schedule periods** sensor enabled: the card requires READ access to show its schedule and CONTROL access to edit it. It is an ordinary enabled sensor rather than a diagnostic entity; raw-pin diagnostics can remain disabled. Other controls and root dates retain separate permissions. The sensor itself remains read-only; validated writes go through the card API.
 

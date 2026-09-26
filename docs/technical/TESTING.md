@@ -4,9 +4,9 @@
 
 The test harness runs Home Assistant in process with mocked HTTP. It needs no running HA server or controller token. The supported minimum is **Home Assistant Core 2026.9.3**. The 2026.9.2 lockfile is retained as historical evidence, not a supported CI target.
 
-The shared Python/TypeScript [validation contract](docs/VALIDATION-CONTRACT.md) records observation/edit boundaries and the fixture-driven parity tests.
+The shared Python/TypeScript [validation contract](VALIDATION-CONTRACT.md) records observation/edit boundaries and the fixture-driven parity tests.
 
-Runtime ownership, resource bounds and the retained HA hook are documented in [runtime lifecycle](docs/RUNTIME-LIFECYCLE.md).
+Runtime ownership, resource bounds and the retained HA hook are documented in [runtime lifecycle](RUNTIME-LIFECYCLE.md).
 
 ## Reproduce the CI checks
 

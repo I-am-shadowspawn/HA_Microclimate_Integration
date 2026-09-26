@@ -1,121 +1,582 @@
-# Compact schedule cards — 1.4.2
-
-> **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
-
-The compact series adds channel schedule cards and a root-controller season-date card with explicit Save/Cancel. See [installation and card usage](docs/CARD-USAGE.md) and [card API](docs/CARD-API.md). A clean reinstall was required for the 1.3.0 transition from the disposable prototype; upgrades within the compact series preserve entry and entity identity. Individual schedule time/setpoint entities were removed; the cards use the aggregate schedule sensor as their permission scope. See [clean reinstall](docs/CLEAN-INSTALL-1.3.0.md) if still on the prototype.
+[![Made with Python](https://img.shields.io/badge/Made%20With%20Python-blue?style=for-the-badge&logo=python&logoColor=white&labelColor=green)](https://www.python.org)
+[![HACS Badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration)
+[![Current Release](https://img.shields.io/github/v/release/I-am-shadowspawn/HA_Microclimate_Integration?style=for-the-badge&filter=*)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/releases)
+[![GitHub license](https://img.shields.io/github/license/I-am-shadowspawn/HA_Microclimate_Integration?style=for-the-badge)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/blob/main/LICENSE)
 
 # Microclimate Integration for Home Assistant
 
-Version **1.4.2**. This custom integration reads Microclimate Evo Connect controller data and adds readback-confirmed configuration controls. Configuration writes remain enabled by default and can be disabled in entry options. Raw-pin diagnostic entities are disabled by default; the Reported schedule periods sensor remains enabled because the card uses it for permissions. Existing climate/sensor observations stay read-only. The channel card can import/export schedule preset files, and HA actions can export, apply or copy compatible schedules; see [schedule presets](docs/SCHEDULE-PRESETS.md) and [write controls](docs/WRITE-CONTROLS.md).
+A custom Home Assistant integration for **Microclimate Evo Connect** environmental controllers.
 
-## Supported Home Assistant baseline
+The integration brings controller and channel data into Home Assistant and provides controls and dashboard cards for viewing and editing supported controller settings and schedules.
 
-Initial public minimum: **Home Assistant Core 2026.9.3**. See [the maintainer-confirmed test platform](docs/TESTED-PLATFORM.md) for Supervisor, OS and Frontend versions. These describe the tested environment, not additional runtime dependencies.
+<p align="center">
+&#x20; <img src="docs/images/cards/01-Example-Evo-Connect-II-Card.png" 
+&#x20;      alt="Example Microclimate Evo Connect II dashboard in Home Assistant" 
+&#x20;      width="800">
+</p>
 
-## Supported profiles and devices
+> **Unofficial, independent project.**  
+> This integration and its custom cards are not affiliated with, endorsed by, or supported by **Microclimate or Blynk**. Their names and product/service names are used solely to identify compatibility and the external services on which the integration depends. For support with this integration, use this project's [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
+---
 
-| Profile | Channel devices | Climate entities |
-|---|---|---|
-| Evo Connect | Yellow, Blue | Yellow |
-| Evo Connect 2 | Yellow, Blue | Yellow, Blue |
-| Evo Connect 3 | Yellow, Red, Blue | Yellow, Red, Blue |
+## Features
 
-Each entry creates one root controller device and its channel devices. Supplied captures cover all three profiles, including all Evo Connect 2 timing modes on firmware 0.2.4. Capability families and schedule pin groups are maintainer-confirmed. Physical transitions, periodic duration units, zero-date behaviour and complete hardware/firmware verification remain outstanding.
+The integration provides Home Assistant access to supported Microclimate controller data and configuration, including:
 
-## Readings
+- automatic creation of controller and channel devices;
+- temperature and probe readings where supported;
+- observed controller setpoints;
+- output levels and control modes;
+- alarm thresholds;
+- timing and schedule configuration;
+- Day/Night, Multi and Seasonal schedule display;
+- editable schedules for supported operating modes;
+- root controller season-date configuration;
+- ramp-duration controls on supported channels;
+- readback-confirmed configuration changes;
+- schedule preset import, export and copy functions;
+- Home Assistant actions for schedule operations;
+- custom Lovelace cards for controller and channel configuration;
+- optional diagnostic entities and support diagnostics;
+- Home Assistant user permission enforcement for configuration changes.
 
-- Temperature, observed setpoint and lower/upper alarm **thresholds**, where the profile has a probe. No active-alarm status is inferred.
-- Output percentage, control mode and timing type. Yellow and Red expose pulse/dimming output readings and ramp duration in minutes; Blue reports its fixed on/off output capability and has no ramp measurement or attributes.
-- Reported schedule periods, with all eight slots retained in attributes. The count means reported slots, not active slots. Thermal periods use `setpoint_temperature` and `setpoint_unit` with the controller-reported °C or °F unit; fixed-output setpoints are percentages. The former `setpoint_celsius` attribute is replaced. Unexpected tokens, reported timezone and unrecognized fields are preserved without calculating the active schedule.
-- Mode-specific schedule attributes: Day Night exposes `day_night.day` and `.night` from the first two pairs; Multi exposes `daily_points` (eight time/setpoint entries); Seasonal exposes `seasons` (four day/night pairs plus root start dates). Original `periods` remain available in every mode. These are reported settings, not an active-schedule calculation. Blue Periodic retains unparsed interval/duration fields; no periodic meaning is assigned to Yellow/Red fields.
-- Root metadata: four season starts, previous-24-hour power, temperature-unit code, system date/time and system name, plus reported pin count. The 24-hour power unit remains unverified and unset. Dates retain the reported year format; no century or timestamp is invented.
-- Optional raw-pin diagnostics, disabled by default. Individual registry enable/disable choices survive reload.
+Normal sensor and climate observations remain read-only. Configuration changes are made through dedicated controls and the supplied dashboard cards.
 
-Missing/invalid readings are unknown; failed refreshes make entities unavailable. The controller's v25 unit flag identifies the native unit for that response. Temperature numbers are retained without conversion; Home Assistant converts typed entities for its configured display unit. A subsequent poll can change the native unit, and an absent/invalid flag leaves thermal observations unknown rather than reusing an old unit.
+---
 
-All entities use one polling coordinator per entry, normally refreshing once per minute. Entries share Home Assistant's HTTP session with explicit request timeouts. One normalization pass and a per-response reading cache avoid duplicate work; unchanged responses suppress entity notifications while failure/recovery transitions remain visible.
+## Supported controllers
 
-## Timing and schedule mapping
+| Controller          | Status                           | Channels          |
+|---------------------|----------------------------------|-------------------|
+| **Evo Connect**     | Supported                        | Yellow, Blue      |
+| **Evo Connect II**  | Supported                        | Yellow, Blue      |
+| **Evo Connect III** | Supported                        | Yellow, Red, Blue |
+| **Evo Connect Pro** | Untested / compatibility unknown | Unknown           |
 
-| Code | Yellow (all models), Red (Evo III) | Blue (all models) |
-|---|---|---|
-| 0 | Constant | Constant |
-| 1 | Day Night | Day Night |
-| 2 | Multi | Multi |
-| 3 | Seasonal | Periodic |
-| 4 | Unknown/unsupported | Seasonal |
+The **Evo Connect Pro has not been tested** with this integration. Compatibility should not be assumed until controller/API evidence is available.
 
-Yellow pairs run v32/v33 through v46/v47; Red v62/v63 through v76/v77; Blue v92/v93 through v106/v107. In Seasonal mode pairs 1/2 are Season 1 day/night, 3/4 Season 2, 5/6 Season 3 and 7/8 Season 4. Root v20–v23 are the corresponding start dates. In Multi the same pairs are eight daily setpoint-change times. Yellow ramp is v48, Red ramp v78, both minutes. Blue has no ramp; returned v108/v114 values remain raw diagnostics without implying ramp or pulse/dimming capability.
+Support may also vary with controller firmware and channel type. See [Supported functionality](#supported-functionality) and the [schedule contract](docs/technical/SCHEDULE-CONTRACT.md) for known behaviour and limitations.
 
-00:00 is retained as a time and 00/00 as a zero-date sentinel; neither is automatically treated as a disabled slot/season. Do not infer an active season from missing dates.
+---
 
-## Installation and configuration
+## Requirements
 
-1. Back up the current integration directory and Home Assistant configuration.
-2. Extract the install archive and replace `config/custom_components/microclimate_integration` with the bundled directory. Replace rather than merge: obsolete alternative modules were removed.
-3. Restart Home Assistant. Add **Microclimate Integration (Unofficial)** through Devices & services and provide the controller name, API token and model.
+- Home Assistant Core **2026.9.3 or later**
+- a supported Microclimate Evo Connect controller;
+- access to the Microclimate web dashboard;
+- the controller's **Auth Token**;
+- internet access from Home Assistant to the Microclimate cloud service.
 
-This release requires recreating the single testing installation; no migration or legacy exposure mode is provided. Device/entity IDs may change during recreation. Entries created with this candidate keep their identity across subsequent rename and credential changes. Use Reconfigure to change the name or token; authentication failures offer reauthentication. The token is the only remote identity available, so different tokens cannot automatically be correlated to the same physical controller. Duplicate tokens are rejected. Never publish a token or credential-bearing request URL.
+This integration communicates with the controller through the remote Microclimate/Blynk service. There is currently **no local-controller fallback** if the cloud service or internet connection is unavailable.
 
-The install archive is a manual custom-component bundle, not an HA add-on or a published HACS release. This candidate has not been installed into your live HA instance by the review process.
+See [TESTED-PLATFORM.md](docs/user/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
 
-## Maintainer guidance
+---
+## Service dependency and third-party services
 
-`const.py` owns channel pins, metadata pins, shared field semantics, enum tables and probe profiles. `CHANNELS` is a generated view used by runtime consumers. The unused `const2.py` shim and compatibility mappings have been removed. Edit the canonical definitions and restart HA to load changed Python code. Climate/sensor observations and select/number/text controls and card schedule writes share one coordinator; `schedule.py` is a parser, not another platform or poller.
+This integration communicates with Microclimate controllers through the cloud service used by the official Microclimate platform, which is provided using **Blynk** infrastructure. It does not communicate directly with the controller over the local network.
 
-Normal operation adds only concise setup/unload debug messages. HA's coordinator reports failures and recovery. Full responses are logged only with the explicit diagnostic option below; credentials are redacted. Unknown vendor behavior is documented in TODO.md rather than hidden behind inferred values.
+Use of the Microclimate/Blynk service remains subject to the applicable terms and service arrangements provided by Microclimate and Blynk. This project is not a party to, and makes no representation about, the commercial or licensing arrangements between those companies.
 
-See README-TESTING.md for the pinned test matrix and build commands; CHANGELOG.md records the local candidate changes. Runtime HTTP uses aiohttp supplied by Home Assistant; the manifest requires no separately installed libraries. Test dependencies are pinned separately for each tested HA version.
+This project is independent and is not affiliated with, endorsed by, or supported by either **Microclimate** or **Blynk**. References to their names and services are solely to describe compatibility and the external services on which the integration depends.
 
-## Capture full API responses for troubleshooting
+Availability of this integration therefore depends on the continued availability and compatibility of the relevant Microclimate/Blynk cloud service. Changes to that service, its API, authentication requirements or applicable terms may affect or prevent the integration from operating.
 
-Open this integration entry's options under Devices & services and enable **Log full API responses**. Also enable DEBUG logging for `custom_components.microclimate_integration` (or specifically `custom_components.microclimate_integration.api_client`). For YAML logging configuration:
+---
 
-```yaml
-logger:
-  logs:
-    custom_components.microclimate_integration: debug
+# Installation
+
+## 1. Obtain your Microclimate Auth Token
+
+Before adding the integration to Home Assistant, obtain the **Auth Token** associated with your controller from the Microclimate web dashboard:
+
+**[http://microclimate.blynk.cc/](http://microclimate.blynk.cc/)**
+
+Sign in to the Microclimate dashboard and obtain the Auth Token for the controller you want to add.
+
+> **Keep the Auth Token private.**\
+> Treat it as a credential. Do not include it in screenshots, GitHub issues, logs or other publicly shared material.
+
+You will need this token when configuring the integration in Home Assistant.
+
+---
+
+## 2. Install the integration
+
+### HACS
+
+When installing through HACS, install **Microclimate Integration** as an integration and restart Home Assistant when prompted.
+
+If the repository is not yet available in the default HACS catalogue, it can be added as a custom repository once the corresponding HACS release has been published and validated.
+
+### Manual installation
+
+For a manual installation:
+
+1. Download the repository or release archive.
+
+2. Copy:
+
+   ```text
+   custom_components/microclimate_integration
+   ```
+
+   into:
+
+   ```text
+   <home-assistant-config>/custom_components/microclimate_integration
+   ```
+
+3. Restart Home Assistant.
+
+The resulting directory should be:
+
+```text
+config/
+└── custom_components/
+    └── microclimate_integration/
+        ├── __init__.py
+        ├── manifest.json
+        └── ...
 ```
 
-Merge this into an existing logger configuration rather than adding a second logger key. The per-entry option applies on the next poll; changing YAML requires the usual HA configuration reload/restart. Disable the option when capture is finished.
+---
 
-The log contains complete decoded JSON, including all pins and encoded schedule fields, without field truncation for accepted responses (read bodies over 1 MiB are rejected). NUL separators are JSON-escaped. This is a semantic JSON capture, not byte-for-byte HTTP traffic. It captures JSON error responses too; unreadable/non-JSON bodies produce a safe diagnostic message instead. Validation during onboarding does not enable response capture.
+# Add your controller to Home Assistant
 
-The configured API token, occurrences of it in response text, and credential fields such as token, password, authorization and API key are replaced with `[REDACTED]`. Other controller names and readings remain visible; review captured logs before sharing. Logging does not mutate the data supplied to entities. Both the option (default off) and DEBUG level are required.
+After installing and restarting Home Assistant:
 
-## Schedule observation quality
+1. Open **Settings → Devices & services**.
+2. Select **Add Integration**.
+3. Search for **Microclimate Integration (Unofficial)**.
+4. Enter the requested controller details, including:
+   - a name for the controller;
+   - the Microclimate **Auth Token**;
+   - the controller model.
+5. Complete the setup.
 
-Schedule fields expose `status`/`setpoint_status` to distinguish absent, invalid, unsupported and valid values. Unknown NUL fields retain their indexes and original values; solar offsets and day masks are not guessed. Seasonal zero dates use `status=sentinel`. API normalization already replaces non-finite numbers and unsupported containers with null; rejected inputs cannot be reconstructed from these typed views.
+<p align="center">
+&#x20; <img src="docs/images/onboarding/01-configuring-device.png" 
+&#x20;      alt="Configuring a Microclimate controller in Home Assistant" 
+&#x20;      width="650">
+</p>
 
-Multi preserves all eight slots in controller order. A midnight/zero-setpoint pair has `activation=likely_unused`, explicitly a maintainer inference, and is not removed. `duplicate_clock_times` reports repeated starts without deciding precedence. No active-period calculation is performed. The reported slot count is not an enabled-slot count.
+Home Assistant will create the root controller device and the appropriate channel devices for the selected controller model.
 
-See `docs/SCHEDULE-CONTRACT.md` for the complete evidence matrix, confirmed Day/Night and Multi layout, and the outstanding physical tests. R-01 full capture coverage and R-03 physical duplicate/midnight semantics remain pending; the read-only software views are implemented.
+You can assign the newly created devices to Home Assistant Areas during onboarding.
 
-## Manual schedule presentation and history
+<p align="center">
+&#x20; <img src="docs/images/onboarding/02-Assigning-Areas.png" 
+&#x20;      alt="Assigning Microclimate devices to Home Assistant areas" 
+&#x20;      width="650">
+</p>
 
-Schedules are manually configured clock times. Automatic sunrise/sunset selection, solar offsets and astronomical calculations are not supported. Unexpected `sr`/`ss` tokens are retained as unsupported raw input rather than presented as a supported scheduling option.
+Once configuration is complete, the integration page shows the controller and its discovered channel devices.
 
-The existing Reported schedule periods entity includes a readable `summary` attribute (maximum 255 characters) alongside the timing mode and reported slot count. Full `day_night`, `daily_points`, `seasons` and raw `periods` details remain available in the live entity attributes. IDs and polling are unchanged.
+<p align="center">
+&#x20; <img src="docs/images/onboarding/03-Integration-Device-Page.png" 
+&#x20;      alt="Microclimate integration device page in Home Assistant" 
+&#x20;      width="750">
+</p>
 
-Large structured schedule attributes are excluded from recorder history using HA's entity metadata; the compact summary, mode and count remain recordable. Consequently history cannot reconstruct every old raw schedule field. HA's downloadable diagnostics provide a bounded structural summary without raw values; opt-in DEBUG capture is available when a full snapshot is needed. No active-calendar projection is calculated. Live dashboard acceptance and long-running recorder growth remain separate deployment checks.
+---
 
-## Aggregate schedule entity
+# Devices and entities
 
-Each channel has one enabled Reported schedule periods sensor with a summary and structured attributes. Its registry entity is the card's schedule permission anchor. Keep it enabled and grant READ access to view the schedule and CONTROL access to edit it.
+Each integration entry creates:
 
-Day & Night uses two pairs; Multi and Seasonal use up to eight. Constant and Periodic do not expose editable manual pairs. The card shows thermal setpoints in HA's configured temperature unit and fixed output as percentages. The sensor remains read-only; validated writes use the card API.
+- one **root controller device**; and
+- separate devices for each controller channel.
 
-Raw-pin entities remain registered for optional troubleshooting but are disabled by default. Other diagnostics, including root metadata and Last configuration write, retain their own defaults.
+For example, an Evo Connect II creates a root controller plus Yellow and Blue channel devices.
 
-Root season starts remain separate metadata sensors. A raw 00/00 value reports unknown; a valid 09/02 reports 09/02. If a valid raw date nevertheless displays unknown, supply that entity's attributes for investigation.
+## Controller device
 
+The root controller contains controller-wide information and settings such as:
 
-## Ramp and season-order controls (1.1.1)
+- controller metadata;
+- system date/time information;
+- season start dates;
+- previous 24-hour power information where reported;
+- configuration/status information.
 
-Yellow and Evo III Red now expose editable ramp duration (v48/v78), 0–240 whole minutes. Blue remains excluded. Root season date edits must form a distinct ordered annual cycle, with one December/January crossing allowed. Validation uses a fresh baseline and checks the observed cycle before confirmation; explicit 00/00 siblings permit initial population, while missing/invalid dates block unsafe ordering assumptions. See the write guide for examples and recovery.
+<p align="center">
+&#x20; <img src="docs/images/onboarding/04-Device-Root-Settings.png" 
+&#x20;      alt="Microclimate root controller entities in Home Assistant" 
+&#x20;      width="750">
+</p>
 
-The maintainer confirmed all previously enabled write attributes on Evo II/III. The new ramp/order additions, Evo I write validation and persistence/soak remain separate follow-ups. Hour/minute editor submissions remain separate confirmed operations; use one complete time action or an explicit Apply flow to avoid transient intermediate times.
+## Channel devices
 
-## Project support and ownership
+Channel devices expose the readings and controls appropriate to that channel and controller model.
 
-See [support and reporting](SUPPORT.md), [private security reporting](SECURITY.md), [contributing](CONTRIBUTING.md), [licensing](docs/LICENSING.md) and [independent branding](docs/BRANDING.md). Maintained by Simon Burke (`@I-am-shadowspawn`); project code is MIT licensed.
+Depending on the channel, these can include:
+
+- temperature;
+- observed setpoint;
+- lower and upper alarm thresholds;
+- output percentage;
+- operating mode;
+- timing mode;
+- ramp duration;
+- reported schedule;
+- configuration controls.
+
+<p align="center">
+&#x20; <img src="docs/images/onboarding/05-Device-Channel-Settings.png" 
+&#x20;      alt="Microclimate channel entities in Home Assistant" 
+&#x20;      width="750">
+</p>
+
+Unavailable or invalid controller readings are represented as unknown or unavailable rather than being guessed.
+
+Temperature values use the controller-reported Celsius or Fahrenheit unit. The integration keeps the reported numeric values in that unit, and Home Assistant can convert typed entities for display. If a response has no recognized temperature unit, thermal readings remain unknown until a later refresh reports one.
+
+---
+
+# Dashboard cards
+
+The integration includes custom cards designed specifically for configuring the Microclimate controller.
+
+There are two principal card types:
+
+- **Channel Schedule Card** — displays and edits the schedule for a controller channel.
+- **Controller Season Card** — displays and edits controller-wide season start dates.
+
+The cards provide explicit **Edit**, **Save** and **Cancel** behaviour so that changing values in the editor does not immediately write them to the controller.
+
+For full card configuration and usage instructions, see [CARD-USAGE.md](docs/user/CARD-USAGE.md).
+
+---
+
+## Channel Schedule Card
+
+The Channel Schedule Card displays the current mode and schedule for a selected controller channel.
+
+<p align="center">
+&#x20; <img src="docs/images/cards/channel_card/03-channel-card-displayed.png" 
+&#x20;      alt="Microclimate channel schedule card" 
+&#x20;      width="650">
+</p>
+
+The card can be added through the Home Assistant dashboard card editor.
+
+<p align="center">
+&#x20; <img src="docs/images/cards/channel_card/01-channel-card-config-a.png" 
+&#x20;      alt="Configuring the Microclimate channel schedule card" 
+&#x20;      width="600">
+</p>
+
+<p align="center">
+&#x20; <img src="docs/images/cards/channel_card/02-channel-card-config-b.png" 
+&#x20;      alt="Microclimate channel schedule card configuration options" 
+&#x20;      width="600">
+</p>
+
+The card uses the channel's **Reported schedule periods** entity to identify the schedule and as the Home Assistant permission scope for schedule access.
+
+Do not disable that entity if you intend to use the schedule card.
+
+---
+
+## Controller Season Card
+
+The Controller Season Card provides a compact view of the controller's season start dates.
+
+<p align="center">
+&#x20; <img src="docs/images/cards/controller_card/03-controller-card-displayed.png" 
+&#x20;      alt="Microclimate controller season card" 
+&#x20;      width="500">
+</p>
+
+It can be configured through the normal Home Assistant card editor.
+
+<p align="center">
+&#x20; <img src="docs/images/cards/controller_card/01-Controller-Card-Config.png" 
+&#x20;      alt="Configuring the Microclimate controller season card" 
+&#x20;      width="550">
+</p>
+
+When editing is enabled, changes remain local to the card until explicitly saved.
+
+<p align="center">
+&#x20; <img src="docs/images/cards/controller_card/04-controller-card-edit-mode.png" 
+&#x20;      alt="Microclimate controller season card in edit mode" 
+&#x20;      width="500">
+</p>
+
+<p align="center">
+&#x20; <img src="docs/images/cards/controller_card/05-Controller-card-save-settings.png" 
+&#x20;      alt="Saving Microclimate controller season settings" 
+&#x20;      width="500">
+</p>
+
+---
+
+# Supported functionality
+
+The controller families use different channel capabilities.
+
+## Channel availability
+
+| Controller      | Yellow | Red | Blue |
+|-----------------|:------:|:---:|:----:|
+| Evo Connect     |   ✓    |  —  |  ✓   |
+| Evo Connect II  |   ✓    |  —  |  ✓   |
+| Evo Connect III |   ✓    |  ✓  |  ✓   |
+| Evo Connect Pro |   ?    |  ?  |  ?   |
+
+`?` indicates that compatibility has not been established.
+
+## Schedule modes
+
+| Mode      | Yellow | Red |   Blue    |
+|-----------|:------:|:---:|:---------:|
+| Constant  |   ✓    |  ✓  |     ✓     |
+| Day/Night |   ✓    |  ✓  |     ✓     |
+| Multi     |   ✓    |  ✓  |     ✓     |
+| Seasonal  |   ✓    |  ✓  |     ✓     |
+| Periodic  |   —    |  —  | Blue only |
+
+Availability of Red depends on the controller model.
+
+Manual schedule editing is currently intended for schedule structures whose mapping has been established. Some Constant and Periodic controller fields remain deliberately read-only or uninterpreted where their meaning has not been verified.
+
+The integration does **not guess unknown vendor fields**.
+
+For the detailed evidence and schedule mapping, see [SCHEDULE-CONTRACT.md](docs/technical/SCHEDULE-CONTRACT.md).
+
+---
+
+# Schedule behaviour
+
+Depending on the selected timing mode, the integration can present controller schedule data as:
+
+### Day/Night
+
+Two time/setpoint pairs representing the configured day and night periods.
+
+### Multi
+
+Up to eight daily time/setpoint points, retained in controller order.
+
+### Seasonal
+
+Four seasonal Day/Night pairs together with the controller's four season start dates.
+
+### Constant
+
+Constant mode is recognised, but editable Constant-target behaviour is not exposed unless the underlying controller field has been verified for that device family.
+
+### Periodic
+
+Periodic mode is reported for supported Blue channels. Unknown interval/duration semantics are preserved rather than assigned an unverified meaning.
+
+The integration does not calculate or claim a device-confirmed "currently active schedule period" solely from the stored schedule.
+
+---
+
+# Editing controller settings
+
+Configuration writes are supported for validated controller fields.
+
+Writes use fresh controller state and readback confirmation rather than assuming that an HTTP request means a change was successfully applied.
+
+This is particularly important for schedules because a schedule update may require multiple controller operations and should **not be considered atomic**.
+
+Configuration writes can be disabled from the integration's options if a read-only installation is preferred.
+
+For details on supported controls, validation and recovery behaviour, see:
+
+- [Write controls](docs/user/WRITE-CONTROLS.md)
+- [Validation contract](docs/technical/VALIDATION-CONTRACT.md)
+- [Schedule presets](docs/user/SCHEDULE-PRESETS.md)
+
+---
+
+# Schedule presets
+
+Supported channel schedules can be exported and imported using the supplied card functionality.
+
+Home Assistant actions are also available for supported operations such as:
+
+- exporting schedules;
+- applying compatible schedules;
+- copying compatible schedules between devices.
+
+Presets are validated against the target channel/device before writes are performed.
+
+See [SCHEDULE-PRESETS.md](docs/user/SCHEDULE-PRESETS.md) for the preset format, compatibility requirements and usage.
+
+---
+
+# Permissions
+
+Home Assistant permissions are respected by the card API.
+
+The **Reported schedule periods** entity acts as the permission anchor for a channel schedule:
+
+- users require suitable read access to view schedule data;
+- users require suitable control permission to modify it.
+
+This entity is therefore enabled by default even though it represents diagnostic/configuration-oriented information.
+
+Raw pin diagnostics are separate and are disabled by default.
+
+---
+
+# Polling and cloud access
+
+The integration uses one Home Assistant update coordinator per configured controller entry.
+
+The controller is normally refreshed approximately once per minute. Multiple entities use the same coordinator data rather than independently polling the cloud service.
+
+Because access is cloud-based:
+
+- internet or service outages can make entities unavailable;
+- authentication failures may require token reauthentication;
+- controller changes made elsewhere can appear on the following refresh;
+- write operations are verified against subsequent controller state.
+
+Automatic repeated write retries and speculative rollback are intentionally avoided.
+
+---
+
+# Diagnostics and troubleshooting
+
+## Authentication problems
+
+If authentication fails:
+
+1. confirm that the controller still appears in the Microclimate web dashboard;
+2. obtain or confirm the Auth Token at **[http://microclimate.blynk.cc/](http://microclimate.blynk.cc/)**;
+3. use the Home Assistant integration's reauthentication/reconfiguration flow.
+
+Never post your Auth Token in an issue.
+
+## Card does not show a schedule
+
+Check that:
+
+- the correct channel device is selected;
+- the **Reported schedule periods** entity is enabled;
+- the Home Assistant user has permission to read it;
+- the card and backend integration versions match.
+
+## Schedule cannot be edited
+
+Check that:
+
+- configuration writes have not been disabled in the integration options;
+- the Home Assistant user has control permission;
+- the current timing mode supports editing;
+- the controller data required to safely construct the change is available.
+
+## Support diagnostics
+
+When reporting a problem, Home Assistant diagnostics can provide useful structural and version information while redacting known credential fields.
+
+Additional full API response logging can be enabled explicitly for investigation where necessary. Full response captures may contain controller names, readings or other private information and should always be reviewed before sharing.
+
+For support, open a [GitHub Issue](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
+
+---
+
+# Upgrading
+
+Normal integration upgrades are intended to retain the Home Assistant config entry, device identity and entity registry bindings.
+
+Before upgrading:
+
+1. review [CHANGELOG.md](CHANGELOG.md) for release-specific changes;
+2. install the new release through HACS or replace the manual installation;
+3. restart Home Assistant if required by the installation method;
+4. confirm that the integration and custom cards load correctly.
+
+If authentication credentials change, use the integration's reauthentication or reconfiguration flow rather than deleting and recreating the integration.
+
+---
+
+# Known limitations
+
+- Communication is through the Microclimate cloud service; local controller communication is not currently available.
+- **Evo Connect Pro is untested and its compatibility is unknown.**
+- Some vendor fields remain intentionally uninterpreted where their purpose, unit or range has not been established.
+- Constant-target editing is not exposed where the correct controller field has not been verified.
+- Blue Periodic interval/duration editing is not exposed until its field semantics are verified.
+- Schedule changes involving multiple values are not atomic.
+- Controller persistence following physical reboot or extended service interruption depends on controller behaviour and should not be inferred solely from successful API readback.
+- The integration does not infer active alarms merely from configured alarm thresholds.
+- Stored schedule data is not presented as proof of the controller's currently active period.
+
+Unknown behaviour is preserved or reported as unsupported rather than guessed.
+
+---
+
+## Documentation
+
+### User guides
+
+- [Card usage](docs/user/CARD-USAGE.md)
+- [Schedule presets](docs/user/SCHEDULE-PRESETS.md)
+- [Write controls](docs/user/WRITE-CONTROLS.md)
+- [Tested platforms](docs/user/TESTED-PLATFORM.md)
+
+### Technical documentation
+
+- [Schedule contract](docs/technical/SCHEDULE-CONTRACT.md)
+- [Validation contract](docs/technical/VALIDATION-CONTRACT.md)
+- [Card API](docs/technical/CARD-API.md)
+- [Runtime lifecycle](docs/technical/RUNTIME-LIFECYCLE.md)
+- [Development and testing](docs/technical/TESTING.md)
+
+### Project information
+
+- [Contributing](CONTRIBUTING.md)
+- [Support](SUPPORT.md)
+- [Security](SECURITY.md)
+- [Licensing](docs/project/LICENSING.md)
+- [Branding](docs/project/BRANDING.md)
+- [Changelog](CHANGELOG.md)
+---
+
+# Reporting issues
+
+Please report integration problems through:
+
+[GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues)
+
+When reporting an issue, include where possible:
+
+- controller model;
+- controller firmware version;
+- Home Assistant Core version;
+- integration version;
+- affected channel;
+- relevant timing/control mode;
+- a description of the expected and observed behaviour.
+
+Do **not** include your Microclimate Auth Token.
+
+For security-sensitive reports, follow [SECURITY.md](SECURITY.md).
+
+---
+
+# Development
+
+Contributions and testing are welcome.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and validation guidance.
+
+The integration aims to preserve controller behaviour exactly where it has been verified and to leave unknown or unconfirmed vendor behaviour explicit rather than attempting to infer it.
+
+---
+# Licence
+
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) and [LICENSING.md](docs/project/LICENSING.md).
+
+Maintained by **`@I-am-shadowspawn`**.
+
+Microclimate and Blynk product names, images, logos and trademarks belong to their respective owners. 
+
+This project is independent and is not affiliated with or endorsed by Microclimate or their service provider Blynk.

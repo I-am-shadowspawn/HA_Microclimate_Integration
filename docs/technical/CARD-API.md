@@ -39,7 +39,7 @@ Same retained user/entry/request UUID and patch digest returns the same operatio
 
 Frontend uses HA's `hass` connection/setConfig/custom-element interfaces for the pinned HA release. The module and dependencies are bundled locally. References: [custom card interface](https://developers.home-assistant.io/docs/frontend/custom-ui/custom-card/), [WebSocket extension](https://developers.home-assistant.io/docs/frontend/extending/websocket-api/).
 
-Portable schedule presets and HA automation actions are described in [Schedule presets](SCHEDULE-PRESETS.md). They use this same save/planner path and do not add writable schedule entities.
+Portable schedule presets and HA automation actions are described in [Schedule presets](../user/SCHEDULE-PRESETS.md). They use this same save/planner path and do not add writable schedule entities.
 
 ## Compact schedule authorization (1.3.0)
 

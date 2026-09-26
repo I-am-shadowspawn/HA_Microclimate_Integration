@@ -1,6 +1,7 @@
 """HA downloadable diagnostics expose useful structure without raw values."""
 
 import json
+from pathlib import Path
 from urllib.parse import quote
 from unittest.mock import patch
 
@@ -39,7 +40,15 @@ async def test_download_redacts_and_bounds_nested_response(hass):
     assert report["entry"]["options"] == {"enable_writes": True, "log_raw_response": False}
     assert report["entry"]["other_option_count"] == 1
     assert report["integration"]["model"] == "Evo Connect 2"
-    assert report["integration"]["version"] == "1.4.2"
+    MANIFEST = (
+            Path(__file__).resolve().parents[1]
+            / "custom_components"
+            / "microclimate_integration"
+            / "manifest.json"
+    )
+
+    EXPECTED_VERSION = json.loads(MANIFEST.read_text())["version"]
+    assert report["integration"]["version"] == EXPECTED_VERSION
     shape = report["response_shape"]
     assert shape["field_count"] == len(data)
     assert shape["sampled_fields"] == MAX_SAMPLED_FIELDS
