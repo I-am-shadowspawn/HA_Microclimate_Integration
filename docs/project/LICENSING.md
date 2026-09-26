@@ -2,7 +2,7 @@
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-The maintainer confirmed that the original integration code has no other code sources and authorized the MIT licence, copyright 2026 Simon Burke. The project licence is in [LICENSE](../LICENSE); an identical copy is included in the installable component so manual/HACS installation preserves the licence.
+The maintainer confirmed that the original integration code has no other code sources and authorized the MIT licence, copyright 2026 Simon Burke. The project licence is in [LICENSE](../../LICENSE); an identical copy is included in the installable component so manual/HACS installation preserves the licence.
 
 An esbuild input-metadata audit of the current card source identified only the following bundled external packages. Each package declares BSD-3-Clause, and its full licence text is retained verbatim in `custom_components/microclimate_integration/frontend/THIRD_PARTY_NOTICES.txt`. These notices remain separate from the project MIT licence.
 

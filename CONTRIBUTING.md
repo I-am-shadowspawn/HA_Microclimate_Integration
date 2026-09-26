@@ -6,7 +6,7 @@ Discuss substantial changes in a GitHub issue before opening a pull request. Inc
 
 Contributions must be your own or carry compatible redistribution rights and attribution. Contributions to this project are provided under its MIT licence; retain existing third-party notices. Do not add vendor artwork without documented permission.
 
-Use Python 3.14.x, uv 0.6.1 and Node.js 24.21.0 with the environments in [README-TESTING.md](README-TESTING.md). From the repository root:
+Use Python 3.14.x, uv 0.6.1 and Node.js 24.21.0 with the environments in [README-TESTING.md](docs/technical/TESTING.md). From the repository root:
 
 ```sh
 python3.14 scripts/test_matrix.py --install --release-gate --ha 2026.9.3
@@ -20,7 +20,7 @@ npx playwright install --with-deps chromium
 npm run test:e2e
 ```
 
-The automated harness mocks device calls. Never use real tokens in automated tests or make unattended live writes. For hardware tests, record model/firmware, before/after observations and persistence separately from simulated test results. See [CARD-VALIDATION.md](docs/CARD-VALIDATION.md).
+The automated harness mocks device calls. Never use real tokens in automated tests or make unattended live writes. For hardware tests, record model/firmware, before/after observations and persistence separately from simulated test results. See [CARD-VALIDATION.md](docs/technical/CARD-VALIDATION.md).
 
 Keep changes focused, include meaningful regressions, update usage documentation and report commands/results in the pull request. Preserve one coordinator, explicit Save/Cancel, validated writes and partial-failure reporting. Run the HACS/hassfest workflow after uploading changes; a passing local JSON check is not a substitute.
 

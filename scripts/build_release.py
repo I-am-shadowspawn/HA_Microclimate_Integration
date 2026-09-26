@@ -41,7 +41,7 @@ DEVELOPMENT_ROOT_FILES = (
     "LICENSE",
     "PIN-VERIFICATION.md",
     "README.md",
-    "README-TESTING.md",
+    "TESTING.md",
     "SECURITY.md",
     "SUPPORT.md",
     "TODO.md",

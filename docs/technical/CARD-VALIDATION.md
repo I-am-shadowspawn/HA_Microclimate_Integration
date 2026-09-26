@@ -2,11 +2,11 @@
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-See [1.3.0 compact-refactor validation](RELEASE-1.3.0-VALIDATION.md). Earlier reports below are historical.
+See [1.3.0 compact-refactor validation](../archive/RELEASE-1.3.0-VALIDATION.md). Earlier reports below are historical.
 
 # Current release: 1.2.1
 
-See [1.2.1 fixes and validation](RELEASE-1.2.1-VALIDATION.md) for the input/HTTP correction and its focused test results. The following 1.2.0 evidence is retained as the implementation baseline.
+See [1.2.1 fixes and validation](../archive/RELEASE-1.2.1-VALIDATION.md) for the input/HTTP correction and its focused test results. The following 1.2.0 evidence is retained as the implementation baseline.
 
 # Microclimate 1.2.0 — card validation
 

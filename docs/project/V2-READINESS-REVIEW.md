@@ -4,11 +4,11 @@
 
 ## Tooling follow-up — 25 September 2026
 
-V2-03 and V2-04 are implemented. The builder now has explicit public inputs and deterministic package checks; the portable workflow gates Python, frontend, browser, HACS, hassfest and packaging before a future tagged release. Core 2026.9.3 is the configured minimum. This review below records the earlier baseline; see [tests and release packaging](../README-TESTING.md) and the active [TODO](../TODO.md) for current status.
+V2-03 and V2-04 are implemented. The builder now has explicit public inputs and deterministic package checks; the portable workflow gates Python, frontend, browser, HACS, hassfest and packaging before a future tagged release. Core 2026.9.3 is the configured minimum. This review below records the earlier baseline; see [tests and release packaging](../technical/TESTING.md) and the active [TODO](../../TODO.md) for current status.
 
 ## Publication follow-up — 25 September 2026
 
-V2-01 and V2-02 are complete. The source is uploaded and both public HACS and hassfest checks passed; V2-07 HACS install/update and release remain separate. This review below records the earlier baseline. See [publication preparation](V2-PUBLICATION-PREPARATION.md) and the active [TODO](../TODO.md) for current status.
+V2-01 and V2-02 are complete. The source is uploaded and both public HACS and hassfest checks passed; V2-07 HACS install/update and release remain separate. This review below records the earlier baseline. See [publication preparation](V2-PUBLICATION-PREPARATION.md) and the active [TODO](../../TODO.md) for current status.
 
 Reviewed 25 September 2026 against workspace 1.3.0. Recommendation: retain the architecture and prepare a focused public-release cycle, not another wholesale rewrite. V1.3 is a strong functional baseline but is not yet a complete public/HACS distribution.
 

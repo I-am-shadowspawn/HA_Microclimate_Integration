@@ -10,4 +10,4 @@ The previously supplied gecko image is excluded from this source tree and releas
 
 Home Assistant supports [local custom-integration brand images](https://developers.home-assistant.io/docs/core/integration/brand_images/); HACS requires a [brand icon](https://hacs.xyz/docs/publish/integration/). Review the draft appearance before public release.
 
-![Original draft icon](../custom_components/microclimate_integration/brand/icon.png)
+![Original draft icon](../../custom_components/microclimate_integration/brand/icon.png)

@@ -50,7 +50,7 @@ Normal sensor and climate observations remain read-only. Configuration changes a
 
 The **Evo Connect Pro has not been tested** with this integration. Compatibility should not be assumed until controller/API evidence is available.
 
-Support may also vary with controller firmware and channel type. See [Supported functionality](#supported-functionality) and the [schedule contract](docs/SCHEDULE-CONTRACT.md) for known behaviour and limitations.
+Support may also vary with controller firmware and channel type. See [Supported functionality](#supported-functionality) and the [schedule contract](docs/technical/SCHEDULE-CONTRACT.md) for known behaviour and limitations.
 
 ---
 
@@ -64,7 +64,7 @@ Support may also vary with controller firmware and channel type. See [Supported 
 
 This integration communicates with the controller through the remote Microclimate/Blynk service. There is currently **no local-controller fallback** if the cloud service or internet connection is unavailable.
 
-See [TESTED-PLATFORM.md](docs/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
+See [TESTED-PLATFORM.md](docs/User/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
 
 ---
 ## Service dependency and third-party services
@@ -240,7 +240,7 @@ There are two principal card types:
 
 The cards provide explicit **Edit**, **Save** and **Cancel** behaviour so that changing values in the editor does not immediately write them to the controller.
 
-For full card configuration and usage instructions, see [CARD-USAGE.md](docs/CARD-USAGE.md).
+For full card configuration and usage instructions, see [CARD-USAGE.md](docs/User/CARD-USAGE.md).
 
 ---
 
@@ -339,7 +339,7 @@ Manual schedule editing is currently intended for schedule structures whose mapp
 
 The integration does **not guess unknown vendor fields**.
 
-For the detailed evidence and schedule mapping, see [SCHEDULE-CONTRACT.md](docs/SCHEDULE-CONTRACT.md).
+For the detailed evidence and schedule mapping, see [SCHEDULE-CONTRACT.md](docs/technical/SCHEDULE-CONTRACT.md).
 
 ---
 
@@ -383,9 +383,9 @@ Configuration writes can be disabled from the integration's options if a read-on
 
 For details on supported controls, validation and recovery behaviour, see:
 
-- [Write controls](docs/WRITE-CONTROLS.md)
-- [Validation contract](docs/VALIDATION-CONTRACT.md)
-- [Schedule presets](docs/SCHEDULE-PRESETS.md)
+- [Write controls](docs/User/WRITE-CONTROLS.md)
+- [Validation contract](docs/technical/VALIDATION-CONTRACT.md)
+- [Schedule presets](docs/User/SCHEDULE-PRESETS.md)
 
 ---
 
@@ -401,7 +401,7 @@ Home Assistant actions are also available for supported operations such as:
 
 Presets are validated against the target channel/device before writes are performed.
 
-See [SCHEDULE-PRESETS.md](docs/SCHEDULE-PRESETS.md) for the preset format, compatibility requirements and usage.
+See [SCHEDULE-PRESETS.md](docs/User/SCHEDULE-PRESETS.md) for the preset format, compatibility requirements and usage.
 
 ---
 
@@ -508,36 +508,31 @@ Unknown behaviour is preserved or reported as unsupported rather than guessed.
 
 ---
 
-# Documentation
+## Documentation
 
-Additional project documentation is available in the `docs` directory.
+### User guides
 
-### User documentation
+- [Card usage](docs/user/CARD-USAGE.md)
+- [Schedule presets](docs/user/SCHEDULE-PRESETS.md)
+- [Write controls](docs/user/WRITE-CONTROLS.md)
+- [Tested platforms](docs/user/TESTED-PLATFORM.md)
 
-- [Card usage](docs/CARD-USAGE.md)
-- [Schedule presets](docs/SCHEDULE-PRESETS.md)
-- [Write controls](docs/WRITE-CONTROLS.md)
-- [Tested Home Assistant platform](docs/TESTED-PLATFORM.md)
+### Technical documentation
 
-### Technical reference
-
-- [Schedule contract](docs/SCHEDULE-CONTRACT.md)
-- [Validation contract](docs/VALIDATION-CONTRACT.md)
-- [Card API](docs/CARD-API.md)
-- [Card validation](docs/CARD-VALIDATION.md)
-- [Runtime lifecycle](docs/RUNTIME-LIFECYCLE.md)
+- [Schedule contract](docs/technical/SCHEDULE-CONTRACT.md)
+- [Validation contract](docs/technical/VALIDATION-CONTRACT.md)
+- [Card API](docs/technical/CARD-API.md)
+- [Runtime lifecycle](docs/technical/RUNTIME-LIFECYCLE.md)
+- [Development and testing](docs/technical/TESTING.md)
 
 ### Project information
 
 - [Contributing](CONTRIBUTING.md)
 - [Support](SUPPORT.md)
 - [Security](SECURITY.md)
-- [Licensing](docs/LICENSING.md)
-- [Branding](docs/BRANDING.md)
+- [Licensing](docs/project/LICENSING.md)
+- [Branding](docs/project/BRANDING.md)
 - [Changelog](CHANGELOG.md)
-
-Release-validation and engineering records in the repository are retained for development provenance but are not required for normal installation or use.
-
 ---
 
 # Reporting issues
@@ -573,7 +568,7 @@ The integration aims to preserve controller behaviour exactly where it has been 
 ---
 # Licence
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) and [LICENSING.md](docs/LICENSING.md).
+This project is licensed under the **MIT License**. See [LICENSE](LICENSE) and [LICENSING.md](docs/project/LICENSING.md).
 
 Maintained by **`@I-am-shadowspawn`**.
 
