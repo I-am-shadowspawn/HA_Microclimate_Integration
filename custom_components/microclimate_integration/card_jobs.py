@@ -47,7 +47,8 @@ class Job(TypedDict):
 
 
 def job_timeout(step_count: int) -> float:
-    # Preflight/final read, plus each guarded read and bounded write primitive.
+    # Retain the conservative existing deadline, including the former separate
+    # guarded-read allowance. Sharing the baseline need not shorten deadlines.
     return 2 * REQUEST_TIMEOUT.total + step_count * (REQUEST_TIMEOUT.total + OPERATION_TIMEOUT) + 5
 
 
@@ -159,21 +160,19 @@ class CardJobs:
                     authorize(self.hass, c, user, plan.fields)
                     if generation(c) != job['generation']:
                         raise WriteValidationError('conflict')
-                    fresh = await c.async_read_locked()
-                    if revision(c, channel) != expected_revision:
-                        raise WriteValidationError('conflict')
-                    expected = dict(fresh)
-                    expected[step.field.pin] = step.wire
-                    # Primitive does a further fresh read; guard its publication too.
+                    # The primitive owns the fresh pre-dispatch read and its guard.
+                    # Reuse that exact baseline only for post-write comparison.
                     in_flight = True
                     job['fields'][index]['status'] = 'pending'
                     self.emit(job)
-                    await c.async_write_locked(step.field.key, step.value,
+                    baseline = await c.async_write_locked(step.field.key, step.value,
                                                 expected_revision=(channel, expected_revision),
                                                 authorize_write=lambda: authorize(self.hass, c, user, plan.fields))
                     in_flight = False
                     job['fields'][index]['status'] = 'confirmed'
                     job['confirmed'] += 1
+                    expected = dict(baseline)
+                    expected[step.field.pin] = step.wire
                     # Wire numeric/string equivalence is normalized for revision comparison.
                     if revision(c, channel) != revision(c, channel, expected):
                         raise WriteValidationError('conflict')
@@ -226,4 +225,3 @@ class CardJobs:
         if not c.closed:
             c.async_update_listeners()
         job['completion'].set_result(self.public_job(job))
-

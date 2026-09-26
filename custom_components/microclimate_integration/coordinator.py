@@ -109,10 +109,14 @@ class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             yield
 
     async def async_write(self, key, value):
-        return await self._execute_write(key, value, acquire=True)
+        await self._execute_write(key, value, acquire=True)
 
     async def async_write_locked(self, key, value, *, authorize_write: Callable[[], None] | None = None, expected_revision: tuple[str | None, str] | None = None):
-        """Batch owner must hold both locks; all per-pin checks still apply."""
+        """Return the confirmed write's fresh baseline to the owner of both locks.
+
+        The batch uses this observation for its expected post-write revision;
+        callers cannot supply or reuse a baseline for a later dispatch.
+        """
         return await self._execute_write(key, value, acquire=False, authorize_write=authorize_write, expected_revision=expected_revision)
 
     async def _execute_write(self, key, value, *, acquire, authorize_write=None, expected_revision=None):
@@ -144,7 +148,8 @@ class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     if not acquire and guard is not None:
                         from .card_model import revision
                         if revision(self, guard[0]) != guard[1]:
-                            raise WriteValidationError('stale_context')
+                            # No update was dispatched: this is a batch conflict.
+                            raise WriteValidationError('conflict')
                     if initial_context != context(field, baseline):
                         raise WriteValidationError('stale_context')
                     if not applicable(field, baseline):
@@ -157,7 +162,7 @@ class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         authorize_write()
                     if matches(field, wire, baseline):
                         self._record(key, 'confirmed_no_change')
-                        return
+                        return dict(baseline)
                     # No await between final option/credential checks and dispatch.
                     self._check(model)
                     dispatched = True
@@ -190,7 +195,7 @@ class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             if field.kind == 'date':
                                 validate_season_sequence(field, wire, data)
                             self._record(key, 'confirmed')
-                            return
+                            return dict(baseline)
                     raise WriteValidationError('rate_limited' if result.outcome == 'rate_limited'
                                                else 'mismatch' if observed else 'uncertain')
         except asyncio.CancelledError:

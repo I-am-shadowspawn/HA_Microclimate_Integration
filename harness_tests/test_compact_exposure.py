@@ -169,9 +169,10 @@ async def test_permission_revoked_during_final_baseline_prevents_dispatch(hass,r
     original=reader.side_effect
     async def read(*args,**kwargs):
         nonlocal permitted
-        if reader.await_count==4:permitted=False
+        # Startup, batch preflight, then the shared pre-dispatch baseline.
+        if reader.await_count==3:permitted=False
         return await original(*args,**kwargs)
     reader.side_effect=read
     api=CardAPI(hass);job=await wait_job(hass,api,await api.manager.save(msg,user))
     assert job['status']=='failed' and job['reason']=='control_denied'
-    assert writer.await_count==0 and reader.await_count==4
+    assert writer.await_count==0 and reader.await_count==3
