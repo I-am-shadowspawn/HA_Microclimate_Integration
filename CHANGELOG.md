@@ -1,5 +1,6 @@
 # Unreleased — controller temperature units
 
+- Use absolute image URLs in the public README so HACS can display screenshots from the repository.
 - Use the controller-reported `C` or `F` unit for temperature entities, climate attributes, schedule observations, card controls and presets. Keep API numbers in their reported unit and let Home Assistant handle display conversion.
 - Refresh unit metadata with each API response; unknown units leave thermal readings unknown, and a unit change invalidates an open card draft. The schedule attribute `setpoint_celsius` becomes `setpoint_temperature` with `setpoint_unit`.
 
