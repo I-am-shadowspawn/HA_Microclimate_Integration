@@ -4,11 +4,11 @@ A custom Home Assistant integration for **Microclimate Evo Connect** environment
 
 The integration brings controller and channel data into Home Assistant and provides controls and dashboard cards for viewing and editing supported controller settings and schedules.
 
-/<p align="center">
-&#x20; <img src="docs/images/cards/01-Example-Evo-Connect-II-Card.png"
-&#x20;      alt="Example Microclimate Evo Connect II dashboard in Home Assistant"
+<p align="center">
+&#x20; <img src="docs/images/cards/01-Example-Evo-Connect-II-Card.png" 
+&#x20;      alt="Example Microclimate Evo Connect II dashboard in Home Assistant" 
 &#x20;      width="800">
-/</p>
+</p>
 
 > **Unofficial, independent project.**  
 > This integration and its custom cards are not affiliated with, endorsed by, or supported by **Microclimate or Blynk**. Their names and product/service names are used solely to identify compatibility and the external services on which the integration depends. For support with this integration, use this project's [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
