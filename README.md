@@ -69,7 +69,7 @@ Support may also vary with controller firmware and channel type. See [Supported 
 
 This integration communicates with the controller through the remote Microclimate/Blynk service. There is currently **no local-controller fallback** if the cloud service or internet connection is unavailable.
 
-See [TESTED-PLATFORM.md](docs/User/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
+See [TESTED-PLATFORM.md](docs/user/TESTED-PLATFORM.md) for the Home Assistant, frontend and platform versions used for release testing.
 
 ---
 ## Service dependency and third-party services
@@ -245,7 +245,7 @@ There are two principal card types:
 
 The cards provide explicit **Edit**, **Save** and **Cancel** behaviour so that changing values in the editor does not immediately write them to the controller.
 
-For full card configuration and usage instructions, see [CARD-USAGE.md](docs/User/CARD-USAGE.md).
+For full card configuration and usage instructions, see [CARD-USAGE.md](docs/user/CARD-USAGE.md).
 
 ---
 
@@ -388,9 +388,9 @@ Configuration writes can be disabled from the integration's options if a read-on
 
 For details on supported controls, validation and recovery behaviour, see:
 
-- [Write controls](docs/User/WRITE-CONTROLS.md)
+- [Write controls](docs/user/WRITE-CONTROLS.md)
 - [Validation contract](docs/technical/VALIDATION-CONTRACT.md)
-- [Schedule presets](docs/User/SCHEDULE-PRESETS.md)
+- [Schedule presets](docs/user/SCHEDULE-PRESETS.md)
 
 ---
 
@@ -406,7 +406,7 @@ Home Assistant actions are also available for supported operations such as:
 
 Presets are validated against the target channel/device before writes are performed.
 
-See [SCHEDULE-PRESETS.md](docs/User/SCHEDULE-PRESETS.md) for the preset format, compatibility requirements and usage.
+See [SCHEDULE-PRESETS.md](docs/user/SCHEDULE-PRESETS.md) for the preset format, compatibility requirements and usage.
 
 ---
 

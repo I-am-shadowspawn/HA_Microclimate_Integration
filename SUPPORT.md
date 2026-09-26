@@ -4,7 +4,7 @@
 
 All integration and custom-card support is handled through [this GitHub repository](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration). Use [Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues) for bugs, questions and feature requests. This is volunteer-maintained software; no response-time guarantee is offered. Microclimate does not support this independent project.
 
-Before reporting, check existing issues, [the README](README.md), [card usage](docs/User/CARD-USAGE.md), [write controls](docs/User/WRITE-CONTROLS.md) and [the tested platform](docs/User/TESTED-PLATFORM.md).
+Before reporting, check existing issues, [the README](README.md), [card usage](docs/user/CARD-USAGE.md), [write controls](docs/user/WRITE-CONTROLS.md) and [the tested platform](docs/user/TESTED-PLATFORM.md).
 
 Include integration/card versions, Home Assistant Core version, controller model and firmware, reproduction steps, expected/observed behaviour and sanitized logs. You can use the integration entry's **Download diagnostics** action under Settings → Devices & services: its bounded export includes model/version, option flags, poll/write status and response shape, without raw pins or credential identifiers. Review it before attaching it to an issue. Clearly distinguish simulated results from controller observations. Never include an API token, token-bearing URL, full HA backup or unreviewed getAll capture. Redact controller names and other personal data where appropriate. Full response DEBUG logging is a separate opt-in capture and should be disabled after investigation.
 
