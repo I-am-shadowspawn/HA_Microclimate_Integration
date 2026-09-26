@@ -9,11 +9,7 @@ A custom Home Assistant integration for **Microclimate Evo Connect** environment
 
 The integration brings controller and channel data into Home Assistant and provides controls and dashboard cards for viewing and editing supported controller settings and schedules.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/01-Example-Evo-Connect-II-Card.png" 
-&#x20;      alt="Example Microclimate Evo Connect II dashboard in Home Assistant" 
-&#x20;      width="800">
-</p>
+![Example Microclimate Evo Connect II dashboard in Home Assistant](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/01-Example-Evo-Connect-II-Card.png)
 
 > **Unofficial, independent project.**  
 > This integration and its custom cards are not affiliated with, endorsed by, or supported by **Microclimate or Blynk**. Their names and product/service names are used solely to identify compatibility and the external services on which the integration depends. For support with this integration, use this project's [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
@@ -155,29 +151,17 @@ After installing and restarting Home Assistant:
    - the controller model.
 5. Complete the setup.
 
-<p align="center">
-&#x20; <img src="docs/images/onboarding/01-configuring-device.png" 
-&#x20;      alt="Configuring a Microclimate controller in Home Assistant" 
-&#x20;      width="650">
-</p>
+![Configuring a Microclimate controller in Home Assistant](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/onboarding/01-configuring-device.png)
 
 Home Assistant will create the root controller device and the appropriate channel devices for the selected controller model.
 
 You can assign the newly created devices to Home Assistant Areas during onboarding.
 
-<p align="center">
-&#x20; <img src="docs/images/onboarding/02-Assigning-Areas.png" 
-&#x20;      alt="Assigning Microclimate devices to Home Assistant areas" 
-&#x20;      width="650">
-</p>
+![Assigning Microclimate devices to Home Assistant areas](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/onboarding/02-Assigning-Areas.png)
 
 Once configuration is complete, the integration page shows the controller and its discovered channel devices.
 
-<p align="center">
-&#x20; <img src="docs/images/onboarding/03-Integration-Device-Page.png" 
-&#x20;      alt="Microclimate integration device page in Home Assistant" 
-&#x20;      width="750">
-</p>
+![Microclimate integration device page in Home Assistant](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/onboarding/03-Integration-Device-Page.png)
 
 ---
 
@@ -200,11 +184,7 @@ The root controller contains controller-wide information and settings such as:
 - previous 24-hour power information where reported;
 - configuration/status information.
 
-<p align="center">
-&#x20; <img src="docs/images/onboarding/04-Device-Root-Settings.png" 
-&#x20;      alt="Microclimate root controller entities in Home Assistant" 
-&#x20;      width="750">
-</p>
+![Microclimate root controller entities in Home Assistant](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/onboarding/04-Device-Root-Settings.png)
 
 ## Channel devices
 
@@ -222,11 +202,7 @@ Depending on the channel, these can include:
 - reported schedule;
 - configuration controls.
 
-<p align="center">
-&#x20; <img src="docs/images/onboarding/05-Device-Channel-Settings.png" 
-&#x20;      alt="Microclimate channel entities in Home Assistant" 
-&#x20;      width="750">
-</p>
+![Microclimate channel entities in Home Assistant](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/onboarding/05-Device-Channel-Settings.png)
 
 Unavailable or invalid controller readings are represented as unknown or unavailable rather than being guessed.
 
@@ -253,25 +229,13 @@ For full card configuration and usage instructions, see [CARD-USAGE.md](docs/use
 
 The Channel Schedule Card displays the current mode and schedule for a selected controller channel.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/channel_card/03-channel-card-displayed.png" 
-&#x20;      alt="Microclimate channel schedule card" 
-&#x20;      width="650">
-</p>
+![Microclimate channel schedule card](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/channel_card/03-channel-card-displayed.png)
 
 The card can be added through the Home Assistant dashboard card editor.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/channel_card/01-channel-card-config-a.png" 
-&#x20;      alt="Configuring the Microclimate channel schedule card" 
-&#x20;      width="600">
-</p>
+![Configuring the Microclimate channel schedule card](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/channel_card/01-channel-card-config-a.png)
 
-<p align="center">
-&#x20; <img src="docs/images/cards/channel_card/02-channel-card-config-b.png" 
-&#x20;      alt="Microclimate channel schedule card configuration options" 
-&#x20;      width="600">
-</p>
+![Microclimate channel schedule card configuration options](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/channel_card/02-channel-card-config-b.png)
 
 The card uses the channel's **Reported schedule periods** entity to identify the schedule and as the Home Assistant permission scope for schedule access.
 
@@ -283,33 +247,17 @@ Do not disable that entity if you intend to use the schedule card.
 
 The Controller Season Card provides a compact view of the controller's season start dates.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/controller_card/03-controller-card-displayed.png" 
-&#x20;      alt="Microclimate controller season card" 
-&#x20;      width="500">
-</p>
+![Microclimate controller season card](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/controller_card/03-controller-card-displayed.png)
 
 It can be configured through the normal Home Assistant card editor.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/controller_card/01-Controller-Card-Config.png" 
-&#x20;      alt="Configuring the Microclimate controller season card" 
-&#x20;      width="550">
-</p>
+![Configuring the Microclimate controller season card](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/controller_card/01-Controller-Card-Config.png)
 
 When editing is enabled, changes remain local to the card until explicitly saved.
 
-<p align="center">
-&#x20; <img src="docs/images/cards/controller_card/04-controller-card-edit-mode.png" 
-&#x20;      alt="Microclimate controller season card in edit mode" 
-&#x20;      width="500">
-</p>
+![Microclimate controller season card in edit mode](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/controller_card/04-controller-card-edit-mode.png)
 
-<p align="center">
-&#x20; <img src="docs/images/cards/controller_card/05-Controller-card-save-settings.png" 
-&#x20;      alt="Saving Microclimate controller season settings" 
-&#x20;      width="500">
-</p>
+![Saving Microclimate controller season settings](https://raw.githubusercontent.com/I-am-shadowspawn/HA_Microclimate_Integration/main/docs/images/cards/controller_card/05-Controller-card-save-settings.png)
 
 ---
 
