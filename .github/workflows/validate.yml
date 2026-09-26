@@ -31,6 +31,10 @@ jobs:
         with:
           version: '0.6.1'
           enable-cache: true
+          cache-dependency-glob: |
+            requirements/*.txt
+            scripts/test_matrix.py
+            
       - name: Lint touched tooling
         run: |
           uvx --from ruff==0.16.9 ruff check scripts/build_release.py scripts/test_matrix.py tests/test_release_package.py
