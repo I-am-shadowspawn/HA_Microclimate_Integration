@@ -87,7 +87,7 @@ jobs:
           diff -r dist/first dist/second
           cd dist/first
           sha256sum --check SHA256SUMS
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@v7 # v7
         with:
           name: microclimate-candidate
           path: dist/first/*
