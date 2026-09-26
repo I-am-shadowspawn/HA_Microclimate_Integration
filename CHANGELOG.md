@@ -1,4 +1,4 @@
-# Unreleased — controller temperature units
+# 1.4.5-delta2 — controller temperature units and HACS screenshots
 
 - Use absolute image URLs in the public README so HACS can display screenshots from the repository.
 - Use the controller-reported `C` or `F` unit for temperature entities, climate attributes, schedule observations, card controls and presets. Keep API numbers in their reported unit and let Home Assistant handle display conversion.
