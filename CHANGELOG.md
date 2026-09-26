@@ -1,3 +1,9 @@
+# 1.4.2 — runtime lifecycle and actionable failures
+
+- Separate bounded save-job ownership from WebSocket routing; expose explicit typed coordinator runtime and batch I/O methods without adding a poller or changing write order.
+- Complete cancelled-before-start jobs, shield service result waits, and bound global history, active jobs and subscriptions. Size deadlines for the planned writes.
+- Preserve sanitized read-error categories through setup and jobs; display actionable failure messages. Retain entity IDs, readback confirmation and no automatic replay/rollback.
+
 # 1.4.1 — shared validation contracts
 
 - Exercise backend and card validation against the same reviewed fixture vectors, with separate permissive observation and strict edit expectations.

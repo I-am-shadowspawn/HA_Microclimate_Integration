@@ -1,5 +1,6 @@
 """Trusted HA schedule actions using the card's existing validated save jobs."""
 
+import asyncio
 import json
 from types import SimpleNamespace
 from uuid import uuid4
@@ -47,9 +48,9 @@ async def _apply(hass, device_id, template, user, *, return_response):
     msg = {"schema_version": SCHEMA_VERSION, "device_id": device.id,
            "runtime_generation": generation(coordinator), "base_revision": revision(coordinator, channel),
            "request_id": str(uuid4()), "patch": patch}
-    api = hass.data[KEY]
+    api = hass.data[KEY].manager
     result = await api.save(msg, user)
-    outcome = await api.jobs[result["operation_id"]]["completion"]
+    outcome = await asyncio.shield(api.jobs[result["operation_id"]]["completion"])
     if outcome["status"] != "succeeded" and not return_response:
         raise HomeAssistantError(
             f"Schedule {outcome['status']} ({outcome['confirmed']}/{outcome['total']} confirmed); "

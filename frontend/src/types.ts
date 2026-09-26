@@ -65,6 +65,7 @@ export interface Job {
   total: number;
   fields: { key: string; label: string; status: string }[];
   reason: string | null;
+  reason_message?: string | null;
   error?: string;
 }
 export interface Hass {

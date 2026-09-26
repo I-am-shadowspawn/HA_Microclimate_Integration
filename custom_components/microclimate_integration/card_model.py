@@ -17,10 +17,10 @@ SCHEMA_VERSION = 1
 
 def generation(coordinator):
     context = (coordinator.entry.data.get('token'), coordinator.entry.data.get('model'))
-    if getattr(coordinator, '_card_context', None) != context:
-        coordinator._card_context = context
-        coordinator._card_generation = uuid4().hex
-    return coordinator._card_generation
+    if coordinator.runtime_context != context:
+        coordinator.runtime_context = context
+        coordinator.runtime_generation = uuid4().hex
+    return coordinator.runtime_generation
 
 
 def resolve(hass, device_id):
@@ -157,5 +157,4 @@ def snapshot(hass, coordinator, channel, device, user):
             'name': device.name_by_user or device.name, 'model': coordinator.entry.data['model'],
             'channel': channel, 'kind': 'channel' if channel else 'controller', 'fields': fields,
             'observations': observations, 'online': coordinator.last_update_success and not coordinator.closed,
-            'writes_enabled': coordinator.writes_enabled, 'busy': coordinator._write_lock.locked()
-                or getattr(coordinator, '_card_active', None) is not None}
+            'writes_enabled': coordinator.writes_enabled, 'busy': coordinator.busy}

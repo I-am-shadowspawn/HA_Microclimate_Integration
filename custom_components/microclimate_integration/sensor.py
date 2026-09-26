@@ -11,12 +11,11 @@ from .validation import finite_number, safe_temperature, control_mode, safe_scal
 from custom_components.microclimate_integration.const import MODEL_CHANNEL_OPTIONS, CHANNELS, DEVICE_METADATA_PINS, CONTROL_TYPE_MAPPING, OUTPUT_TYPE_MAPPING
 from .const_helpers import enum_value
 from .schedule import schedule_observation, reported_value, observe_time, observe_date, observe_field
-from custom_components.microclimate_integration.const import DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
     """Use the entry coordinator; raw candidates make no vendor claims."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities = [MicroclimatePinCount(coordinator, entry), MicroclimateWriteStatus(coordinator, entry)]
     entities.extend(MicroclimateDeviceMetadata(coordinator, entry, key, definition)
                     for key, definition in DEVICE_METADATA_PINS.items())

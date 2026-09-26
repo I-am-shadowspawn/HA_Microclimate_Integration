@@ -48,19 +48,19 @@ async def test_anchor_only_permission_and_rename(hass,runtime,hass_admin_user):
     assert len(projection['fields'])==16
     assert all(f['entity_id']==anchor and f['writable'] and f['authorization_scope']=='channel_schedule' for f in projection['fields'])
     assert not projection['observations']
-    api=CardAPI(hass);job=await wait_job(hass,api,await api.save(msg,user))
+    api=CardAPI(hass);job=await wait_job(hass,api,await api.manager.save(msg,user))
     assert job['status']=='succeeded'
     registry.async_update_entity(anchor,new_entity_id='sensor.renamed_schedule')
     user.permissions.check_entity.side_effect=lambda eid,policy:eid=='sensor.renamed_schedule'
     assert all(f['entity_id']=='sensor.renamed_schedule' for f in snapshot(hass,c,'Yellow',device,user)['fields'])
-    assert api.find_job({'operation_id':job['operation_id']},user)['status']=='succeeded'
+    assert api.manager.find_job({'operation_id':job['operation_id']},user)['status']=='succeeded'
 
 async def test_read_only_anchor_cannot_save(hass,runtime,hass_admin_user):
     from homeassistant.auth.permissions.const import POLICY_READ
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
     user=Mock(id='readonly');user.permissions.check_entity.side_effect=lambda eid,policy:policy==POLICY_READ
     assert all(not f['writable'] for f in snapshot(hass,c,'Yellow',device,user)['fields'])
-    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).save(msg,user)
+    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).manager.save(msg,user)
     assert writer.await_count==0
 
 @pytest.mark.parametrize('damage',['missing','disabled','foreign','foreign_entry','device_disabled'])
@@ -82,7 +82,7 @@ async def test_invalid_schedule_anchor_fails_closed(hass,runtime,hass_admin_user
         registry.async_update_entity(anchor.entity_id,device_id=other.id)
     else:dr.async_get(hass).async_update_device(device.id,disabled_by=dr.DeviceEntryDisabler.USER)
     assert not field_access(hass,c,field,hass_admin_user,control=True)
-    with pytest.raises(WriteValidationError):await CardAPI(hass).save(msg,hass_admin_user)
+    with pytest.raises(WriteValidationError):await CardAPI(hass).manager.save(msg,hass_admin_user)
     assert writer.await_count==0
 
 async def test_revocation_stops_next_pin_and_hides_recovery(hass,runtime,hass_admin_user):
@@ -96,9 +96,9 @@ async def test_revocation_stops_next_pin_and_hides_recovery(hass,runtime,hass_ad
         result=await original(*args,**kwargs);permitted=False
         return result
     writer.side_effect=update
-    api=CardAPI(hass);result=await api.save(msg,user);job=await wait_job(hass,api,result)
+    api=CardAPI(hass);result=await api.manager.save(msg,user);job=await wait_job(hass,api,result)
     assert job['status']=='partial' and job['reason']=='control_denied' and writer.await_count==1
-    with pytest.raises(WriteValidationError,match='control_denied'):api.find_job(result,user)
+    with pytest.raises(WriteValidationError,match='control_denied'):api.manager.find_job(result,user)
     connection=Mock(user=user,subscriptions={})
     await api.handle(connection,{'id':1,'device_id':device.id,'request_id':msg['request_id']},'request')
     connection.send_error.assert_called_once()
@@ -111,17 +111,17 @@ async def test_non_schedule_permissions_remain_independent(hass,runtime,hass_adm
     for key in ('Yellow_lower_alarm','season_1_start_pin'):
         assert not field_access(hass,c,definition_for('Evo Connect 3',key),user,control=True)
     msg['patch']={'kind':'channel','fields':{'Yellow_lower_alarm':30}}
-    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).save(msg,user)
+    with pytest.raises(WriteValidationError,match='control_denied'):await CardAPI(hass).manager.save(msg,user)
     assert writer.await_count==0
 
 async def test_hidden_anchor_is_usable_but_disabled_completed_job_is_not(hass,runtime,hass_admin_user):
     c,data,writer,device,view,msg=await context(hass,runtime,hass_admin_user)
     anchor=next(f['entity_id'] for f in view['fields'] if f['index'])
     registry=er.async_get(hass);registry.async_update_entity(anchor,hidden_by=er.RegistryEntryHider.USER)
-    api=CardAPI(hass);result=await api.save(msg,hass_admin_user)
+    api=CardAPI(hass);result=await api.manager.save(msg,hass_admin_user)
     assert (await wait_job(hass,api,result))['status']=='succeeded'
     registry.async_update_entity(anchor,disabled_by=er.RegistryEntryDisabler.USER)
-    with pytest.raises(WriteValidationError,match='control_denied'):api.find_job(result,hass_admin_user)
+    with pytest.raises(WriteValidationError,match='control_denied'):api.manager.find_job(result,hass_admin_user)
 
 @pytest.mark.parametrize('key,value,pin,wire',[
     ('Yellow_period_1_setpoint',25.125,'v33','25.125'),
@@ -169,6 +169,6 @@ async def test_permission_revoked_during_final_baseline_prevents_dispatch(hass,r
         if reader.await_count==4:permitted=False
         return await original(*args,**kwargs)
     reader.side_effect=read
-    api=CardAPI(hass);job=await wait_job(hass,api,await api.save(msg,user))
+    api=CardAPI(hass);job=await wait_job(hass,api,await api.manager.save(msg,user))
     assert job['status']=='failed' and job['reason']=='control_denied'
     assert writer.await_count==0 and reader.await_count==4

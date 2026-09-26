@@ -1,9 +1,17 @@
 """A single polling/normalization owner and serialized, observed configuration writes."""
+from __future__ import annotations
+
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import timedelta, datetime, timezone
 import logging
+from typing import Any, Callable
+from uuid import uuid4
 
+from .errors import ReadUpdateFailed
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -19,27 +27,52 @@ OPERATION_TIMEOUT = 60
 READBACK_DELAYS = (0, 2, 5, 10)
 
 
-class MicroclimateCoordinator(DataUpdateCoordinator):
+class MicroclimateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """The I/O lock includes publication, preventing an older poll overwriting a write."""
 
-    def __init__(self, hass, entry):
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry[MicroclimateCoordinator]):
         self.entry = entry
-        self.closed = False
+        self.closed: bool = False
+        self.active_job: str | None = None
+        self.runtime_context: tuple[str | None, str | None] | None = None
+        self.runtime_generation: str = uuid4().hex
         self._io_lock = asyncio.Lock()
         self._write_lock = asyncio.Lock()
-        self._write_tasks = set()
-        self._refresh_tasks = set()
-        self.last_write = None
+        self._write_tasks: set[asyncio.Task[Any]] = set()
+        self._refresh_tasks: set[asyncio.Task[Any]] = set()
+        self.last_write: dict[str, str] | None = None
         super().__init__(hass, _LOGGER, name=f'microclimate_integration_{entry.data["evo_device"]}',
                          config_entry=entry, always_update=False,
                          update_method=lambda: async_update_data(hass, entry),
                          update_interval=timedelta(minutes=1))
 
     @property
+    def busy(self) -> bool:
+        return self.active_job is not None or self._write_lock.locked()
+
+    def track_write_task(self, task: asyncio.Task[Any]) -> None:
+        self._write_tasks.add(task)
+        task.add_done_callback(self._write_tasks.discard)
+
+    @asynccontextmanager
+    async def async_batch(self):
+        """Only the batch job owner may use the locked read/write methods."""
+        async with self._write_lock, self._io_lock:
+            self._check(self.entry.data.get('model'))
+            yield
+
+    async def async_read_locked(self) -> dict:
+        data = await async_update_data(self.hass, self.entry)
+        self._publish(data)
+        return data
+
+    @property
     def writes_enabled(self):
         return not self.closed and self.entry.options.get(CONF_ENABLE_WRITES, DEFAULT_ENABLE_WRITES) is True
 
     async def _async_refresh(self, *args, **kwargs):
+        # HA 2026.9 publishes after _async_update_data returns. Lock through that
+        # publication; its supported fetch hook alone cannot preserve ordering.
         if self.closed:
             return
         task = asyncio.current_task()
@@ -78,11 +111,11 @@ class MicroclimateCoordinator(DataUpdateCoordinator):
     async def async_write(self, key, value):
         return await self._execute_write(key, value, acquire=True)
 
-    async def _async_write_locked(self, key, value, *, authorize_write=None):
+    async def async_write_locked(self, key, value, *, authorize_write: Callable[[], None] | None = None, expected_revision: tuple[str | None, str] | None = None):
         """Batch owner must hold both locks; all per-pin checks still apply."""
-        return await self._execute_write(key, value, acquire=False, authorize_write=authorize_write)
+        return await self._execute_write(key, value, acquire=False, authorize_write=authorize_write, expected_revision=expected_revision)
 
-    async def _execute_write(self, key, value, *, acquire, authorize_write=None):
+    async def _execute_write(self, key, value, *, acquire, authorize_write=None, expected_revision=None):
         """Validate before I/O, update once, then confirm against fresh API observations."""
         dispatched = False
         task = asyncio.current_task()
@@ -107,7 +140,7 @@ class MicroclimateCoordinator(DataUpdateCoordinator):
                     if token != self.entry.data['token']:
                         raise WriteValidationError('stale_context')
                     self._publish(baseline)
-                    guard = getattr(self, '_card_expected_revision', None)
+                    guard = expected_revision
                     if not acquire and guard is not None:
                         from .card_model import revision
                         if revision(self, guard[0]) != guard[1]:
@@ -170,7 +203,7 @@ class MicroclimateCoordinator(DataUpdateCoordinator):
             self._record(key, 'invalid_auth')
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key='invalid_auth') from None
         except (WriteValidationError, UpdateFailed, TimeoutError) as err:
-            code = err.code if isinstance(err, WriteValidationError) else ('uncertain' if dispatched else 'read_failed')
+            code = err.code if isinstance(err, WriteValidationError) else ('uncertain' if dispatched else err.code if isinstance(err, ReadUpdateFailed) else 'read_failed')
             self._record(key, code)
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key=code) from None
         finally:

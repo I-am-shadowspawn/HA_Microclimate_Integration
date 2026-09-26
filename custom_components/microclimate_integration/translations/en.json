@@ -30,7 +30,9 @@
       "invalid_model": "Select a supported model.",
       "invalid_auth": "The API token was rejected. Check the token and try again.",
       "cannot_connect": "Unable to validate the controller connection. Try again later.",
-      "already_configured": "This API token is already used by another controller entry."
+      "already_configured": "This API token is already used by another controller entry.",
+      "invalid_payload": "The service returned unusable data. Refresh later; if it persists, report sanitized diagnostics.",
+      "rate_limited": "The service is throttling requests. Wait before trying again; check observed settings before repeating a write."
     },
     "abort": {
       "already_configured": "This API token is already configured.",
@@ -79,7 +81,7 @@
       "message": "The server rejected the update. The observed configuration is retained."
     },
     "rate_limited": {
-      "message": "The server rate limited the update. Check the observed value before trying again."
+      "message": "The service is throttling requests. Wait before trying again; check observed settings before repeating a write."
     },
     "mismatch": {
       "message": "The requested setting was not confirmed by API readback. The observed value is displayed."
@@ -104,6 +106,15 @@
     },
     "control_denied": {
       "message": "Schedule control permission is unavailable or was revoked. No further update was sent."
+    },
+    "unavailable": {
+      "message": "Controller service unavailable. Check connectivity and try again later."
+    },
+    "invalid_payload": {
+      "message": "The service returned unusable data. Refresh later; if it persists, report sanitized diagnostics."
+    },
+    "operation_timeout": {
+      "message": "The operation deadline expired. Review confirmed changes and controller state before trying again."
     }
   }
 }
