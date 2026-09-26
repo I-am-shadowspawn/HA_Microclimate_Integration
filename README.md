@@ -1,3 +1,8 @@
+[![Made with Python](https://img.shields.io/badge/Made%20With%20Python-blue?style=for-the-badge&logo=python&logoColor=white&labelColor=green)](https://www.python.org)
+[![HACS Badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration)
+[![Current Release](https://img.shields.io/github/v/release/I-am-shadowspawn/HA_Microclimate_Integration?style=for-the-badge&filter=*)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/releases)
+[![GitHub license](https://img.shields.io/github/license/I-am-shadowspawn/HA_Microclimate_Integration?style=for-the-badge)](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/blob/main/LICENSE)
+
 # Microclimate Integration for Home Assistant
 
 A custom Home Assistant integration for **Microclimate Evo Connect** environmental controllers.
