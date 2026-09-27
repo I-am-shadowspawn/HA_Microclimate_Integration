@@ -1,6 +1,6 @@
 {
   "name": "microclimate-cards",
-  "version": "1.4.5-delta2",
+  "version": "1.4.6",
   "private": true,
   "type": "module",
   "scripts": {

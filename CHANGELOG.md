@@ -1,15 +1,21 @@
-# Unreleased — branding
+# Unreleased
+
+> **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
+
+# 1.4.6 — branding and frontend lifecycle
+
+## Branding and frontend lifecycle
 
 - Register the bundled controller/channel card module automatically when Home Assistant's frontend loads; existing manual Lovelace resources can be removed.
 - Replace the independent integration icon with maintainer-supplied artwork and display model-specific artwork in the bundled controller and channel cards. Native device pages continue to use the integration icon under Home Assistant Core 2026.9.3.
 - Add maintainer-supplied red, yellow and blue entity pictures to channel climate, sensor and configuration entities; root-controller entities retain their normal icons.
 
-# Unreleased — lifecycle and test layout
+## Lifecycle and test layout
 
 - Load the bundled cards safely when multiple resource URLs are present: custom elements and picker entries register only once. Document UI/YAML resource updates and fresh reinstall identity/history behavior.
 - Consolidate Python integration tests in `tests/`, centralize shared test helpers, and standardize production/test formatting and imports. No runtime behavior or entity identity changes.
 
-# Unreleased — measured batch read reduction
+## Measured batch read reduction
 
 - Share each batch write's fresh coordinator baseline with post-write revision validation, reducing immediate-confirmation saves from `3N+2` to `2N+2` reads for N pin updates. Preserve serialized writes, current permission/context checks, per-pin readback and final confirmation. A full eight-point save now uses 34 reads instead of 50; notification behavior is unchanged.
 
@@ -49,9 +55,7 @@
 - Add bounded, redacted Home Assistant downloadable diagnostics with model/version, safe options, polling/write status and response shape. Raw values require the existing explicit DEBUG capture option.
 - Remove a workstation path from the development documentation and audit packaged public assets for credentials and personal paths.
 
-# Unreleased — distribution tooling
-
-> **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
+## Distribution tooling
 
 - Select reviewed public fixtures and required runtime assets explicitly in reproducible release archives; check clean extraction and version agreement.
 - Run Core 2026.9.3, frontend type/lint/unit/browser checks, bundle reproducibility, HACS and hassfest in GitHub CI. Gate future tagged releases on those results.
