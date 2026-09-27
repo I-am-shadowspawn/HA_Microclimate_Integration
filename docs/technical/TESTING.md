@@ -10,6 +10,14 @@ The shared Python/TypeScript [validation contract](VALIDATION-CONTRACT.md) recor
 
 Runtime ownership, resource bounds and the retained HA hook are documented in [runtime lifecycle](RUNTIME-LIFECYCLE.md).
 
+## Public identity and upgrade contract
+
+The disposable pre-1.3.0 prototype required a one-time clean install. The public baseline is the compact release series, with v1.4.5-delta2 used as the frozen comparison for the V2-11 regression. The config entry schema remains version 1. The token's SHA-256 digest is the entry's unique ID for duplicate detection, while Home Assistant's persistent `entry_id` anchors the root device, channel devices, entity unique IDs and card device selections. Rotating the token changes the digest but must retain the entry ID. A normal release installation or rollback within this schema does not recreate the entry or require a migration.
+
+`tests/test_public_upgrade_contract.py` checks the baseline identifier forms from that tagged candidate against the current runtime, then exercises a loaded entry through reload, rename/token reconfiguration, reauthentication and another reload. It checks customized entity/device registry rows and both saved root/channel card device IDs after each step. The test uses one installed code version and mocked cloud traffic. Separately, the maintainer reported a manual upgrade and rollback between v1.4.5 and v1.4.5-delta2 on 27 September 2026: controller/channel devices, entity IDs and saved card selections remained intact in both directions. Earlier HACS upgrades through release 1.3.2 also retained existing cards. V2-06 adds two successful UI/YAML uninstall/reinstall cycles, explicit resource instructions and a browser double-load regression; fresh reinstalls create new IDs and do not attach old history to them.
+
+For future release checks, back up HA, record one root and one channel device ID, their entity registry IDs (including a renamed entity and a disabled diagnostic), and both cards' saved `device_id` values. Upgrade without deleting the config entry, then compare those records and confirm both cards load. If rollback is exercised, restore the earlier release through the supported install method, restart HA and refresh the browser resource before comparing again. Record both integration versions, HA Core version, card resource URLs and outcomes without publishing tokens or private controller data. A missing card after upgrade may be a stale frontend resource rather than a registry migration; check the resource before changing the config entry.
+
 ## Reproduce the CI checks
 
 Use Python **3.14.x**, [uv](https://docs.astral.sh/uv/) 0.6.1, Node.js **24.21.0** and npm. GitHub CI pins Python 3.14.7 and installs the locked HA 2026.9.3 environment. uv uses its normal cache unless you set `UV_CACHE_DIR` yourself.

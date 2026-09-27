@@ -2,6 +2,8 @@
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
+The integration serves `/microclimate_integration/microclimate-cards.js` as a no-cache static path once per HA runtime. Dashboard resource registration is a documented one-time UI or YAML step, not an integration side effect. The bundle guards its three custom-element definitions and two card-picker entries when multiple resource URLs load in one browser page. The first loaded element class remains active until a page refresh; schema 1 validation reports an incompatible backend/card snapshot instead of enabling edits. See [card resource lifecycle](../user/CARD-USAGE.md#resource-and-uninstall-lifecycle).
+
 Authenticated HA WebSocket commands under `microclimate_integration/card/`:
 
 | Command | Parameters beyond HA id/type | Result |
