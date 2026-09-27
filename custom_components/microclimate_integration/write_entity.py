@@ -2,6 +2,7 @@
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .channel_artwork import channel_picture
 from .identity import channel_device_info, controller_device_info
 from .validation import reported_temperature_unit
 from .write_contract import applicable, control_mode, write_definitions
@@ -23,6 +24,7 @@ class WriteEntity(CoordinatorEntity):
     def __init__(self, coordinator, entry, field):
         super().__init__(coordinator)
         self.field = field
+        self._attr_entity_picture = channel_picture(field.channel) if field.channel else None
         self._attr_unique_id = f"{entry.entry_id}_write_{field.key}"
         self._attr_device_info = (
             channel_device_info(entry, field.channel, coordinator.hass)

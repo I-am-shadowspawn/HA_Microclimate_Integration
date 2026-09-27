@@ -47,6 +47,8 @@ class ReleasePackageTests(unittest.TestCase):
                                 ), name
                     component = "custom_components/microclimate_integration/"
                     assert component + "brand/icon.png" in names
+                    for channel in ("red", "yellow", "blue"):
+                        assert component + f"static/channel_{channel}.png" in names
                     for model_icon in (
                         "evo-connect.png",
                         "evo-connect-ii.png",

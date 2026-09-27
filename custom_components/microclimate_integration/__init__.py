@@ -7,6 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 
+from .channel_artwork import async_register_channel_artwork
 from .const import DOMAIN
 from .coordinator import MicroclimateCoordinator
 from .identity import controller_device_info
@@ -22,6 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup(hass: HomeAssistant, _config: dict):
     """Set up the Microclimate Integration."""
     hass.data.setdefault(DOMAIN, {})
+    await async_register_channel_artwork(hass)
     from .card_api import async_setup_card_api
 
     await async_setup_card_api(hass)
