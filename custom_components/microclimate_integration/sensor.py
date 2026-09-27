@@ -1,10 +1,10 @@
 import re
 
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import PERCENTAGE
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .channel_artwork import channel_picture
 from .const import (
     CHANNEL_CAPABILITIES,
     CHANNELS,
@@ -15,7 +15,6 @@ from .const import (
     OUTPUT_TYPE_MAPPING,
     timing_type_mapping,
 )
-from .const_helpers import enum_value
 from .identity import channel_device_info, channel_identity, controller_device_info
 from .readings import cached, read_enum, read_pin
 from .schedule import (
@@ -109,6 +108,7 @@ class MicroclimateRawPin(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, entry, channel, pin):
         super().__init__(coordinator)
+        self._attr_entity_picture = channel_picture(channel)
         self._pin = pin
         self._attr_name = f"Raw {pin}"
         self._attr_unique_id = f"{channel_identity(entry, channel)}_raw_{pin}"
@@ -128,6 +128,7 @@ class MicroclimateMeasurement(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, entry, definition):
         super().__init__(coordinator)
+        self._attr_entity_picture = channel_picture(definition.channel)
         self.definition = definition
         self._attr_unique_id = (
             f"{channel_identity(entry, definition.channel)}_measurement_{definition.key}"
@@ -230,6 +231,7 @@ class MicroclimateChannelMode(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, entry, channel, key, name, mapping):
         super().__init__(coordinator)
+        self._attr_entity_picture = channel_picture(channel)
         self._pin = CHANNELS[channel][key]
         self._mapping = mapping
         self._fixed_output = (
@@ -278,6 +280,7 @@ class MicroclimateSchedule(CoordinatorEntity, SensorEntity):
 
     def __init__(self, coordinator, entry, channel):
         super().__init__(coordinator)
+        self._attr_entity_picture = channel_picture(channel)
         self._channel = channel
         self._attr_unique_id = f"{channel_identity(entry, channel)}_schedule"
         self._attr_device_info = channel_device_info(entry, channel, coordinator.hass)

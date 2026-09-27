@@ -2,9 +2,11 @@ import { html, nothing } from "lit";
 import type { MicroclimateCard } from "../card";
 import { errorFor, pointError } from "../draft";
 import { saveStatus } from "./save-status";
+import { modelIconUrl } from "../model-icon";
 export function renderCard(card: MicroclimateCard) {
     const v = card.view,
       d = card.working;
+    const icon = v ? modelIconUrl(v.model) : null;
     const problem = card.draft ? errorFor(card.draft) : null;
     const points = d?.points ?? [];
     const selected = points.find((p) => p.draft_id === card.selected);
@@ -18,12 +20,17 @@ export function renderCard(card: MicroclimateCard) {
       >`;
     return html`<ha-card
       ><header>
-        <div>
-          <h2>${card._config?.title ?? v?.name ?? "Microclimate"}</h2>
-          <div class="muted">
-            ${v?.model ?? card.t("connecting")}${card.draft
-              ? card.t("draft_preview")
-              : ""}${v && !v.online ? card.t("offline") : ""}
+        <div class="identity">
+          ${icon
+            ? html`<img class="model-icon" src=${icon} alt=${v?.model ?? ""} width="48" height="48" />`
+            : nothing}
+          <div>
+            <h2>${card._config?.title ?? v?.name ?? "Microclimate"}</h2>
+            <div class="muted">
+              ${v?.model ?? card.t("connecting")}${card.draft
+                ? card.t("draft_preview")
+                : ""}${v && !v.online ? card.t("offline") : ""}
+            </div>
           </div>
         </div>
         ${!card.draft && card.canEdit

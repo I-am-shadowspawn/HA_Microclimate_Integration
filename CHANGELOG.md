@@ -1,3 +1,9 @@
+# Unreleased — branding
+
+- Register the bundled controller/channel card module automatically when Home Assistant's frontend loads; existing manual Lovelace resources can be removed.
+- Replace the independent integration icon with maintainer-supplied artwork and display model-specific artwork in the bundled controller and channel cards. Native device pages continue to use the integration icon under Home Assistant Core 2026.9.3.
+- Add maintainer-supplied red, yellow and blue entity pictures to channel climate, sensor and configuration entities; root-controller entities retain their normal icons.
+
 # Unreleased — lifecycle and test layout
 
 - Load the bundled cards safely when multiple resource URLs are present: custom elements and picker entries register only once. Document UI/YAML resource updates and fresh reinstall identity/history behavior.

@@ -4,9 +4,13 @@
 
 The release includes **Microclimate channel** and **Microclimate controller** cards. Install the backend and its bundled card together. The minimum supported Home Assistant Core version is 2026.9.3.
 
+Each card shows artwork for its selected Evo Connect model. Home Assistant's native device-page icon remains the integration brand image because Core 2026.9.3 does not offer a per-device image setting.
+
+Channel entities also publish red, yellow or blue `entity_picture` artwork. Home Assistant may show that picture in entity rows and cards that support it; the native device-page header remains the integration image.
+
 ## Upgrading
 
-Normal upgrades retain the Home Assistant entry and saved card device selections. Install the complete integration release, restart Home Assistant, update the JavaScript resource's `v=` query to the installed release version, and refresh the browser. Preserve any custom colour configuration. Only installations of the disposable pre-1.3.0 prototype needed the [historical clean-install runbook](../archive/CLEAN-INSTALL-1.3.0.md).
+Normal upgrades retain the Home Assistant entry and saved card device selections. Install the complete integration release, restart Home Assistant and refresh the browser. The integration registers its bundled JavaScript with the installed version automatically. If you previously added a manual Microclimate resource, remove that old entry before refreshing so an older bundle cannot load first. Preserve any custom colour configuration. Only installations of the disposable pre-1.3.0 prototype needed the [historical clean-install runbook](../archive/CLEAN-INSTALL-1.3.0.md).
 
 Individual time/setpoint entities no longer exist. Keep the channel's **Reported schedule periods** sensor enabled: the card requires READ access to show its schedule and CONTROL access to edit it. It is an ordinary enabled sensor rather than a diagnostic entity; raw-pin diagnostics can remain disabled. Other controls and root dates retain separate permissions. The sensor itself remains read-only; validated writes go through the card API.
 
@@ -15,7 +19,7 @@ For a complete Day Night, Multi or Seasonal schedule, **Download preset** saves 
 ## Install and add cards
 
 1. Back up your Home Assistant configuration. Install the integration through HACS or, for a manual installation, extract the install ZIP into your HA configuration directory so it contains `custom_components/microclimate_integration/manifest.json` and `frontend/microclimate-cards.js` beneath the integration folder. Restart HA after installation or replacement.
-2. In dashboard settings → Resources (enable Advanced Mode in your user profile if necessary), add `/microclimate_integration/microclimate-cards.js?v=<installed-version>` as a **JavaScript module**, replacing `<installed-version>` with the version in the integration manifest (for example, `1.4.5-delta2`). Add it once. On upgrade, update the version query and reload the browser.
+2. Add and configure a Microclimate controller under Settings → Devices & services. The integration loads both card types automatically when the Home Assistant frontend is present; no Dashboard Resources entry is needed.
 3. Edit a dashboard, Add card, choose **Microclimate channel**, then select the registered Yellow/Red/Blue channel device. Add one per channel you want displayed.
 4. Add **Microclimate controller** separately and select the root device to edit shared season dates.
 
@@ -42,21 +46,11 @@ The integration serves its bundled JavaScript locally. There are no runtime CDNs
 
 ## Resource and uninstall lifecycle
 
-The integration serves the card bundle, but does not add a dashboard resource automatically. Register **one** JavaScript module resource for `/microclimate_integration/microclimate-cards.js?v=<installed-version>`. For UI-managed resources, use Settings → Dashboards → Resources. If you already manage dashboard resources in YAML, add one entry under `lovelace.resources` in `configuration.yaml`:
+The integration serves one JavaScript bundle and registers it with Home Assistant's frontend as a versioned module URL. This works with UI-managed and YAML-managed dashboards without adding a Lovelace resource. It does not add cards to any dashboard. Browser refresh after an upgrade or rollback loads the installed bundle; if a stale version remains, restart HA and reload the page.
 
-```yaml
-lovelace:
-  resource_mode: yaml
-  resources:
-    - url: /microclimate_integration/microclimate-cards.js?v=1.4.5-delta2
-      type: module
-```
+If an earlier release was configured manually, remove its `/microclimate_integration/microclimate-cards.js?...` entry from Settings → Dashboards → Resources or from your `lovelace.resources` YAML. Keeping it can cause an old bundle to define the custom elements before the new auto-registered module loads. Do not change your resource mode merely for these cards. Global module registration is for the normal HA frontend; casting has not been validated.
 
-Replace the example query with the installed version. When upgrading or rolling back, replace the existing resource URL's version query, reload dashboard resources if using YAML, then refresh the browser. Avoid keeping both old and new URLs registered: a browser can keep the first loaded custom element until the page is reloaded. A card/backend version error means the backend and browser bundle disagree; verify both installed versions and the resource URL before editing. See Home Assistant's [resource documentation](https://www.home-assistant.io/dashboards/dashboards) for YAML resource mode and reload actions.
-
-Changing an existing installation from UI-managed resources to `resource_mode: yaml` requires moving its other resources to YAML too. You do not need to change resource mode solely for this card.
-
-Before uninstalling, remove the channel/controller cards and their resource entry from your dashboard configuration, then remove the integration. A later fresh setup creates a new Home Assistant config entry and therefore new device and entity IDs; saved cards need their devices selected again, and recorder history from the removed IDs is not attached to the new IDs automatically. For an upgrade or rollback, keep the existing config entry to preserve those bindings. The maintainer completed two manual uninstall/reinstall cycles with the same controllers in UI and YAML dashboard modes; each cycle created new device/entity IDs and did not expose the prior history through the new entities.
+Before uninstalling, remove the channel/controller cards from your dashboards and any old manually configured resource, then remove the integration. The automatically registered URL belongs to the integration runtime and disappears on HA restart after removal; unloading one controller entry does not remove it while other entries may remain. A later fresh setup creates a new Home Assistant config entry and therefore new device and entity IDs; saved cards need their devices selected again, and recorder history from the removed IDs is not attached to the new IDs automatically. For an upgrade or rollback, keep the existing config entry to preserve those bindings. The maintainer completed two manual uninstall/reinstall cycles with the same controllers in UI and YAML dashboard modes; each cycle created new device/entity IDs and did not expose the prior history through the new entities.
 
 ## View and edit
 
@@ -96,7 +90,7 @@ Drafts are in-memory only. Page reload warns about unsaved changes and never sub
 
 - **Unknown**: missing/invalid data or an unset date; it is never filled with an invented zero.
 - **Edit absent/disabled**: check entity permissions, integration write option, unavailable/disabled controls, other active saves and matching backend/card versions.
-- **Version mismatch/custom element missing**: install the complete current integration release, update the module resource's version query, restart HA and reload the browser cache.
+- **Version mismatch/custom element missing**: install the complete current integration release, remove any old manually configured Microclimate resource, restart HA and reload the browser. Confirm that the served module URL contains the installed version.
 - **Time-template conflict**: affected slots have incompatible preserved metadata. Capture the observed encodings for investigation; do not discard timezone/opaque suffixes to force a write.
 - **Invalid date path**: no sequence of the requested single-pin updates preserves a valid calendar. No writes were dispatched.
 

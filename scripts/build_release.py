@@ -162,7 +162,13 @@ def build(output: Path) -> list[Path]:
             "manifest.json",
             "LICENSE",
             "brand/icon.png",
+            "static/channel_red.png",
+            "static/channel_yellow.png",
+            "static/channel_blue.png",
             "frontend/microclimate-cards.js",
+            "frontend/evo-connect.png",
+            "frontend/evo-connect-ii.png",
+            "frontend/evo-connect-iii.png",
             "frontend/THIRD_PARTY_NOTICES.txt",
         )
     ]

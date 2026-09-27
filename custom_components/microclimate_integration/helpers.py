@@ -4,6 +4,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api_client import EvoDeviceDataError, get_evo_device_data
+from .channel_artwork import channel_picture
 from .errors import ReadUpdateFailed
 from .identity import channel_device_info, controller_device_info
 
@@ -29,6 +30,7 @@ class MicroclimateBaseEntity(CoordinatorEntity):
         super().__init__(coordinator)
         self._entry = coordinator.config_entry
         self._channel = channel
+        self._attr_entity_picture = channel_picture(channel) if channel else None
         self._attr_device_info = (
             channel_device_info(self._entry, channel, coordinator.hass)
             if channel

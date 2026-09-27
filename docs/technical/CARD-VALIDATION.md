@@ -32,13 +32,13 @@ The module is bundled locally with Lit license notices. The development ZIP incl
 ## Remaining external acceptance
 
 - Test controller-backed Multi insertion/deletion, zero-tail behavior, transient time/target effects and persistence on each model/firmware in an explicitly authorized hardware session.
-- Install the resource in the user's HA dashboard and confirm actual browser/theme/mobile behavior and restricted-user usage. Chromium is automated here; Firefox/WebKit were not separately run.
+- Confirm the auto-registered module loads in the user's HA dashboard and check actual browser/theme/mobile behavior and restricted-user usage. Chromium is automated here; Firefox/WebKit were not separately run.
 - Constant target and Periodic interval/duration writes remain outside this mapped contract.
 
 These are external acceptance/future mapping items, not hidden unfinished card implementation. The single-pin vendor API cannot provide atomic Save or eliminate races with an external application.
 
 ## Engineering choices
 
-Shared card rendering resides in `frontend/src/card.ts`; two subclasses register separate elements. A read-only `request` API recovers a lost Save acknowledgement without re-sending updates. Existing `likely_unused` observation attributes remain compatible, with new confirmed `card_storage_role` evidence for the editing contract. Module resources are registered manually by the user, never inserted into their dashboards automatically.
+Shared card rendering resides in `frontend/src/card.ts`; two subclasses register separate elements. A read-only `request` API recovers a lost Save acknowledgement without re-sending updates. Existing `likely_unused` observation attributes remain compatible, with new confirmed `card_storage_role` evidence for the editing contract. The integration registers its module when the HA frontend loads; it never inserts cards into user dashboards or modifies Lovelace resource storage.
 
 Development tooling is pinned by package-lock.json; npm reports ESLint 9.39.5 as deprecated. It is development-only, passed the configured lint checks, and is not shipped in the install ZIP. Updating that tooling major can be done separately from controller behavior.
