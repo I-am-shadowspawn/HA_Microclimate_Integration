@@ -1,14 +1,14 @@
-# Configuration writes — 1.4.2
+# Configuration writes
 
 > **Unofficial, independent project.** This integration and its custom cards are not affiliated with, endorsed by, or supported by Microclimate. Their only connection to Microclimate is that they work with its products. Product names are used solely to identify compatibility. For integration support, use this project’s [GitHub Issues](https://github.com/I-am-shadowspawn/HA_Microclimate_Integration/issues).
 
-This iteration adds editable controls alongside the existing observations. Writes remain enabled by default; raw-pin diagnostics default to disabled. Full raw-response DEBUG logging remains off. The automated validation uses mocked controller traffic and does not dispatch live writes.
+Editable controls accompany the existing observations. Writes are enabled by default; raw-pin diagnostics default to disabled. Full raw-response DEBUG logging remains off. Automated validation uses mocked controller traffic and does not dispatch live writes.
 
 ## Where to find the controls
 
 Open Settings → Devices & services → Microclimate and select a channel device. Selectors named Configure control mode, Configure output type and Configure timing mode edit the confirmed enums. Number controls edit lower/upper alarm thresholds and Yellow/Red ramp time. The channel card edits schedule setpoints and start times with explicit Save/Cancel; individual schedule number/time entities have been removed. The root controller has four Set season start text controls and a Last configuration write diagnostic.
 
-After the required clean reinstall, existing ID continuity is not guaranteed. New controls have distinct stable unique IDs `<entry_id>_write_<field_key>`. HA assigns their visible entity IDs from the device/control names; use the entity picker rather than constructing IDs. Internal slot field keys remain stable across timing modes. Controls track observed values, including subsequent official-app edits.
+Normal upgrades retain the entry, devices and entity registry bindings. The one-time clean reinstall applied only to the disposable pre-1.3.0 prototype. Controls use stable unique IDs `<entry_id>_write_<field_key>`; HA assigns visible entity IDs from device/control names, so use the entity picker rather than constructing IDs. Internal slot field keys remain stable across timing modes. Controls track observed values, including subsequent official-app edits.
 
 | Setting | Yellow | Red, Evo III only | Blue |
 |---|---|---|---|
