@@ -47,6 +47,12 @@ class ReleasePackageTests(unittest.TestCase):
                                 ), name
                     component = "custom_components/microclimate_integration/"
                     assert component + "brand/icon.png" in names
+                    for model_icon in (
+                        "evo-connect.png",
+                        "evo-connect-ii.png",
+                        "evo-connect-iii.png",
+                    ):
+                        assert component + f"frontend/{model_icon}" in names
                     assert component + "LICENSE" in names
                     assert component + "frontend/microclimate-cards.js" in names
                     assert component + "frontend/THIRD_PARTY_NOTICES.txt" in names

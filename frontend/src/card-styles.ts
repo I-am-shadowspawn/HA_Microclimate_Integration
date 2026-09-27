@@ -23,6 +23,19 @@ export const cardStyles = css`
       justify-content: space-between;
       gap: 12px;
     }
+    .identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .model-icon {
+      flex: 0 0 48px;
+      width: 48px;
+      height: 48px;
+      border-radius: 9px;
+      object-fit: cover;
+    }
     h2 {
       font-size: 21px;
       font-weight: 600;

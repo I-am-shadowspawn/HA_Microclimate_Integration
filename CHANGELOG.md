@@ -1,3 +1,7 @@
+# Unreleased — branding
+
+- Replace the independent integration icon with maintainer-supplied artwork and display model-specific artwork in the bundled controller and channel cards. Native device pages continue to use the integration icon under Home Assistant Core 2026.9.3.
+
 # Unreleased — lifecycle and test layout
 
 - Load the bundled cards safely when multiple resource URLs are present: custom elements and picker entries register only once. Document UI/YAML resource updates and fresh reinstall identity/history behavior.

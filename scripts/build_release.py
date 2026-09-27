@@ -163,6 +163,9 @@ def build(output: Path) -> list[Path]:
             "LICENSE",
             "brand/icon.png",
             "frontend/microclimate-cards.js",
+            "frontend/evo-connect.png",
+            "frontend/evo-connect-ii.png",
+            "frontend/evo-connect-iii.png",
             "frontend/THIRD_PARTY_NOTICES.txt",
         )
     ]

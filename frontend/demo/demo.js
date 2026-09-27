@@ -104,7 +104,7 @@ window.view = {
   device_id: kind,
   name:
     kind === "controller" ? "Rainforest controller" : `Rainforest · ${channel}`,
-  model: "Evo Connect 3",
+  model: params.get("model") || "Evo Connect 3",
   channel: kind === "controller" ? null : channel,
   kind,
   fields,

@@ -4,6 +4,8 @@
 
 The release includes **Microclimate channel** and **Microclimate controller** cards. Install the backend and its bundled card together. The minimum supported Home Assistant Core version is 2026.9.3.
 
+Each card shows artwork for its selected Evo Connect model. Home Assistant's native device-page icon remains the integration brand image because Core 2026.9.3 does not offer a per-device image setting.
+
 ## Upgrading
 
 Normal upgrades retain the Home Assistant entry and saved card device selections. Install the complete integration release, restart Home Assistant, update the JavaScript resource's `v=` query to the installed release version, and refresh the browser. Preserve any custom colour configuration. Only installations of the disposable pre-1.3.0 prototype needed the [historical clean-install runbook](../archive/CLEAN-INSTALL-1.3.0.md).

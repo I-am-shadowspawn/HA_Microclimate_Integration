@@ -183,12 +183,19 @@ async def async_setup_card_api(hass):
 
         decorated = websocket_api.websocket_command(schema)(websocket_api.async_response(handler))
         websocket_api.async_register_command(hass, decorated)
+    frontend = Path(__file__).parent / "frontend"
     await hass.http.async_register_static_paths(
         [
             StaticPathConfig(
-                "/microclimate_integration/microclimate-cards.js",
-                str(Path(__file__).parent / "frontend" / "microclimate-cards.js"),
+                f"/microclimate_integration/{name}",
+                str(frontend / name),
                 False,
+            )
+            for name in (
+                "microclimate-cards.js",
+                "evo-connect.png",
+                "evo-connect-ii.png",
+                "evo-connect-iii.png",
             )
         ]
     )

@@ -12,7 +12,7 @@ export default defineConfig({
     { name: "webkit", use: { browserName: "webkit" } },
   ],
   webServer: {
-    command: "python3 -m http.server 8767 --bind 127.0.0.1 --directory ..",
+    command: "python3 demo/server.py",
     url: "http://127.0.0.1:8767/frontend/demo/",
     reuseExistingServer: false,
   },

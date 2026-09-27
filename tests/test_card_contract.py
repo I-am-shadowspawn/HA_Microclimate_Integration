@@ -330,6 +330,10 @@ async def test_static_bundle_served_and_request_recovery(
     client = await hass_client()
     response = await client.get("/microclimate_integration/microclimate-cards.js?v=1.2.0")
     assert response.status == 200 and "microclimate-channel-card" in await response.text()
+    for model_icon in ("evo-connect.png", "evo-connect-ii.png", "evo-connect-iii.png"):
+        response = await client.get(f"/microclimate_integration/{model_icon}")
+        assert response.status == 200
+        assert (await response.read()).startswith(b"\x89PNG\r\n\x1a\n")
     api = hass.data[KEY]
     result = await api.manager.save(msg, hass_admin_user)
     await wait_job(hass, api, result)
