@@ -7,6 +7,47 @@ test.beforeEach(async ({ page }) => {
       : route.abort(),
   );
 });
+test("loading the bundled resource twice keeps one card registration", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/frontend/demo/");
+  await expect(page.getByRole("button", { name: "Edit", exact: true })).toBeVisible();
+  await page.evaluate(() => {
+    (window as any).firstCardConstructors = [
+      customElements.get("microclimate-channel-card"),
+      customElements.get("microclimate-controller-card"),
+      customElements.get("microclimate-card-editor"),
+    ];
+  });
+  await page.addScriptTag({
+    type: "module",
+    url: "/custom_components/microclimate_integration/frontend/microclimate-cards.js?second-load=1",
+  });
+  const second = await page.evaluate(() => ({
+    sameConstructors: (window as any).firstCardConstructors.every(
+      (value: CustomElementConstructor, index: number) =>
+        value ===
+        customElements.get(
+          [
+            "microclimate-channel-card",
+            "microclimate-controller-card",
+            "microclimate-card-editor",
+          ][index],
+        ),
+    ),
+    counts: (window as any).customCards.reduce(
+      (counts: Record<string, number>, card: { type: string }) => {
+        counts[card.type] = (counts[card.type] ?? 0) + 1;
+        return counts;
+      },
+      {},
+    ),
+  }));
+  expect(second.sameConstructors).toBe(true);
+  expect(second.counts["microclimate-channel-card"]).toBe(1);
+  expect(second.counts["microclimate-controller-card"]).toBe(1);
+  expect(errors).toEqual([]);
+});
 test("draft changes and Cancel never call save", async ({ page }) => {
   await page.goto("/frontend/demo/");
   await page.getByRole("button", { name: "Edit", exact: true }).click();

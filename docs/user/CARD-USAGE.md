@@ -40,6 +40,24 @@ Copy the device ID from its HA device-page URL, or use the visual editor. `read_
 
 The integration serves its bundled JavaScript locally. There are no runtime CDNs, device tokens in the browser, automatic dashboard modifications, or additional device polling loops.
 
+## Resource and uninstall lifecycle
+
+The integration serves the card bundle, but does not add a dashboard resource automatically. Register **one** JavaScript module resource for `/microclimate_integration/microclimate-cards.js?v=<installed-version>`. For UI-managed resources, use Settings → Dashboards → Resources. If you already manage dashboard resources in YAML, add one entry under `lovelace.resources` in `configuration.yaml`:
+
+```yaml
+lovelace:
+  resource_mode: yaml
+  resources:
+    - url: /microclimate_integration/microclimate-cards.js?v=1.4.5-delta2
+      type: module
+```
+
+Replace the example query with the installed version. When upgrading or rolling back, replace the existing resource URL's version query, reload dashboard resources if using YAML, then refresh the browser. Avoid keeping both old and new URLs registered: a browser can keep the first loaded custom element until the page is reloaded. A card/backend version error means the backend and browser bundle disagree; verify both installed versions and the resource URL before editing. See Home Assistant's [resource documentation](https://www.home-assistant.io/dashboards/dashboards) for YAML resource mode and reload actions.
+
+Changing an existing installation from UI-managed resources to `resource_mode: yaml` requires moving its other resources to YAML too. You do not need to change resource mode solely for this card.
+
+Before uninstalling, remove the channel/controller cards and their resource entry from your dashboard configuration, then remove the integration. A later fresh setup creates a new Home Assistant config entry and therefore new device and entity IDs; saved cards need their devices selected again, and recorder history from the removed IDs is not attached to the new IDs automatically. For an upgrade or rollback, keep the existing config entry to preserve those bindings. The maintainer completed two manual uninstall/reinstall cycles with the same controllers in UI and YAML dashboard modes; each cycle created new device/entity IDs and did not expose the prior history through the new entities.
+
 ## View and edit
 
 Cards open read-only. **Edit** creates a local draft. Numeric inputs, slider movements, dragging and arrow keys never send updates. **Cancel** discards that draft. **Save changes** reviews and sends the final values; separate hour/minute edits produce one complete time value.

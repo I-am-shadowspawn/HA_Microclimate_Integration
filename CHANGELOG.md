@@ -1,5 +1,6 @@
-# Unreleased — test layout maintenance
+# Unreleased — lifecycle and test layout
 
+- Load the bundled cards safely when multiple resource URLs are present: custom elements and picker entries register only once. Document UI/YAML resource updates and fresh reinstall identity/history behavior.
 - Consolidate Python integration tests in `tests/`, centralize shared test helpers, and standardize production/test formatting and imports. No runtime behavior or entity identity changes.
 
 # Unreleased — measured batch read reduction
