@@ -5,20 +5,33 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.components import websocket_api
+from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import callback
 from homeassistant.helpers import device_registry as dr
+from homeassistant.loader import async_get_integration
+from homeassistant.setup import async_when_setup
 
-from .card_model import SCHEMA_VERSION, generation, resolve, snapshot
+from .card_jobs import CardJobs
+from .card_model import generation, resolve, snapshot
+from .const import DOMAIN
+from .errors import error_message
 from .write_contract import WriteValidationError
 
 KEY = "microclimate_card_api"
 PREFIX = "microclimate_integration/card/"
-from .card_jobs import CardJobs
-from .errors import error_message
 
 MAX_SUBSCRIPTIONS = 256
 MAX_CONNECTION_SUBSCRIPTIONS = 32
+
+
+async def _register_frontend_module(hass, _component):
+    """Advertise the bundled card after HA's optional frontend is ready."""
+    integration = await async_get_integration(hass, DOMAIN)
+    add_extra_js_url(
+        hass,
+        f"/microclimate_integration/microclimate-cards.js?v={integration.version}",
+    )
 
 
 class CardAPI:
@@ -199,4 +212,5 @@ async def async_setup_card_api(hass):
             )
         ]
     )
+    async_when_setup(hass, "frontend", _register_frontend_module)
     hass.data[KEY] = api
